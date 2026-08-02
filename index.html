@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YouTubeレポート — 職業、くまのお医者さん。</title>
+<style>
+:root{
+  color-scheme: light;
+  --plane:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,0.10);
+  --s1:#2a78d6; --s1soft:#cde2fb; --mag:#e87ba4; --good:#006300; --bad:#d03b3b;
+  --aqua:#1baf7a; --orange:#eb6834;
+}
+@media (prefers-color-scheme: dark){ :root:where(:not([data-theme="light"])){
+  color-scheme: dark;
+  --plane:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.10);
+  --s1:#3987e5; --s1soft:#184f95; --mag:#d55181; --good:#0ca30c; --bad:#d03b3b;
+  --aqua:#199e70; --orange:#d95926;
+}}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --plane:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.10);
+  --s1:#3987e5; --s1soft:#184f95; --mag:#d55181; --good:#0ca30c; --bad:#d03b3b;
+  --aqua:#199e70; --orange:#d95926;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--plane);color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
+  padding:24px 16px 56px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:960px;margin:0 auto}
+.head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;margin-bottom:4px}
+h1{font-size:20px;margin:0;line-height:1.3}
+.sub{color:var(--ink2);font-size:13px}
+.period{color:var(--muted);font-size:12px;margin-bottom:20px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:26px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.kpi .label{font-size:12px;color:var(--ink2);margin-bottom:6px}
+.kpi .val{font-size:26px;font-weight:700;letter-spacing:-.01em;line-height:1}
+.kpi .note{font-size:12px;color:var(--muted);margin-top:6px}
+.up{color:var(--good)} .down{color:var(--bad)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 18px 14px;margin-bottom:20px}
+.card h2{font-size:15px;margin:0 0 2px}
+.card .csub{font-size:12px;color:var(--muted);margin:0 0 14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:680px){.grid2{grid-template-columns:1fr}}
+.bar-row{display:grid;grid-template-columns:130px 1fr auto;align-items:center;gap:10px;margin:7px 0;font-size:13px}
+.bar-row .name{color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{background:var(--grid);border-radius:5px;height:16px;overflow:hidden}
+.bar-fill{height:100%;border-radius:5px;background:var(--s1)}
+.bar-val{font-variant-numeric:tabular-nums;color:var(--ink);font-size:12px;min-width:52px;text-align:right}
+.vid-row{display:grid;grid-template-columns:22px 1fr;gap:12px;align-items:center;margin:10px 0}
+.vid-rank{font-weight:700;color:var(--muted);font-size:13px;text-align:center}
+.vid-body .vt{font-size:13px;margin-bottom:4px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.vid-body .vt a{color:var(--ink);text-decoration:none}
+.vid-body .vt a:hover{color:var(--s1);text-decoration:underline}
+.watch{color:var(--s1);font-size:12px;text-decoration:none;white-space:nowrap;margin-left:8px}
+.watch:hover{text-decoration:underline}
+.vid-meta{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--ink2);margin-bottom:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+.demo-row{display:grid;grid-template-columns:56px 1fr 1fr;align-items:center;gap:8px;margin:6px 0;font-size:12px}
+.demo-lab{color:var(--ink2);text-align:right;font-variant-numeric:tabular-nums}
+.demo-half{display:flex;align-items:center;gap:6px}
+.demo-half.l{flex-direction:row-reverse}
+.demo-bar{height:14px;border-radius:4px}
+.demo-num{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:34px}
+.svgwrap{width:100%;overflow-x:auto}
+svg{display:block;max-width:100%}
+.tt{position:fixed;pointer-events:none;background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:8px 10px;font-size:12px;color:var(--ink);box-shadow:0 6px 20px rgba(0,0,0,.18);
+  opacity:0;transition:opacity .08s;z-index:20;white-space:nowrap}
+.foot{color:var(--muted);font-size:11px;margin-top:8px;text-align:center}
+.pill{display:inline-block;background:var(--s1soft);color:var(--s1);font-size:12px;font-weight:600;
+  padding:2px 10px;border-radius:999px}
+.ret-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.ret-card{border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.ret-title{font-size:12px;color:var(--ink2);line-height:1.35;height:2.7em;overflow:hidden;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:6px}
+.ret-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.badge{font-size:11px;padding:1px 8px;border-radius:999px;font-weight:600}
+.badge.good{background:rgba(12,163,12,.14);color:var(--good)}
+.badge.warn{background:rgba(235,104,52,.16);color:var(--orange)}
+.badge.mut{background:var(--grid);color:var(--ink2)}
+.act{border-left:3px solid var(--s1);padding:2px 0 2px 14px;margin:0 0 16px}
+.act h3{font-size:14px;margin:0 0 4px}
+.act p{font-size:13px;color:var(--ink2);margin:0 0 4px;line-height:1.5}
+.act .why{font-size:12px;color:var(--muted)}
+.act .why b{color:var(--ink2);font-weight:600}
+.prio{font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;margin-right:6px;vertical-align:middle}
+.prio.hi{background:var(--bad);color:#fff}.prio.md{background:var(--orange);color:#fff}.prio.lo{background:var(--muted);color:#fff}
+/* エグゼクティブサマリー */
+.exec{background:linear-gradient(135deg,var(--s1soft),transparent);border:1px solid var(--border);
+  border-radius:14px;padding:18px 20px;margin-bottom:22px}
+.exec h2{font-size:16px;margin:0 0 2px}
+.exec .esub{font-size:12px;color:var(--muted);margin:0 0 14px}
+.chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+.chip{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.chip .cl{font-size:11px;color:var(--ink2);margin-bottom:4px}
+.chip .cv{font-size:22px;font-weight:700;line-height:1;letter-spacing:-.01em}
+.chip .cd{font-size:12px;margin-top:5px;font-weight:600}
+.pts{list-style:none;padding:0;margin:0}
+.pts li{font-size:13px;line-height:1.55;padding:4px 0 4px 24px;position:relative;color:var(--ink)}
+.pts li .ic{position:absolute;left:0;top:4px}
+/* 戦略セクション */
+.sec-t{font-size:13px;font-weight:700;margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px}
+.sec-t .n{background:var(--s1);color:#fff;width:22px;height:22px;border-radius:6px;display:inline-flex;
+  align-items:center;justify-content:center;font-size:12px;flex:none}
+.slist{list-style:none;padding:0;margin:0 0 6px}
+.slist li{font-size:13px;line-height:1.55;padding:5px 0 5px 20px;position:relative;color:var(--ink2)}
+.slist li:before{content:"▸";position:absolute;left:2px;color:var(--s1)}
+.slist li b{color:var(--ink)}
+.tmpl{background:var(--plane);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:12.5px;line-height:1.7}
+.tmpl .step{color:var(--ink)}.tmpl .step b{color:var(--s1)}
+.idea-tbl{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:4px}
+.idea-tbl th,.idea-tbl td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+.idea-tbl th{color:var(--muted);font-weight:600;font-size:11px;white-space:nowrap}
+.idea-tbl td.k{white-space:nowrap;color:var(--ink);font-weight:600}
+.tag{font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px;white-space:nowrap}
+.tag.s{background:rgba(42,120,214,.15);color:var(--s1)}.tag.l{background:rgba(235,104,52,.15);color:var(--orange)}
+.note{background:rgba(235,104,52,.08);border-left:3px solid var(--orange);border-radius:6px;
+  padding:10px 14px;font-size:12.5px;line-height:1.6;color:var(--ink2);margin-top:10px}
+.tblwrap{width:100%;overflow-x:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <h1 id="chTitle"></h1>
+    <span class="pill" id="subPill"></span>
+  </div>
+  <div class="period" id="period"></div>
+
+  <div class="exec">
+    <h2>📌 今週の要点</h2>
+    <p class="esub" id="execSub"></p>
+    <div class="chips" id="execChips"></div>
+    <ul class="pts" id="execPts"></ul>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="card">
+    <h2>視聴回数の推移</h2>
+    <p class="csub">直近90日間・日次</p>
+    <div class="svgwrap"><svg id="trend" viewBox="0 0 920 260" preserveAspectRatio="xMidYMid meet"></svg></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>流入元</h2>
+      <p class="csub">視聴回数ベース・上位</p>
+      <div id="traffic"></div>
+    </div>
+    <div class="card">
+      <h2>視聴デバイス</h2>
+      <p class="csub">視聴回数ベース</p>
+      <div id="devices"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>人気動画 TOP10</h2>
+    <p class="csub">直近90日の視聴回数</p>
+    <div id="topvids"></div>
+  </div>
+
+  <div class="card">
+    <h2>視聴者層</h2>
+    <p class="csub">年齢×性別の視聴割合</p>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--mag)"></i>女性</span>
+      <span><i class="dot" style="background:var(--s1)"></i>男性</span>
+    </div>
+    <div id="demo"></div>
+  </div>
+
+  <div class="card">
+    <h2>視聴維持率（離脱ポイント）</h2>
+    <p class="csub" id="retSub"></p>
+    <div class="ret-grid" id="retention"></div>
+    <p class="csub" style="margin-top:12px">※ 横軸=動画の再生位置（0〜100%）、縦軸=維持率。ショートはループ再生のため序盤が100%超になります。破線=100%基準。<span style="color:var(--bad)">▼</span>=最大の離脱ポイント。</p>
+  </div>
+
+  <div class="card">
+    <h2>ネクストアクション（戦略）</h2>
+    <p class="csub">2026年のショート/リール・美容業界トレンド × このチャンネルの実データ</p>
+
+    <div class="sec-t"><span class="n">1</span>トレンド（2026・ショート/リール/美容）</div>
+    <ul class="slist" id="secTrend"></ul>
+
+    <div class="sec-t"><span class="n">2</span>編集の仕方</div>
+    <ul class="slist" id="secEdit"></ul>
+
+    <div class="sec-t"><span class="n">3</span>構成テンプレート</div>
+    <div id="secStruct"></div>
+
+    <div class="sec-t"><span class="n">4</span>データに基づく改善アクション</div>
+    <div id="actions"></div>
+
+    <div class="sec-t"><span class="n">5</span>差別化（このチャンネルの強み活用）</div>
+    <ul class="slist" id="secDiff"></ul>
+
+    <div class="sec-t"><span class="n">6</span>次回企画案 10本</div>
+    <div class="tblwrap">
+      <table class="idea-tbl" id="secIdeas">
+        <thead><tr><th>形式</th><th>テーマ</th><th>内容</th><th>ターゲット</th><th>狙い・目的</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="note" id="secNote"></div>
+  </div>
+
+  <div class="foot" id="foot"></div>
+</div>
+
+<div class="tt" id="tip"></div>
+
+<script>
+const D = {"period": {"start": "2026-05-01", "end": "2026-07-30"}, "generated": "2026-08-02", "channel": {"title": "職業、くまのお医者さん。毛利理人 / クマ取り専門クリニック院長", "id": "UCOiUrgmKgxfA9o09cENY_ZQ", "subscribers": 7980, "totalViews": 4215896, "videoCount": 642}, "summary": {"views": 539134, "minutesWatched": 327289, "avgViewDurationSec": 62, "subsGained": 506, "subsLost": 280, "subsNet": 226}, "daily": [{"date": "2026-05-01", "views": 5500, "minutes": 3209, "subsNet": 1}, {"date": "2026-05-02", "views": 8087, "minutes": 4260, "subsNet": 3}, {"date": "2026-05-03", "views": 8657, "minutes": 4459, "subsNet": 3}, {"date": "2026-05-04", "views": 9333, "minutes": 3960, "subsNet": 4}, {"date": "2026-05-05", "views": 11845, "minutes": 5198, "subsNet": 5}, {"date": "2026-05-06", "views": 9712, "minutes": 4683, "subsNet": 8}, {"date": "2026-05-07", "views": 7613, "minutes": 3488, "subsNet": 2}, {"date": "2026-05-08", "views": 6715, "minutes": 4612, "subsNet": -3}, {"date": "2026-05-09", "views": 8372, "minutes": 3895, "subsNet": 7}, {"date": "2026-05-10", "views": 8117, "minutes": 3939, "subsNet": 6}, {"date": "2026-05-11", "views": 8519, "minutes": 3888, "subsNet": 4}, {"date": "2026-05-12", "views": 7849, "minutes": 3552, "subsNet": 9}, {"date": "2026-05-13", "views": 5540, "minutes": 3029, "subsNet": 5}, {"date": "2026-05-14", "views": 5767, "minutes": 3337, "subsNet": 2}, {"date": "2026-05-15", "views": 5122, "minutes": 3444, "subsNet": 0}, {"date": "2026-05-16", "views": 4090, "minutes": 2663, "subsNet": 2}, {"date": "2026-05-17", "views": 4417, "minutes": 2490, "subsNet": 1}, {"date": "2026-05-18", "views": 4581, "minutes": 2596, "subsNet": 0}, {"date": "2026-05-19", "views": 4706, "minutes": 3191, "subsNet": 0}, {"date": "2026-05-20", "views": 4914, "minutes": 2959, "subsNet": 5}, {"date": "2026-05-21", "views": 4714, "minutes": 2566, "subsNet": 5}, {"date": "2026-05-22", "views": 4291, "minutes": 2403, "subsNet": 0}, {"date": "2026-05-23", "views": 6105, "minutes": 3040, "subsNet": 3}, {"date": "2026-05-24", "views": 4823, "minutes": 3663, "subsNet": 4}, {"date": "2026-05-25", "views": 4571, "minutes": 2715, "subsNet": 5}, {"date": "2026-05-26", "views": 3533, "minutes": 2162, "subsNet": -1}, {"date": "2026-05-27", "views": 3749, "minutes": 2060, "subsNet": 0}, {"date": "2026-05-28", "views": 3263, "minutes": 2185, "subsNet": -3}, {"date": "2026-05-29", "views": 3187, "minutes": 2102, "subsNet": 0}, {"date": "2026-05-30", "views": 3285, "minutes": 2751, "subsNet": -1}, {"date": "2026-05-31", "views": 4600, "minutes": 4275, "subsNet": -1}, {"date": "2026-06-01", "views": 3161, "minutes": 2780, "subsNet": 2}, {"date": "2026-06-02", "views": 7869, "minutes": 4405, "subsNet": 5}, {"date": "2026-06-03", "views": 5442, "minutes": 5978, "subsNet": 5}, {"date": "2026-06-04", "views": 8407, "minutes": 9516, "subsNet": 5}, {"date": "2026-06-05", "views": 7662, "minutes": 7246, "subsNet": 4}, {"date": "2026-06-06", "views": 6581, "minutes": 5776, "subsNet": 1}, {"date": "2026-06-07", "views": 6588, "minutes": 6266, "subsNet": 6}, {"date": "2026-06-08", "views": 5428, "minutes": 4624, "subsNet": 2}, {"date": "2026-06-09", "views": 4401, "minutes": 4105, "subsNet": -2}, {"date": "2026-06-10", "views": 3749, "minutes": 3283, "subsNet": -3}, {"date": "2026-06-11", "views": 4723, "minutes": 3843, "subsNet": 3}, {"date": "2026-06-12", "views": 5570, "minutes": 3835, "subsNet": 2}, {"date": "2026-06-13", "views": 7534, "minutes": 3983, "subsNet": 3}, {"date": "2026-06-14", "views": 5671, "minutes": 3690, "subsNet": 1}, {"date": "2026-06-15", "views": 6917, "minutes": 3940, "subsNet": 2}, {"date": "2026-06-16", "views": 4055, "minutes": 2449, "subsNet": 2}, {"date": "2026-06-17", "views": 4441, "minutes": 2873, "subsNet": 4}, {"date": "2026-06-18", "views": 8023, "minutes": 3754, "subsNet": 3}, {"date": "2026-06-19", "views": 5527, "minutes": 3028, "subsNet": 2}, {"date": "2026-06-20", "views": 6502, "minutes": 3656, "subsNet": 5}, {"date": "2026-06-21", "views": 6825, "minutes": 4969, "subsNet": 5}, {"date": "2026-06-22", "views": 5021, "minutes": 3769, "subsNet": 3}, {"date": "2026-06-23", "views": 4277, "minutes": 2775, "subsNet": -4}, {"date": "2026-06-24", "views": 4665, "minutes": 2963, "subsNet": 4}, {"date": "2026-06-25", "views": 4965, "minutes": 3187, "subsNet": 3}, {"date": "2026-06-26", "views": 11625, "minutes": 4740, "subsNet": 4}, {"date": "2026-06-27", "views": 9739, "minutes": 4934, "subsNet": 3}, {"date": "2026-06-28", "views": 9249, "minutes": 4423, "subsNet": 2}, {"date": "2026-06-29", "views": 6839, "minutes": 4037, "subsNet": -3}, {"date": "2026-06-30", "views": 7652, "minutes": 3775, "subsNet": 6}, {"date": "2026-07-01", "views": 5951, "minutes": 4075, "subsNet": 2}, {"date": "2026-07-02", "views": 5247, "minutes": 3116, "subsNet": 3}, {"date": "2026-07-03", "views": 5628, "minutes": 3344, "subsNet": 9}, {"date": "2026-07-04", "views": 7250, "minutes": 3988, "subsNet": 2}, {"date": "2026-07-05", "views": 6165, "minutes": 3681, "subsNet": 4}, {"date": "2026-07-06", "views": 7420, "minutes": 3480, "subsNet": 4}, {"date": "2026-07-07", "views": 6093, "minutes": 3094, "subsNet": 9}, {"date": "2026-07-08", "views": 5049, "minutes": 2998, "subsNet": 1}, {"date": "2026-07-09", "views": 4336, "minutes": 2641, "subsNet": 4}, {"date": "2026-07-10", "views": 5934, "minutes": 2943, "subsNet": 4}, {"date": "2026-07-11", "views": 6450, "minutes": 3175, "subsNet": 2}, {"date": "2026-07-12", "views": 4751, "minutes": 2849, "subsNet": 4}, {"date": "2026-07-13", "views": 5386, "minutes": 2832, "subsNet": -2}, {"date": "2026-07-14", "views": 6514, "minutes": 3191, "subsNet": 0}, {"date": "2026-07-15", "views": 5130, "minutes": 2658, "subsNet": 3}, {"date": "2026-07-16", "views": 4309, "minutes": 2726, "subsNet": 2}, {"date": "2026-07-17", "views": 3986, "minutes": 2400, "subsNet": 2}, {"date": "2026-07-18", "views": 6631, "minutes": 3575, "subsNet": 4}, {"date": "2026-07-19", "views": 8420, "minutes": 3697, "subsNet": 1}, {"date": "2026-07-20", "views": 6571, "minutes": 3635, "subsNet": 0}, {"date": "2026-07-21", "views": 4633, "minutes": 2824, "subsNet": 4}, {"date": "2026-07-22", "views": 4191, "minutes": 2457, "subsNet": 1}, {"date": "2026-07-23", "views": 4512, "minutes": 3824, "subsNet": 1}, {"date": "2026-07-24", "views": 4194, "minutes": 2904, "subsNet": 2}, {"date": "2026-07-25", "views": 4062, "minutes": 2891, "subsNet": -3}, {"date": "2026-07-26", "views": 3836, "minutes": 2742, "subsNet": 1}, {"date": "2026-07-27", "views": 4426, "minutes": 3136, "subsNet": 7}, {"date": "2026-07-28", "views": 3976, "minutes": 2942, "subsNet": -1}, {"date": "2026-07-29", "views": 4859, "minutes": 3348, "subsNet": 3}, {"date": "2026-07-30", "views": 8539, "minutes": 4701, "subsNet": 3}], "topVideos": [{"id": "qYiKSLCnhKo", "title": "クマ取り失敗。地獄の日々...あれから3ヶ月経ちました。 #クマ取り #若返り治療　#エイジングケア", "views": 127986, "minutes": 46020, "avgSec": 36}, {"id": "5Y9Hf7NKe6M", "title": "クマ取り失敗。地獄の日々...#クマ取りダウンタイム　#クマ取り #ダウンタイム", "views": 46642, "minutes": 13010, "avgSec": 28}, {"id": "CsdyaiLXZ_k", "title": "【クマ治療】40代のクマ取り劇的ビフォーアフター#クマ取り #目の下のクマ取り #目の下のクマ #shorts", "views": 33233, "minutes": 4826, "avgSec": 17}, {"id": "jyqvUuonp1w", "title": "【目の下たるみ】50代のクマ取り治療#クマ取り #ダウンタイム #shorts", "views": 24264, "minutes": 2399, "avgSec": 13}, {"id": "IS1vYtuuV5k", "title": "クマ取り失敗？地獄の日々...#クマ治療 #クマ取り #美容整形 #アンチエイジング #若返り", "views": 12495, "minutes": 4360, "avgSec": 35}, {"id": "rvMJuZoQIv0", "title": "【クマ治療】クマ取り失敗、地獄の日々、#クマ取り #クマ改善 #クマ取り失敗#shorts", "views": 12428, "minutes": 4231, "avgSec": 36}, {"id": "9ZNKuhEN0BA", "title": "クマ取り＝脱脂　だけじゃありませんから！ #クマ取り #クマ治療", "views": 11687, "minutes": 5687, "avgSec": 44}, {"id": "DQH9q9zTg1o", "title": "湘南美容クリニックの元ドクターが暴露【LAST CALLでも話題】【SBCの秘密教えます】", "views": 9201, "minutes": 34232, "avgSec": 223}, {"id": "-s4aggvj7CU", "title": "目周りのアートメイク、医師がおすすめしない理由 #クマ取り #クマ治療 #アートメイク #コンシーラー", "views": 8363, "minutes": 2494, "avgSec": 29}, {"id": "bYEZXohrjFs", "title": "リポットレーザー、アフターケアしっかりすればめっちゃ良いかも？🐻 #シミ取り #リポットレーザー", "views": 7415, "minutes": 2639, "avgSec": 35}], "retention": [{"curve": [{"t": 0.01, "watch": 1.7952}, {"t": 0.02, "watch": 1.7628}, {"t": 0.03, "watch": 1.7347}, {"t": 0.04, "watch": 1.6789}, {"t": 0.05, "watch": 1.6197}, {"t": 0.06, "watch": 1.5786}, {"t": 0.07, "watch": 1.5488}, {"t": 0.08, "watch": 1.5039}, {"t": 0.09, "watch": 1.4789}, {"t": 0.1, "watch": 1.4594}, {"t": 0.11, "watch": 1.4314}, {"t": 0.12, "watch": 1.4159}, {"t": 0.13, "watch": 1.3983}, {"t": 0.14, "watch": 1.3776}, {"t": 0.15, "watch": 1.3565}, {"t": 0.16, "watch": 1.3445}, {"t": 0.17, "watch": 1.3352}, {"t": 0.18, "watch": 1.3212}, {"t": 0.19, "watch": 1.3135}, {"t": 0.2, "watch": 1.3057}, {"t": 0.21, "watch": 1.2935}, {"t": 0.22, "watch": 1.2861}, {"t": 0.23, "watch": 1.28}, {"t": 0.24, "watch": 1.2715}, {"t": 0.25, "watch": 1.2629}, {"t": 0.26, "watch": 1.2586}, {"t": 0.27, "watch": 1.253}, {"t": 0.28, "watch": 1.2467}, {"t": 0.29, "watch": 1.2433}, {"t": 0.3, "watch": 1.2403}, {"t": 0.31, "watch": 1.2351}, {"t": 0.32, "watch": 1.2319}, {"t": 0.33, "watch": 1.2292}, {"t": 0.34, "watch": 1.2263}, {"t": 0.35, "watch": 1.2224}, {"t": 0.36, "watch": 1.2199}, {"t": 0.37, "watch": 1.2171}, {"t": 0.38, "watch": 1.2138}, {"t": 0.39, "watch": 1.2113}, {"t": 0.4, "watch": 1.2067}, {"t": 0.41, "watch": 1.2021}, {"t": 0.42, "watch": 1.1982}, {"t": 0.43, "watch": 1.1948}, {"t": 0.44, "watch": 1.1917}, {"t": 0.45, "watch": 1.1898}, {"t": 0.46, "watch": 1.1871}, {"t": 0.47, "watch": 1.1855}, {"t": 0.48, "watch": 1.1825}, {"t": 0.49, "watch": 1.1815}, {"t": 0.5, "watch": 1.1801}, {"t": 0.51, "watch": 1.1788}, {"t": 0.52, "watch": 1.1789}, {"t": 0.53, "watch": 1.1781}, {"t": 0.54, "watch": 1.1777}, {"t": 0.55, "watch": 1.1772}, {"t": 0.56, "watch": 1.1768}, {"t": 0.57, "watch": 1.1768}, {"t": 0.58, "watch": 1.1752}, {"t": 0.59, "watch": 1.1752}, {"t": 0.6, "watch": 1.1753}, {"t": 0.61, "watch": 1.1745}, {"t": 0.62, "watch": 1.1739}, {"t": 0.63, "watch": 1.1741}, {"t": 0.64, "watch": 1.174}, {"t": 0.65, "watch": 1.1738}, {"t": 0.66, "watch": 1.1731}, {"t": 0.67, "watch": 1.1718}, {"t": 0.68, "watch": 1.1704}, {"t": 0.69, "watch": 1.1688}, {"t": 0.7, "watch": 1.1678}, {"t": 0.71, "watch": 1.1657}, {"t": 0.72, "watch": 1.1641}, {"t": 0.73, "watch": 1.1631}, {"t": 0.74, "watch": 1.1612}, {"t": 0.75, "watch": 1.1588}, {"t": 0.76, "watch": 1.1555}, {"t": 0.77, "watch": 1.1525}, {"t": 0.78, "watch": 1.1476}, {"t": 0.79, "watch": 1.1418}, {"t": 0.8, "watch": 1.1373}, {"t": 0.81, "watch": 1.1289}, {"t": 0.82, "watch": 1.1205}, {"t": 0.83, "watch": 1.1137}, {"t": 0.84, "watch": 1.1055}, {"t": 0.85, "watch": 1.0964}, {"t": 0.86, "watch": 1.0904}, {"t": 0.87, "watch": 1.0835}, {"t": 0.88, "watch": 1.074}, {"t": 0.89, "watch": 1.0654}, {"t": 0.9, "watch": 1.0577}, {"t": 0.91, "watch": 1.0461}, {"t": 0.92, "watch": 1.0351}, {"t": 0.93, "watch": 1.0254}, {"t": 0.94, "watch": 1.0109}, {"t": 0.95, "watch": 0.9735}, {"t": 0.96, "watch": 0.9432}, {"t": 0.97, "watch": 0.9085}, {"t": 0.98, "watch": 0.7623}, {"t": 0.99, "watch": 0.758}, {"t": 1, "watch": 0.7539}], "hook": 1.62, "mid": 1.18, "end": 0.754, "relPerf": 0.888, "dropAt": 0.98, "dropAmt": 0.146, "id": "qYiKSLCnhKo", "title": "クマ取り失敗。地獄の日々...あれから3ヶ月経ちました。 #クマ取り #若返り治療　#エイジングケア", "views": 127986}, {"curve": [{"t": 0.01, "watch": 1.7671}, {"t": 0.02, "watch": 1.7386}, {"t": 0.03, "watch": 1.7133}, {"t": 0.04, "watch": 1.6877}, {"t": 0.05, "watch": 1.6571}, {"t": 0.06, "watch": 1.6062}, {"t": 0.07, "watch": 1.5802}, {"t": 0.08, "watch": 1.5599}, {"t": 0.09, "watch": 1.5413}, {"t": 0.1, "watch": 1.521}, {"t": 0.11, "watch": 1.4967}, {"t": 0.12, "watch": 1.4827}, {"t": 0.13, "watch": 1.4713}, {"t": 0.14, "watch": 1.4614}, {"t": 0.15, "watch": 1.447}, {"t": 0.16, "watch": 1.4393}, {"t": 0.17, "watch": 1.4342}, {"t": 0.18, "watch": 1.4261}, {"t": 0.19, "watch": 1.4183}, {"t": 0.2, "watch": 1.4082}, {"t": 0.21, "watch": 1.4005}, {"t": 0.22, "watch": 1.3924}, {"t": 0.23, "watch": 1.384}, {"t": 0.24, "watch": 1.3747}, {"t": 0.25, "watch": 1.3678}, {"t": 0.26, "watch": 1.362}, {"t": 0.27, "watch": 1.3557}, {"t": 0.28, "watch": 1.3499}, {"t": 0.29, "watch": 1.3435}, {"t": 0.3, "watch": 1.3371}, {"t": 0.31, "watch": 1.3284}, {"t": 0.32, "watch": 1.3179}, {"t": 0.33, "watch": 1.3085}, {"t": 0.34, "watch": 1.3013}, {"t": 0.35, "watch": 1.2954}, {"t": 0.36, "watch": 1.2892}, {"t": 0.37, "watch": 1.2844}, {"t": 0.38, "watch": 1.2792}, {"t": 0.39, "watch": 1.2758}, {"t": 0.4, "watch": 1.2734}, {"t": 0.41, "watch": 1.271}, {"t": 0.42, "watch": 1.2681}, {"t": 0.43, "watch": 1.266}, {"t": 0.44, "watch": 1.2638}, {"t": 0.45, "watch": 1.2611}, {"t": 0.46, "watch": 1.2583}, {"t": 0.47, "watch": 1.256}, {"t": 0.48, "watch": 1.2543}, {"t": 0.49, "watch": 1.252}, {"t": 0.5, "watch": 1.2505}, {"t": 0.51, "watch": 1.2468}, {"t": 0.52, "watch": 1.2449}, {"t": 0.53, "watch": 1.2437}, {"t": 0.54, "watch": 1.2421}, {"t": 0.55, "watch": 1.2407}, {"t": 0.56, "watch": 1.239}, {"t": 0.57, "watch": 1.2382}, {"t": 0.58, "watch": 1.2367}, {"t": 0.59, "watch": 1.2357}, {"t": 0.6, "watch": 1.2346}, {"t": 0.61, "watch": 1.2334}, {"t": 0.62, "watch": 1.2323}, {"t": 0.63, "watch": 1.2313}, {"t": 0.64, "watch": 1.2307}, {"t": 0.65, "watch": 1.2291}, {"t": 0.66, "watch": 1.2298}, {"t": 0.67, "watch": 1.2299}, {"t": 0.68, "watch": 1.2298}, {"t": 0.69, "watch": 1.2298}, {"t": 0.7, "watch": 1.2298}, {"t": 0.71, "watch": 1.2297}, {"t": 0.72, "watch": 1.2308}, {"t": 0.73, "watch": 1.2298}, {"t": 0.74, "watch": 1.2292}, {"t": 0.75, "watch": 1.2295}, {"t": 0.76, "watch": 1.2286}, {"t": 0.77, "watch": 1.2291}, {"t": 0.78, "watch": 1.2277}, {"t": 0.79, "watch": 1.2264}, {"t": 0.8, "watch": 1.2258}, {"t": 0.81, "watch": 1.2244}, {"t": 0.82, "watch": 1.222}, {"t": 0.83, "watch": 1.2176}, {"t": 0.84, "watch": 1.2117}, {"t": 0.85, "watch": 1.2042}, {"t": 0.86, "watch": 1.197}, {"t": 0.87, "watch": 1.1843}, {"t": 0.88, "watch": 1.1645}, {"t": 0.89, "watch": 1.1507}, {"t": 0.9, "watch": 1.133}, {"t": 0.91, "watch": 1.1092}, {"t": 0.92, "watch": 1.0632}, {"t": 0.93, "watch": 1.0158}, {"t": 0.94, "watch": 0.9769}, {"t": 0.95, "watch": 0.9357}, {"t": 0.96, "watch": 0.8313}, {"t": 0.97, "watch": 0.794}, {"t": 0.98, "watch": 0.7867}, {"t": 0.99, "watch": 0.7803}, {"t": 1, "watch": 0.7748}], "hook": 1.657, "mid": 1.25, "end": 0.775, "relPerf": 0.881, "dropAt": 0.96, "dropAmt": 0.104, "id": "5Y9Hf7NKe6M", "title": "クマ取り失敗。地獄の日々...#クマ取りダウンタイム　#クマ取り #ダウンタイム", "views": 46642}, {"curve": [{"t": 0.01, "watch": 1.9961}, {"t": 0.02, "watch": 1.9892}, {"t": 0.03, "watch": 1.9593}, {"t": 0.04, "watch": 1.9367}, {"t": 0.05, "watch": 1.8971}, {"t": 0.06, "watch": 1.8525}, {"t": 0.07, "watch": 1.8205}, {"t": 0.08, "watch": 1.7684}, {"t": 0.09, "watch": 1.7258}, {"t": 0.1, "watch": 1.7029}, {"t": 0.11, "watch": 1.6789}, {"t": 0.12, "watch": 1.667}, {"t": 0.13, "watch": 1.6459}, {"t": 0.14, "watch": 1.6274}, {"t": 0.15, "watch": 1.6129}, {"t": 0.16, "watch": 1.5895}, {"t": 0.17, "watch": 1.5618}, {"t": 0.18, "watch": 1.5475}, {"t": 0.19, "watch": 1.5305}, {"t": 0.2, "watch": 1.5175}, {"t": 0.21, "watch": 1.5032}, {"t": 0.22, "watch": 1.4927}, {"t": 0.23, "watch": 1.4795}, {"t": 0.24, "watch": 1.4618}, {"t": 0.25, "watch": 1.455}, {"t": 0.26, "watch": 1.4478}, {"t": 0.27, "watch": 1.4388}, {"t": 0.28, "watch": 1.433}, {"t": 0.29, "watch": 1.4247}, {"t": 0.3, "watch": 1.4166}, {"t": 0.31, "watch": 1.4085}, {"t": 0.32, "watch": 1.3977}, {"t": 0.33, "watch": 1.389}, {"t": 0.34, "watch": 1.3817}, {"t": 0.35, "watch": 1.3763}, {"t": 0.36, "watch": 1.3696}, {"t": 0.37, "watch": 1.3648}, {"t": 0.38, "watch": 1.3606}, {"t": 0.39, "watch": 1.3529}, {"t": 0.4, "watch": 1.3492}, {"t": 0.41, "watch": 1.3458}, {"t": 0.42, "watch": 1.3414}, {"t": 0.43, "watch": 1.3376}, {"t": 0.44, "watch": 1.3318}, {"t": 0.45, "watch": 1.327}, {"t": 0.46, "watch": 1.3231}, {"t": 0.47, "watch": 1.3186}, {"t": 0.48, "watch": 1.3147}, {"t": 0.49, "watch": 1.3125}, {"t": 0.5, "watch": 1.3095}, {"t": 0.51, "watch": 1.3051}, {"t": 0.52, "watch": 1.302}, {"t": 0.53, "watch": 1.2989}, {"t": 0.54, "watch": 1.2949}, {"t": 0.55, "watch": 1.2887}, {"t": 0.56, "watch": 1.2851}, {"t": 0.57, "watch": 1.2815}, {"t": 0.58, "watch": 1.2774}, {"t": 0.59, "watch": 1.2729}, {"t": 0.6, "watch": 1.27}, {"t": 0.61, "watch": 1.2668}, {"t": 0.62, "watch": 1.2626}, {"t": 0.63, "watch": 1.2603}, {"t": 0.64, "watch": 1.2564}, {"t": 0.65, "watch": 1.2537}, {"t": 0.66, "watch": 1.2517}, {"t": 0.67, "watch": 1.2494}, {"t": 0.68, "watch": 1.2468}, {"t": 0.69, "watch": 1.2437}, {"t": 0.7, "watch": 1.2409}, {"t": 0.71, "watch": 1.2382}, {"t": 0.72, "watch": 1.2361}, {"t": 0.73, "watch": 1.2337}, {"t": 0.74, "watch": 1.2312}, {"t": 0.75, "watch": 1.2291}, {"t": 0.76, "watch": 1.2268}, {"t": 0.77, "watch": 1.2234}, {"t": 0.78, "watch": 1.2224}, {"t": 0.79, "watch": 1.2212}, {"t": 0.8, "watch": 1.2192}, {"t": 0.81, "watch": 1.2178}, {"t": 0.82, "watch": 1.2165}, {"t": 0.83, "watch": 1.214}, {"t": 0.84, "watch": 1.2096}, {"t": 0.85, "watch": 1.2046}, {"t": 0.86, "watch": 1.1955}, {"t": 0.87, "watch": 1.1852}, {"t": 0.88, "watch": 1.1764}, {"t": 0.89, "watch": 1.1646}, {"t": 0.9, "watch": 1.155}, {"t": 0.91, "watch": 1.1405}, {"t": 0.92, "watch": 1.1268}, {"t": 0.93, "watch": 1.0391}, {"t": 0.94, "watch": 1.027}, {"t": 0.95, "watch": 1.0247}, {"t": 0.96, "watch": 1.023}, {"t": 0.97, "watch": 1.0214}, {"t": 0.98, "watch": 1.02}, {"t": 0.99, "watch": 1.0177}, {"t": 1, "watch": 1.0066}], "hook": 1.897, "mid": 1.309, "end": 1.007, "relPerf": 0.901, "dropAt": 0.93, "dropAmt": 0.088, "id": "CsdyaiLXZ_k", "title": "【クマ治療】40代のクマ取り劇的ビフォーアフター#クマ取り #目の下のクマ取り #目の下のクマ #shorts", "views": 33233}, {"curve": [{"t": 0.01, "watch": 1.9051}, {"t": 0.02, "watch": 2.2092}, {"t": 0.03, "watch": 2.2058}, {"t": 0.04, "watch": 2.1914}, {"t": 0.05, "watch": 2.1844}, {"t": 0.06, "watch": 2.1765}, {"t": 0.07, "watch": 2.1571}, {"t": 0.08, "watch": 2.1412}, {"t": 0.09, "watch": 2.1184}, {"t": 0.1, "watch": 2.0956}, {"t": 0.11, "watch": 2.0756}, {"t": 0.12, "watch": 2.0508}, {"t": 0.13, "watch": 2.0213}, {"t": 0.14, "watch": 1.9784}, {"t": 0.15, "watch": 1.9478}, {"t": 0.16, "watch": 1.9332}, {"t": 0.17, "watch": 1.9108}, {"t": 0.18, "watch": 1.8943}, {"t": 0.19, "watch": 1.8829}, {"t": 0.2, "watch": 1.8574}, {"t": 0.21, "watch": 1.8484}, {"t": 0.22, "watch": 1.8399}, {"t": 0.23, "watch": 1.8187}, {"t": 0.24, "watch": 1.8104}, {"t": 0.25, "watch": 1.7903}, {"t": 0.26, "watch": 1.7684}, {"t": 0.27, "watch": 1.7644}, {"t": 0.28, "watch": 1.7487}, {"t": 0.29, "watch": 1.744}, {"t": 0.3, "watch": 1.7354}, {"t": 0.31, "watch": 1.7258}, {"t": 0.32, "watch": 1.7225}, {"t": 0.33, "watch": 1.7143}, {"t": 0.34, "watch": 1.7099}, {"t": 0.35, "watch": 1.7048}, {"t": 0.36, "watch": 1.6953}, {"t": 0.37, "watch": 1.6916}, {"t": 0.38, "watch": 1.6854}, {"t": 0.39, "watch": 1.6722}, {"t": 0.4, "watch": 1.6684}, {"t": 0.41, "watch": 1.6631}, {"t": 0.42, "watch": 1.6597}, {"t": 0.43, "watch": 1.6574}, {"t": 0.44, "watch": 1.6515}, {"t": 0.45, "watch": 1.6485}, {"t": 0.46, "watch": 1.6455}, {"t": 0.47, "watch": 1.6427}, {"t": 0.48, "watch": 1.6411}, {"t": 0.49, "watch": 1.6377}, {"t": 0.5, "watch": 1.6335}, {"t": 0.51, "watch": 1.6265}, {"t": 0.52, "watch": 1.6233}, {"t": 0.53, "watch": 1.6207}, {"t": 0.54, "watch": 1.6184}, {"t": 0.55, "watch": 1.6162}, {"t": 0.56, "watch": 1.614}, {"t": 0.57, "watch": 1.6113}, {"t": 0.58, "watch": 1.6098}, {"t": 0.59, "watch": 1.609}, {"t": 0.6, "watch": 1.6065}, {"t": 0.61, "watch": 1.6047}, {"t": 0.62, "watch": 1.6038}, {"t": 0.63, "watch": 1.6006}, {"t": 0.64, "watch": 1.5937}, {"t": 0.65, "watch": 1.59}, {"t": 0.66, "watch": 1.5886}, {"t": 0.67, "watch": 1.5862}, {"t": 0.68, "watch": 1.5821}, {"t": 0.69, "watch": 1.5787}, {"t": 0.7, "watch": 1.573}, {"t": 0.71, "watch": 1.5674}, {"t": 0.72, "watch": 1.5635}, {"t": 0.73, "watch": 1.5559}, {"t": 0.74, "watch": 1.5488}, {"t": 0.75, "watch": 1.5352}, {"t": 0.76, "watch": 1.5127}, {"t": 0.77, "watch": 1.5053}, {"t": 0.78, "watch": 1.4944}, {"t": 0.79, "watch": 1.4847}, {"t": 0.8, "watch": 1.4736}, {"t": 0.81, "watch": 1.463}, {"t": 0.82, "watch": 1.4567}, {"t": 0.83, "watch": 1.4472}, {"t": 0.84, "watch": 1.4366}, {"t": 0.85, "watch": 1.4278}, {"t": 0.86, "watch": 1.4184}, {"t": 0.87, "watch": 1.4104}, {"t": 0.88, "watch": 1.3989}, {"t": 0.89, "watch": 1.3882}, {"t": 0.9, "watch": 1.3833}, {"t": 0.91, "watch": 1.3798}, {"t": 0.92, "watch": 1.3758}, {"t": 0.93, "watch": 1.3729}, {"t": 0.94, "watch": 1.3693}, {"t": 0.95, "watch": 1.3655}, {"t": 0.96, "watch": 1.3624}, {"t": 0.97, "watch": 1.3595}, {"t": 0.98, "watch": 1.3557}, {"t": 0.99, "watch": 1.3535}, {"t": 1, "watch": 1.3479}], "hook": 2.184, "mid": 1.633, "end": 1.348, "relPerf": 0.916, "dropAt": 0.14, "dropAmt": 0.043, "id": "jyqvUuonp1w", "title": "【目の下たるみ】50代のクマ取り治療#クマ取り #ダウンタイム #shorts", "views": 24264}, {"curve": [{"t": 0.01, "watch": 1.7325}, {"t": 0.02, "watch": 1.6926}, {"t": 0.03, "watch": 1.6538}, {"t": 0.04, "watch": 1.5933}, {"t": 0.05, "watch": 1.5353}, {"t": 0.06, "watch": 1.4981}, {"t": 0.07, "watch": 1.4747}, {"t": 0.08, "watch": 1.4341}, {"t": 0.09, "watch": 1.4187}, {"t": 0.1, "watch": 1.4031}, {"t": 0.11, "watch": 1.3815}, {"t": 0.12, "watch": 1.3673}, {"t": 0.13, "watch": 1.356}, {"t": 0.14, "watch": 1.3387}, {"t": 0.15, "watch": 1.3238}, {"t": 0.16, "watch": 1.3115}, {"t": 0.17, "watch": 1.302}, {"t": 0.18, "watch": 1.2895}, {"t": 0.19, "watch": 1.2807}, {"t": 0.2, "watch": 1.2735}, {"t": 0.21, "watch": 1.2654}, {"t": 0.22, "watch": 1.261}, {"t": 0.23, "watch": 1.2573}, {"t": 0.24, "watch": 1.2516}, {"t": 0.25, "watch": 1.2473}, {"t": 0.26, "watch": 1.2417}, {"t": 0.27, "watch": 1.2336}, {"t": 0.28, "watch": 1.2286}, {"t": 0.29, "watch": 1.2239}, {"t": 0.3, "watch": 1.2184}, {"t": 0.31, "watch": 1.2102}, {"t": 0.32, "watch": 1.2055}, {"t": 0.33, "watch": 1.2031}, {"t": 0.34, "watch": 1.1971}, {"t": 0.35, "watch": 1.1936}, {"t": 0.36, "watch": 1.1912}, {"t": 0.37, "watch": 1.1881}, {"t": 0.38, "watch": 1.1845}, {"t": 0.39, "watch": 1.1796}, {"t": 0.4, "watch": 1.175}, {"t": 0.41, "watch": 1.1724}, {"t": 0.42, "watch": 1.1704}, {"t": 0.43, "watch": 1.166}, {"t": 0.44, "watch": 1.1624}, {"t": 0.45, "watch": 1.1609}, {"t": 0.46, "watch": 1.1577}, {"t": 0.47, "watch": 1.1527}, {"t": 0.48, "watch": 1.1486}, {"t": 0.49, "watch": 1.1409}, {"t": 0.5, "watch": 1.1332}, {"t": 0.51, "watch": 1.1255}, {"t": 0.52, "watch": 1.12}, {"t": 0.53, "watch": 1.115}, {"t": 0.54, "watch": 1.1107}, {"t": 0.55, "watch": 1.1077}, {"t": 0.56, "watch": 1.1065}, {"t": 0.57, "watch": 1.1034}, {"t": 0.58, "watch": 1.1029}, {"t": 0.59, "watch": 1.1021}, {"t": 0.6, "watch": 1.099}, {"t": 0.61, "watch": 1.0987}, {"t": 0.62, "watch": 1.0986}, {"t": 0.63, "watch": 1.0972}, {"t": 0.64, "watch": 1.0978}, {"t": 0.65, "watch": 1.0979}, {"t": 0.66, "watch": 1.0949}, {"t": 0.67, "watch": 1.0932}, {"t": 0.68, "watch": 1.0925}, {"t": 0.69, "watch": 1.0921}, {"t": 0.7, "watch": 1.0912}, {"t": 0.71, "watch": 1.0905}, {"t": 0.72, "watch": 1.0899}, {"t": 0.73, "watch": 1.0891}, {"t": 0.74, "watch": 1.0887}, {"t": 0.75, "watch": 1.0884}, {"t": 0.76, "watch": 1.0868}, {"t": 0.77, "watch": 1.087}, {"t": 0.78, "watch": 1.0846}, {"t": 0.79, "watch": 1.0807}, {"t": 0.8, "watch": 1.0799}, {"t": 0.81, "watch": 1.0778}, {"t": 0.82, "watch": 1.0755}, {"t": 0.83, "watch": 1.0752}, {"t": 0.84, "watch": 1.0738}, {"t": 0.85, "watch": 1.0707}, {"t": 0.86, "watch": 1.0636}, {"t": 0.87, "watch": 1.0585}, {"t": 0.88, "watch": 1.0538}, {"t": 0.89, "watch": 1.0501}, {"t": 0.9, "watch": 1.0468}, {"t": 0.91, "watch": 1.038}, {"t": 0.92, "watch": 1.0266}, {"t": 0.93, "watch": 1.0139}, {"t": 0.94, "watch": 1.001}, {"t": 0.95, "watch": 0.986}, {"t": 0.96, "watch": 0.9747}, {"t": 0.97, "watch": 0.9632}, {"t": 0.98, "watch": 0.9508}, {"t": 0.99, "watch": 0.9486}, {"t": 1, "watch": 0.9455}], "hook": 1.535, "mid": 1.133, "end": 0.946, "relPerf": 0.873, "dropAt": 0.04, "dropAmt": 0.06, "id": "IS1vYtuuV5k", "title": "クマ取り失敗？地獄の日々...#クマ治療 #クマ取り #美容整形 #アンチエイジング #若返り", "views": 12495}, {"curve": [{"t": 0.01, "watch": 1.87}, {"t": 0.02, "watch": 1.8417}, {"t": 0.03, "watch": 1.8014}, {"t": 0.04, "watch": 1.7269}, {"t": 0.05, "watch": 1.6224}, {"t": 0.06, "watch": 1.5654}, {"t": 0.07, "watch": 1.5063}, {"t": 0.08, "watch": 1.4427}, {"t": 0.09, "watch": 1.4088}, {"t": 0.1, "watch": 1.3879}, {"t": 0.11, "watch": 1.3564}, {"t": 0.12, "watch": 1.3395}, {"t": 0.13, "watch": 1.3225}, {"t": 0.14, "watch": 1.3006}, {"t": 0.15, "watch": 1.2925}, {"t": 0.16, "watch": 1.2839}, {"t": 0.17, "watch": 1.2692}, {"t": 0.18, "watch": 1.2599}, {"t": 0.19, "watch": 1.2514}, {"t": 0.2, "watch": 1.2406}, {"t": 0.21, "watch": 1.2338}, {"t": 0.22, "watch": 1.2284}, {"t": 0.23, "watch": 1.2208}, {"t": 0.24, "watch": 1.2125}, {"t": 0.25, "watch": 1.206}, {"t": 0.26, "watch": 1.1965}, {"t": 0.27, "watch": 1.1871}, {"t": 0.28, "watch": 1.1813}, {"t": 0.29, "watch": 1.1752}, {"t": 0.3, "watch": 1.167}, {"t": 0.31, "watch": 1.1641}, {"t": 0.32, "watch": 1.1603}, {"t": 0.33, "watch": 1.1573}, {"t": 0.34, "watch": 1.154}, {"t": 0.35, "watch": 1.1514}, {"t": 0.36, "watch": 1.1467}, {"t": 0.37, "watch": 1.1447}, {"t": 0.38, "watch": 1.1433}, {"t": 0.39, "watch": 1.1392}, {"t": 0.4, "watch": 1.1372}, {"t": 0.41, "watch": 1.1323}, {"t": 0.42, "watch": 1.1282}, {"t": 0.43, "watch": 1.1246}, {"t": 0.44, "watch": 1.1232}, {"t": 0.45, "watch": 1.1204}, {"t": 0.46, "watch": 1.1149}, {"t": 0.47, "watch": 1.1132}, {"t": 0.48, "watch": 1.1094}, {"t": 0.49, "watch": 1.1034}, {"t": 0.5, "watch": 1.1018}, {"t": 0.51, "watch": 1.0977}, {"t": 0.52, "watch": 1.0943}, {"t": 0.53, "watch": 1.0919}, {"t": 0.54, "watch": 1.0911}, {"t": 0.55, "watch": 1.0892}, {"t": 0.56, "watch": 1.0904}, {"t": 0.57, "watch": 1.0906}, {"t": 0.58, "watch": 1.0888}, {"t": 0.59, "watch": 1.0885}, {"t": 0.6, "watch": 1.0893}, {"t": 0.61, "watch": 1.088}, {"t": 0.62, "watch": 1.0886}, {"t": 0.63, "watch": 1.0878}, {"t": 0.64, "watch": 1.0856}, {"t": 0.65, "watch": 1.0863}, {"t": 0.66, "watch": 1.0847}, {"t": 0.67, "watch": 1.0834}, {"t": 0.68, "watch": 1.0833}, {"t": 0.69, "watch": 1.0827}, {"t": 0.7, "watch": 1.0812}, {"t": 0.71, "watch": 1.0794}, {"t": 0.72, "watch": 1.0782}, {"t": 0.73, "watch": 1.0776}, {"t": 0.74, "watch": 1.0758}, {"t": 0.75, "watch": 1.075}, {"t": 0.76, "watch": 1.0736}, {"t": 0.77, "watch": 1.0703}, {"t": 0.78, "watch": 1.0701}, {"t": 0.79, "watch": 1.0694}, {"t": 0.8, "watch": 1.0672}, {"t": 0.81, "watch": 1.0659}, {"t": 0.82, "watch": 1.0649}, {"t": 0.83, "watch": 1.0627}, {"t": 0.84, "watch": 1.0626}, {"t": 0.85, "watch": 1.0596}, {"t": 0.86, "watch": 1.0519}, {"t": 0.87, "watch": 1.0457}, {"t": 0.88, "watch": 1.0383}, {"t": 0.89, "watch": 1.0267}, {"t": 0.9, "watch": 1.0191}, {"t": 0.91, "watch": 1.0093}, {"t": 0.92, "watch": 0.9997}, {"t": 0.93, "watch": 0.9915}, {"t": 0.94, "watch": 0.9834}, {"t": 0.95, "watch": 0.9764}, {"t": 0.96, "watch": 0.9676}, {"t": 0.97, "watch": 0.9595}, {"t": 0.98, "watch": 0.9501}, {"t": 0.99, "watch": 0.9468}, {"t": 1, "watch": 0.9456}], "hook": 1.622, "mid": 1.102, "end": 0.946, "relPerf": 0.871, "dropAt": 0.05, "dropAmt": 0.104, "id": "rvMJuZoQIv0", "title": "【クマ治療】クマ取り失敗、地獄の日々、#クマ取り #クマ改善 #クマ取り失敗#shorts", "views": 12428}], "traffic": [{"source": "SUBSCRIBER", "views": 223239}, {"source": "YT_SEARCH", "views": 141336}, {"source": "SHORTS", "views": 115034}, {"source": "YT_CHANNEL", "views": 28375}, {"source": "RELATED_VIDEO", "views": 17174}, {"source": "EXT_URL", "views": 5910}, {"source": "YT_OTHER_PAGE", "views": 2342}, {"source": "NO_LINK_OTHER", "views": 2020}, {"source": "NOTIFICATION", "views": 1440}, {"source": "HASHTAGS", "views": 692}, {"source": "SOUND_PAGE", "views": 612}, {"source": "END_SCREEN", "views": 385}, {"source": "PLAYLIST", "views": 247}, {"source": "SHORTS_CONTENT_LINKS", "views": 202}, {"source": "ANNOTATION", "views": 1}], "demographics": [{"age": "age45-54", "gender": "female", "pct": 24.7}, {"age": "age55-64", "gender": "female", "pct": 20.2}, {"age": "age35-44", "gender": "female", "pct": 12.0}, {"age": "age45-54", "gender": "male", "pct": 8.6}, {"age": "age65-", "gender": "female", "pct": 8.0}, {"age": "age35-44", "gender": "male", "pct": 6.9}, {"age": "age25-34", "gender": "female", "pct": 6.3}, {"age": "age25-34", "gender": "male", "pct": 4.9}, {"age": "age55-64", "gender": "male", "pct": 4.4}, {"age": "age18-24", "gender": "female", "pct": 1.4}, {"age": "age65-", "gender": "male", "pct": 1.4}, {"age": "age18-24", "gender": "male", "pct": 1.1}, {"age": "age13-17", "gender": "female", "pct": 0.1}, {"age": "age13-17", "gender": "male", "pct": 0.1}, {"age": "age55-64", "gender": "genderUserSpecified", "pct": 0.0}], "devices": [{"device": "MOBILE", "views": 423271}, {"device": "TV", "views": 48049}, {"device": "DESKTOP", "views": 40702}, {"device": "TABLET", "views": 26508}], "countries": [{"country": "JP", "views": 528843}, {"country": "US", "views": 3408}, {"country": "AU", "views": 145}, {"country": "KR", "views": 69}, {"country": "ID", "views": 62}, {"country": "BH", "views": 29}, {"country": "GB", "views": 28}, {"country": "CA", "views": 16}]};
+const yen = n => n.toLocaleString('ja-JP');
+const tip = document.getElementById('tip');
+function showTip(html,x,y){tip.innerHTML=html;tip.style.opacity=1;
+  let tx=x+14,ty=y+14; if(tx+tip.offsetWidth>innerWidth)tx=x-tip.offsetWidth-14;
+  tip.style.left=tx+'px';tip.style.top=ty+'px';}
+function hideTip(){tip.style.opacity=0;}
+
+// ---- header ----
+document.getElementById('chTitle').textContent = D.channel.title;
+document.getElementById('subPill').textContent = '登録者 '+yen(D.channel.subscribers)+'人';
+document.getElementById('period').textContent = '対象期間: '+D.period.start+' 〜 '+D.period.end+'（過去90日）';
+document.getElementById('foot').textContent = '生成日: '+D.generated+' ／ データ: YouTube Analytics API・Data API v3 ／ チャンネルID '+D.channel.id;
+
+// ---- KPI ----
+const s = D.summary;
+const hours = Math.round(s.minutesWatched/60);
+const netCls = s.subsNet>=0?'up':'down';
+const netSign = s.subsNet>=0?'+':'';
+const kpis = [
+  {label:'視聴回数（90日）', val:yen(s.views), note:'1日あたり 約'+yen(Math.round(s.views/90))+'回'},
+  {label:'総視聴時間（90日）', val:yen(hours)+'<span style="font-size:15px;font-weight:600">時間</span>', note:yen(s.minutesWatched)+'分'},
+  {label:'平均視聴時間', val:s.avgViewDurationSec+'<span style="font-size:15px;font-weight:600">秒</span>', note:'1視聴あたり'},
+  {label:'登録者 純増（90日）', val:'<span class="'+netCls+'">'+netSign+yen(s.subsNet)+'</span>', note:'獲得 '+yen(s.subsGained)+' ／ 解除 '+yen(s.subsLost)},
+  {label:'総再生回数（累計）', val:yen(D.channel.totalViews), note:'動画 '+yen(D.channel.videoCount)+'本'},
+];
+document.getElementById('kpis').innerHTML = kpis.map(k=>
+  '<div class="kpi"><div class="label">'+k.label+'</div><div class="val">'+k.val+'</div><div class="note">'+k.note+'</div></div>').join('');
+
+// ---- trend area chart ----
+(function(){
+  const rows = D.daily; if(!rows||!rows.length)return;
+  const W=920,H=260,pad={l:52,r:14,t:14,b:26};
+  const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+  const max=Math.max(...rows.map(r=>r.views))*1.08;
+  const x=i=>pad.l+ (rows.length<2?iw/2: i/(rows.length-1)*iw);
+  const y=v=>pad.t+ih - v/max*ih;
+  const svg=document.getElementById('trend');
+  let g='';
+  // gridlines + y labels
+  const ticks=4;
+  for(let t=0;t<=ticks;t++){const v=max/ticks*t; const yy=y(v);
+    g+='<line x1="'+pad.l+'" x2="'+(W-pad.r)+'" y1="'+yy+'" y2="'+yy+'" stroke="var(--grid)" stroke-width="1"/>';
+    g+='<text x="'+(pad.l-8)+'" y="'+(yy+4)+'" text-anchor="end" font-size="11" fill="var(--muted)" style="font-variant-numeric:tabular-nums">'+yen(Math.round(v))+'</text>';
+  }
+  // x labels (first, mid, last)
+  [0,Math.floor(rows.length/2),rows.length-1].forEach(i=>{
+    g+='<text x="'+x(i)+'" y="'+(H-8)+'" text-anchor="middle" font-size="11" fill="var(--muted)">'+rows[i].date.slice(5)+'</text>';
+  });
+  // area + line
+  let line='M'+x(0)+' '+y(rows[0].views);
+  rows.forEach((r,i)=>{ if(i) line+=' L'+x(i)+' '+y(r.views); });
+  const area=line+' L'+x(rows.length-1)+' '+(pad.t+ih)+' L'+x(0)+' '+(pad.t+ih)+' Z';
+  g+='<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1">'+
+     '<stop offset="0" stop-color="var(--s1)" stop-opacity="0.28"/>'+
+     '<stop offset="1" stop-color="var(--s1)" stop-opacity="0.02"/></linearGradient></defs>';
+  g+='<path d="'+area+'" fill="url(#ag)"/>';
+  g+='<path d="'+line+'" fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round"/>';
+  // baseline
+  g+='<line x1="'+pad.l+'" x2="'+(W-pad.r)+'" y1="'+(pad.t+ih)+'" y2="'+(pad.t+ih)+'" stroke="var(--axis)" stroke-width="1"/>';
+  // hover layer
+  g+='<line id="cross" x1="0" x2="0" y1="'+pad.t+'" y2="'+(pad.t+ih)+'" stroke="var(--axis)" stroke-width="1" opacity="0"/>';
+  g+='<circle id="cdot" r="4.5" fill="var(--s1)" stroke="var(--surface)" stroke-width="2" opacity="0"/>';
+  g+='<rect x="'+pad.l+'" y="'+pad.t+'" width="'+iw+'" height="'+ih+'" fill="transparent" id="hit"/>';
+  svg.innerHTML=g;
+  const cross=svg.querySelector('#cross'),cdot=svg.querySelector('#cdot');
+  svg.querySelector('#hit').addEventListener('mousemove',ev=>{
+    const rect=svg.getBoundingClientRect(); const sx=(ev.clientX-rect.left)/rect.width*W;
+    let i=Math.round((sx-pad.l)/iw*(rows.length-1)); i=Math.max(0,Math.min(rows.length-1,i));
+    const r=rows[i]; cross.setAttribute('x1',x(i));cross.setAttribute('x2',x(i));cross.setAttribute('opacity',1);
+    cdot.setAttribute('cx',x(i));cdot.setAttribute('cy',y(r.views));cdot.setAttribute('opacity',1);
+    showTip('<b>'+r.date+'</b><br>視聴 '+yen(r.views)+'回<br>視聴時間 '+yen(r.minutes)+'分<br>登録 '+(r.subsNet>=0?'+':'')+r.subsNet, ev.clientX, ev.clientY);
+  });
+  svg.querySelector('#hit').addEventListener('mouseleave',()=>{cross.setAttribute('opacity',0);cdot.setAttribute('opacity',0);hideTip();});
+})();
+
+// ---- horizontal bars helper ----
+function bars(el, items, labelKey, valKey, color){
+  const max=Math.max(...items.map(i=>i[valKey]));
+  el.innerHTML=items.map(it=>{
+    const w=(it[valKey]/max*100).toFixed(1);
+    return '<div class="bar-row"><div class="name" title="'+it[labelKey]+'">'+it[labelKey]+'</div>'+
+      '<div class="bar-track"><div class="bar-fill" style="width:'+w+'%;background:'+color+'"></div></div>'+
+      '<div class="bar-val">'+yen(it[valKey])+'</div></div>';
+  }).join('');
+}
+
+// traffic
+const TR={SUBSCRIBER:'登録者フィード',YT_SEARCH:'YouTube検索',SHORTS:'ショートフィード',YT_CHANNEL:'チャンネルページ',
+RELATED_VIDEO:'関連動画',EXT_URL:'外部サイト',YT_OTHER_PAGE:'その他YouTube',NO_LINK_OTHER:'直接/不明',
+NOTIFICATION:'通知',HASHTAGS:'ハッシュタグ',SOUND_PAGE:'サウンドページ',END_SCREEN:'終了画面',
+PLAYLIST:'再生リスト',SHORTS_CONTENT_LINKS:'ショート内リンク',ANNOTATION:'アノテーション'};
+bars(document.getElementById('traffic'),
+  D.traffic.slice(0,7).map(t=>({name:TR[t.source]||t.source,views:t.views})),'name','views','var(--s1)');
+
+// devices
+const DV={MOBILE:'スマホ',TV:'テレビ',DESKTOP:'PC',TABLET:'タブレット'};
+const devTotal=D.devices.reduce((a,d)=>a+d.views,0);
+document.getElementById('devices').innerHTML=D.devices.map(d=>{
+  const pct=(d.views/devTotal*100);
+  const w=pct.toFixed(1);
+  return '<div class="bar-row"><div class="name">'+(DV[d.device]||d.device)+'</div>'+
+    '<div class="bar-track"><div class="bar-fill" style="width:'+w+'%"></div></div>'+
+    '<div class="bar-val">'+pct.toFixed(1)+'%</div></div>';
+}).join('');
+
+// top videos
+(function(){
+  const max=Math.max(...D.topVideos.map(v=>v.views));
+  document.getElementById('topvids').innerHTML=D.topVideos.map((v,i)=>{
+    const w=(v.views/max*100).toFixed(1);
+    const m=Math.floor(v.avgSec/60), sec=v.avgSec%60;
+    const url='https://youtu.be/'+v.id;
+    return '<div class="vid-row"><div class="vid-rank">'+(i+1)+'</div>'+
+      '<div class="vid-body"><div class="vt"><a href="'+url+'" target="_blank" rel="noopener" title="'+v.title.replace(/"/g,'&quot;')+'">'+v.title+'</a><a class="watch" href="'+url+'" target="_blank" rel="noopener">▶ 見る</a></div>'+
+      '<div class="vid-meta"><div class="bar-track"><div class="bar-fill" style="width:'+w+'%"></div></div>'+
+      '<div class="bar-val">'+yen(v.views)+'回 ・ 平均'+m+':'+String(sec).padStart(2,'0')+'</div></div></div></div>';
+  }).join('');
+})();
+
+// demographics grouped by age
+(function(){
+  const AG={'age13-17':'13–17','age18-24':'18–24','age25-34':'25–34','age35-44':'35–44',
+    'age45-54':'45–54','age55-64':'55–64','age65-':'65+'};
+  const order=['age13-17','age18-24','age25-34','age35-44','age45-54','age55-64','age65-'];
+  const map={};
+  D.demographics.forEach(r=>{map[r.age]=map[r.age]||{f:0,m:0}; if(r.gender==='female')map[r.age].f=r.pct; else if(r.gender==='male')map[r.age].m=r.pct;});
+  const maxv=Math.max(...Object.values(map).flatMap(o=>[o.f,o.m]),1);
+  const el=document.getElementById('demo');
+  el.innerHTML=order.filter(a=>map[a]).map(a=>{
+    const o=map[a];
+    const fw=(o.f/maxv*100).toFixed(1), mw=(o.m/maxv*100).toFixed(1);
+    return '<div class="demo-row">'+
+      '<div class="demo-half l"><div class="demo-num">'+o.f.toFixed(1)+'%</div><div class="demo-bar" style="width:'+fw+'%;background:var(--mag)"></div></div>'+
+      '<div class="demo-lab">'+AG[a]+'</div>'+
+      '<div class="demo-half"><div class="demo-bar" style="width:'+mw+'%;background:var(--s1)"></div><div class="demo-num">'+o.m.toFixed(1)+'%</div></div>'+
+      '</div>';
+  }).join('');
+  // fix grid: label center
+  el.querySelectorAll('.demo-row').forEach(r=>{r.style.gridTemplateColumns='1fr 56px 1fr';});
+})();
+
+// ---- retention small multiples ----
+(function(){
+  const R=(D.retention||[]).filter(r=>r.curve&&r.curve.length);
+  const el=document.getElementById('retention');
+  if(!R.length){el.innerHTML='<p class="csub">維持率データがありません（視聴数が少ない動画は非表示）</p>';return;}
+  const avgRel=R.reduce((a,r)=>a+(r.relPerf||0),0)/R.length;
+  document.getElementById('retSub').innerHTML='TOP'+R.length+'動画・類似動画比 平均 <b style="color:var(--good)">'+(avgRel*100).toFixed(0)+'パーセンタイル</b>（高いほど同種動画より維持率が良い）';
+  const W=260,H=110,pad={l:6,r:6,t:8,b:16};
+  const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+  el.innerHTML=R.map(r=>{
+    const cur=r.curve;
+    const maxY=Math.max(2,...cur.map(p=>p.watch));
+    const x=t=>pad.l+t*iw;
+    const y=v=>pad.t+ih-(v/maxY)*ih;
+    let path='M'+x(cur[0].t)+' '+y(cur[0].watch);
+    cur.forEach((p,i)=>{if(i)path+=' L'+x(p.t)+' '+y(p.watch);});
+    const base=y(1);
+    // drop marker
+    let mark='';
+    if(r.dropAt!=null){const dp=cur.reduce((a,b)=>Math.abs(b.t-r.dropAt)<Math.abs(a.t-r.dropAt)?b:a);
+      mark='<text x="'+x(dp.t)+'" y="'+(y(dp.watch)-4)+'" text-anchor="middle" font-size="11" fill="var(--bad)">▼</text>';}
+    const relPct=(r.relPerf*100).toFixed(0);
+    const relCls=r.relPerf>=0.75?'good':(r.relPerf>=0.5?'mut':'warn');
+    const hookCls=r.hook>=1?'good':(r.hook>=0.7?'mut':'warn');
+    return '<div class="ret-card">'+
+      '<div class="ret-title">'+r.title+'</div>'+
+      '<div class="ret-badges">'+
+        '<span class="badge '+relCls+'">類似比 '+relPct+'%</span>'+
+        '<span class="badge '+hookCls+'">冒頭 '+(r.hook*100).toFixed(0)+'%</span>'+
+        '<span class="badge mut">完了 '+(r.end*100).toFixed(0)+'%</span>'+
+      '</div>'+
+      '<svg viewBox="0 0 '+W+' '+H+'">'+
+        '<line x1="'+pad.l+'" x2="'+(W-pad.r)+'" y1="'+base+'" y2="'+base+'" stroke="var(--axis)" stroke-width="1" stroke-dasharray="3 3"/>'+
+        '<path d="'+path+'" fill="none" stroke="var(--s1)" stroke-width="2"/>'+
+        mark+
+        '<text x="'+pad.l+'" y="'+(H-4)+'" font-size="9" fill="var(--muted)">0%</text>'+
+        '<text x="'+(W-pad.r)+'" y="'+(H-4)+'" text-anchor="end" font-size="9" fill="var(--muted)">100%</text>'+
+      '</svg></div>';
+  }).join('');
+})();
+
+// ---- action plan (data-driven) ----
+(function(){
+  const s=D.summary, ch=D.channel;
+  const trTot=D.traffic.reduce((a,t)=>a+t.views,0);
+  const tr={}; D.traffic.forEach(t=>tr[t.source]=t.views);
+  const pct=v=>(v/s.views*100).toFixed(0);
+  const searchPct=((tr.YT_SEARCH||0)/trTot*100).toFixed(0);
+  const subPct=((tr.SUBSCRIBER||0)/trTot*100).toFixed(0);
+  const shortsPct=((tr.SHORTS||0)/trTot*100).toFixed(0);
+  const dev={}; D.devices.forEach(d=>dev[d.device]=d.views);
+  const devTot=D.devices.reduce((a,d)=>a+d.views,0);
+  const mobPct=((dev.MOBILE||0)/devTot*100).toFixed(0);
+  // female 35-64
+  let femCore=0; D.demographics.forEach(r=>{if(r.gender==='female'&&['age35-44','age45-54','age55-64'].includes(r.age))femCore+=r.pct;});
+  const R=(D.retention||[]).filter(r=>r.curve);
+  const avgRel=R.length?R.reduce((a,r)=>a+(r.relPerf||0),0)/R.length:0;
+  const earlyDrop=R.filter(r=>r.dropAt!=null&&r.dropAt<=0.1);
+  const jp=D.countries&&D.countries[0]?((D.countries[0].views/D.countries.reduce((a,c)=>a+c.views,0))*100).toFixed(0):null;
+
+  const acts=[
+    {p:'hi',h:'「失敗→回復」ストーリーのショートを主軸に増産',
+     body:'TOP動画は「クマ取り失敗。地獄の日々」系が'+yen(D.topVideos[0].views)+'回で1位。上位6本中4本が同系統。',
+     why:'<b>根拠:</b> TOP動画の視聴維持率は類似動画比 平均'+(avgRel*100).toFixed(0)+'パーセンタイル＝同種の上位'+(100-avgRel*100).toFixed(0)+'%。既に"勝ちパターン"が確立。症例・経過日数違いで横展開が最も費用対効果が高い。'},
+    {p:'hi',h:'ショート冒頭2秒（フック）の作り込みを徹底',
+     body:earlyDrop.length? '一部の動画（'+earlyDrop.length+'本）で再生開始 '+Math.round(earlyDrop[0].dropAt*100)+'% 付近に最大の離脱。冒頭で結論・ビフォーを先に見せる。'
+        :'冒頭維持率がそのまま最終視聴数を左右。結論/ビフォーを最初の1カットで提示。',
+     why:'<b>根拠:</b> スマホ視聴が'+mobPct+'%＝縦画面・音無しでもわかる冒頭テロップが効く。冒頭維持率が高い動画ほど完了率・再生数が高い相関。'},
+    {p:'md',h:'検索を狙ったタイトル・概要のSEO最適化',
+     body:'「クマ取り」「目の下のクマ」「ダウンタイム」を軸に、症例条件（年代・術式）をタイトル前半へ。',
+     why:'<b>根拠:</b> 流入の'+searchPct+'%がYouTube検索（'+yen(tr.YT_SEARCH||0)+'回）。検索は見込み客＝来院意欲が高い層。タイトル前半の語順が表示CTRを左右。'},
+    {p:'md',h:'40〜60代女性に刺さる訴求へ寄せる',
+     body:'サムネの文言・症例モデル・悩み提起を「40〜60代女性」目線に統一。',
+     why:'<b>根拠:</b> 視聴者の'+femCore.toFixed(0)+'%が35〜64歳女性。最大層は45〜54歳女性(24.7%)。この層の悩み言語に合わせるとCTRと維持率が伸びる。'},
+    {p:'md',h:'投稿頻度を維持し登録者フィードを最大化',
+     body:'週5本ペースを継続。公開時間を主要視聴時間帯に寄せ、通知が届く設計に。',
+     why:'<b>根拠:</b> 最大の流入は登録者フィード'+subPct+'%（'+yen(tr.SUBSCRIBER||0)+'回）。投稿が途切れるとフィード露出が落ちる。90日で純増+'+s.subsNet+'人＝伸長中、頻度が効いている。'},
+    {p:'lo',h:'解説ロング動画で"検討・比較"層を刈り取る',
+     body:'ショートで認知→「術式の違い」「クリニック選び」等のロングで比較検討層を受け皿に。',
+     why:'<b>根拠:</b> ロングの「元ドクター暴露」動画(3:43)が'+yen(D.topVideos.find(v=>v.avgSec>120)?D.topVideos.find(v=>v.avgSec>120).views:9201)+'回を獲得。平均視聴時間'+s.avgViewDurationSec+'秒はショート中心ゆえ。ロングは指名検索・来院に直結しやすい。'},
+    {p:'lo',h:'収益データの可視化（要・追加設定）',
+     body:'収益・RPMを本レポートに追加するには monetary スコープでの再認証が必要。',
+     why:'<b>根拠:</b> 現在の連携は非収益スコープのため収益は未取得。追加すれば単価の高い動画テーマが判別でき、投資配分を最適化できる。'},
+  ];
+  document.getElementById('actions').innerHTML=acts.map(a=>
+    '<div class="act"><h3><span class="prio '+a.p+'">'+({hi:'優先度 高',md:'中',lo:'低'}[a.p])+'</span>'+a.h+'</h3>'+
+    '<p>'+a.body+'</p><p class="why">'+a.why+'</p></div>').join('');
+})();
+
+// ---- executive summary (週次・7日 vs 前7日) ----
+(function(){
+  const dl=D.daily||[];
+  const sum=(arr,k)=>arr.reduce((a,x)=>a+(x[k]||0),0);
+  const last7=dl.slice(-7), prev7=dl.slice(-14,-7);
+  const v7=sum(last7,'views'), vP=sum(prev7,'views');
+  const m7=sum(last7,'minutes'), mP=sum(prev7,'minutes');
+  const s7=sum(last7,'subsNet'), sP=sum(prev7,'subsNet');
+  const delta=(cur,prev)=>{ if(!prev) return null; return ((cur-prev)/prev*100); };
+  const dhtml=(d)=>{ if(d===null) return '<span style="color:var(--muted)">前週比 —</span>';
+    const cls=d>=0?'up':'down'; const s=d>=0?'▲':'▼';
+    return '<span class="'+cls+'">'+s+' '+Math.abs(d).toFixed(0)+'%<span style="color:var(--muted);font-weight:400"> 前週比</span></span>';};
+  document.getElementById('execSub').textContent='直近7日間（'+ (last7[0]?last7[0].date:'') +' 〜 '+ (last7.length?last7[last7.length-1].date:'') +'）の実績と、前の7日間との比較';
+  const chips=[
+    {l:'視聴回数（7日）',v:yen(v7),d:delta(v7,vP)},
+    {l:'視聴時間（7日）',v:yen(Math.round(m7/60))+'時間',d:delta(m7,mP)},
+    {l:'登録者 純増（7日）',v:(s7>=0?'+':'')+yen(s7),d:delta(s7,sP)},
+  ];
+  document.getElementById('execChips').innerHTML=chips.map(c=>
+    '<div class="chip"><div class="cl">'+c.l+'</div><div class="cv">'+c.v+'</div><div class="cd">'+dhtml(c.d)+'</div></div>').join('');
+  // 自動ハイライト
+  const trTop=D.traffic&&D.traffic[0]?({SUBSCRIBER:'登録者フィード',YT_SEARCH:'YouTube検索',SHORTS:'ショートフィード',YT_CHANNEL:'チャンネルページ',RELATED_VIDEO:'関連動画'}[D.traffic[0].source]||D.traffic[0].source):'-';
+  const topV=D.topVideos&&D.topVideos[0]?D.topVideos[0]:null;
+  const R=(D.retention||[]).filter(r=>r.curve);
+  const weak=R.filter(r=>r.dropAt!=null&&r.dropAt<=0.1);
+  const avgRel=R.length?R.reduce((a,r)=>a+(r.relPerf||0),0)/R.length:0;
+  const pts=[];
+  pts.push({ic:'📈',t:'直近7日は'+yen(v7)+'回視聴。'+(delta(v7,vP)>=0?'前週から伸長':'前週より減速')+'。主な流入は<b>'+trTop+'</b>。'});
+  if(topV) pts.push({ic:'🏆',t:'今期の最人気は「'+topV.title.slice(0,26)+'…」（'+yen(topV.views)+'回）。<b>失敗→回復ストーリーの横展開</b>が最優先。'});
+  pts.push({ic:'💪',t:'維持率は類似動画比 <b>'+(avgRel*100).toFixed(0)+'パーセンタイル</b>＝このチャンネルの強み。頻度を落とさず量産を。'});
+  if(weak.length) pts.push({ic:'⚠️',t:'冒頭で早期離脱する動画が <b>'+weak.length+'本</b>。<b>最初の2秒</b>を結論テロップ＋動く症例カットに要改善。'});
+  pts.push({ic:'🎯',t:'最大視聴層は<b>45〜64歳女性</b>。サムネ文言・症例モデルをこの層に統一するとCTR↑。'});
+  document.getElementById('execPts').innerHTML=pts.map(p=>'<li><span class="ic">'+p.ic+'</span>'+p.t+'</li>').join('');
+})();
+
+// ---- strategy static content ----
+(function(){
+  const trend=[
+    '<b>冒頭2秒が全て</b>。3秒以内に視覚的サプライズ・太字テロップ・直接的な問いで掴めなければ即スワイプ。完了率と非スワイプ率が拡散のトリガー。',
+    '<b>「4ビート構造」</b>が標準：Hook→Context→Payoff→Loop（冒頭に戻る作り）で完了率70%超を狙う。',
+    '<b>ビジュアル・ベロシティ</b>：2.5〜3秒に1回、カット/ズーム/テロップの変化を必ず入れる。',
+    '<b>最適尺は15〜35秒</b>（クマ取り解説は20〜35秒が完了率のスイートスポット）。トレンド音源を内容のテンポに合わせる。',
+    '美容業界は<b>ショートが主戦場</b>。医師の人柄・院内の雰囲気を見せる動画が来院に直結。SEO→<b>AI検索対策(AIO)</b>へ移行中。',
+    '<b>⚠️医療広告ガイドライン</b>：SNS/YouTubeも広告扱い。体験談は原則NG、ビフォーアフターは4要件（治療名・費用・リスク副作用・術後ケア）併記が必須。',
+  ];
+  const edit=[
+    '<b>テロップは「1フレーズ1行・大きめ・強調色」</b>。スマホ視聴が大半＆音OFF前提。小さいテロップはスキップ要因。',
+    '<b>3秒に1カットのジャンプカット</b>。「ズーム・パン・テキスト」の3種で緩急。間は0.1秒単位で削り、静止は0.4〜0.6秒に。',
+    '<b>0秒から結論テロップを焼き込む</b>（例：「クマ取り、9割が知らない落とし穴」）。',
+    '<b>ループ設計</b>：最後のカットが冒頭に自然につながる終わり方で再視聴を誘発。',
+    '<b>字幕は全編</b>：アクセシビリティ＋検索対象になる。',
+  ];
+  const diff=[
+    '<b>日本初のクマ取り"専門"＋6,000件超＋院長本人出演</b> → その他大勢の美容外科と違い「専門性・権威」で勝てる。',
+    '<b>"失敗・地獄の日々"を正直に見せる稀有なスタンス</b> → 業界は成功例しか出さない中「正直＝信頼」で差別化（維持率上位11%の理由）。',
+    '<b>「専門医が失敗を解剖する」ポジション</b>を確立。体験談ではなく<b>医学的教育コンテンツ</b>として設計＝ガイドライン適合＋独自性。',
+    '<b>compliance自体を差別化に</b>：4要件をきちんと出す誠実さで信頼構築。体験談風構成（冒頭に成功談→末尾に誘導）は避け、削除・炎上リスクも回避。',
+  ];
+  const struct=
+    '<div class="tmpl"><div class="step"><b>ショート（20〜35秒）</b></div>'+
+    '<div class="step"><b>0–2秒 フック</b>：衝撃の結論 or 問い</div>'+
+    '<div class="step"><b>2–8秒 文脈</b>：なぜ起きるかを専門医視点で1文</div>'+
+    '<div class="step"><b>8–25秒 ペイオフ</b>：具体解説＋症例（4要件を小さく常時表示）</div>'+
+    '<div class="step"><b>25–35秒 ループ&余韻</b>：もう1回見たくなる一言で締める</div></div>'+
+    '<div class="tmpl"><div class="step"><b>ロング（10〜20分）</b></div>'+
+    '<div class="step"><b>0–15秒</b>：最大のフック（結論/引きを先出し・4要件明記）</div>'+
+    '<div class="step"><b>序盤</b>：「今日わかること」を箇条書き提示（離脱防止）</div>'+
+    '<div class="step"><b>中盤</b>：症例解説＋失敗パターン＋回避法（チャプター必須）</div>'+
+    '<div class="step"><b>終盤</b>：質問回収＆次動画への導線（指名検索・来院へ）</div></div>';
+  const ideas=[
+    ['s','クマ取りで逆に老ける3パターン','専門医が失敗の型を3つ即答、症例カット付き','40–60代女性・検討初期','勝ちパターン横展開／保存・完了率'],
+    ['s','「脱脂だけ」で失敗する理由','脱脂単独の落とし穴を1点深掘り','術式を調べ始めた層','検索流入の受け皿／指名化'],
+    ['s','あなたのクマ、実は"影"かも','クマの種類(青/茶/黒)を10秒診断','クマ種別が不明な人','保存・共有／来院前の自己診断'],
+    ['s','40代 vs 50代 クマ取りの違い','年代別の適応と注意を対比','45–54歳女性(最大層)','最大セグメント直撃／CTR'],
+    ['s','他院症例を医師が本音解説','一般症例を専門医目線で誇張の見抜き方','比較検討中・不信のある層','権威×差別化／信頼構築'],
+    ['s','クマ取り後のNG行動3選','ダウンタイム中のNGを3つ','施術直後・予定者','術後ケア価値／来院後満足'],
+    ['l','【保存版】クマ取り術式ぜんぶ解説','脱脂/裏ハムラ/表ハムラ/注入を費用・リスク・DT・ケアまで(4要件網羅)','本格検討層','検討層の刈り取り／滞在時間↑'],
+    ['l','クマ取り"失敗"の医学的原因と回避法','失敗の解剖学的理由→回避の質問リスト','一度失敗した/怖い層','独自性最大化／指名検索・来院'],
+    ['l','院長の1日／6,000件の裏側','院内ツアー＋施術哲学(人柄・専門性の可視化)','院を選び中の層','来院動機／信頼・親近感'],
+    ['l','質問50連発に専門医が回答','コメント質問をまとめ回答(体験談転載はしない)','既存ファン・登録者','登録者フィード最大化／関係強化'],
+  ];
+  const li=a=>a.map(x=>'<li>'+x+'</li>').join('');
+  document.getElementById('secTrend').innerHTML=li(trend);
+  document.getElementById('secEdit').innerHTML=li(edit);
+  document.getElementById('secDiff').innerHTML=li(diff);
+  document.getElementById('secStruct').innerHTML=struct;
+  document.querySelector('#secIdeas tbody').innerHTML=ideas.map((r,i)=>
+    '<tr><td><span class="tag '+r[0]+'">'+(r[0]==='s'?' short':'long')+'</span></td>'+
+    '<td class="k">'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td><td>'+r[4]+'</td></tr>').join('');
+  document.getElementById('secNote').innerHTML='<b>コンプラの肝：</b>「医師が原理・リスク・回避を教える教育コンテンツ」に寄せると、医療広告ガイドライン適合と独自性を両立できます。「患者の成功体験→クリニック誘導」型は体験談広告と見なされ得るため避けるのが安全です。';
+})();
+</script>
+</body>
+</html>
