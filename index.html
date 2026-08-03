@@ -312,6 +312,7 @@ svg{display:block;max-width:100%}
 
     <div class="sec-t"><span class="n">1</span>トレンド（2026・ショート/リール/美容）</div>
     <p class="csub" id="trendUpdated"></p>
+    <div class="hint"><span class="h">📡 調査ソース</span>ローカルのAIが毎週Web検索で、<b>X・TikTok・Instagramリール・YouTubeショート・美容メディア（@cosme／トリビュー等）・業界ニュース</b>を横断的に調べています。<b>各項目の末尾に「出典」を明記</b>（どこ発の話かが分かります）。<br>※各SNSの中身を直接取得はできないため、「メディア/記事が報じたトレンドを拾う（間接）」形です。生のバズをリアルタイムに拾うものではありません。</div>
     <ul class="slist" id="secTrend"></ul>
 
     <div class="sec-t"><span class="n">2</span>編集の仕方</div>
@@ -937,7 +938,7 @@ document.getElementById('devices').innerHTML=D.devices.map(d=>{
     const page='daihon/w/'+date+'.html';
     const tkm={'認知':'awr','教育':'edu','ファン化':'fan'};
     document.getElementById('weeklyIdeasWrap').style.display='';
-    document.getElementById('weeklyIdeasSub').innerHTML='🔄 自動生成: <b>'+date+'</b>（今週のトレンドに合わせてAIが新規作成）　<a href="'+page+'" style="color:var(--s1)">📝 台本を見る →</a>　過去分は<a href="daihon/index.html" style="color:var(--s1)">台本一覧</a>に蓄積';
+    document.getElementById('weeklyIdeasSub').innerHTML='🔄 自動生成: <b>'+date+'</b>（今週のトレンドに合わせてAIが新規作成）　<a href="'+page+'" style="color:var(--s1)">📝 台本を見る →</a>　過去分は<a href="daihon/index.html" style="color:var(--s1)">台本一覧</a>に蓄積<br><span style="color:var(--muted)">根拠＝下の「①トレンド」（各項目に出典つき）。その週のトレンドから逆算して企画化しています</span>';
     document.querySelector('#weeklyIdeas tbody').innerHTML=W.ideas.map(it=>{
       const fmt=it.fmt==='long'?'long':'s'; const flabel=it.fmt==='long'?'long':' short';
       return '<tr><td><span class="tag '+fmt+'">'+flabel+'</span></td>'+
