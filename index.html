@@ -143,6 +143,15 @@ svg{display:block;max-width:100%}
 .reasons li .rn{position:absolute;left:0;top:6px;background:var(--s1);color:#fff;width:18px;height:18px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
 .reasons li b{color:var(--ink)}
 .concl{margin-top:12px;padding:10px 14px;background:var(--surface);border-left:3px solid var(--s1);border-radius:6px;font-size:12.5px;line-height:1.6}
+.hint{font-size:11.5px;color:var(--ink2);background:var(--plane);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin:2px 0 12px;line-height:1.55}
+.hint b{color:var(--ink)}
+.hint .h{color:var(--s1);font-weight:700;margin-right:4px}
+.verdict{font-size:11px;margin-top:6px;font-weight:700;display:inline-block;padding:1px 8px;border-radius:999px}
+.verdict.good{background:rgba(0,131,0,.14);color:var(--good)}
+.verdict.warn{background:rgba(235,104,52,.16);color:var(--orange)}
+.verdict.mid{background:var(--grid);color:var(--ink2)}
+.badge-legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11px;color:var(--ink2);margin:2px 0 12px}
+.badge-legend b{color:var(--ink)}
 .note{background:rgba(235,104,52,.08);border-left:3px solid var(--orange);border-radius:6px;
   padding:10px 14px;font-size:12.5px;line-height:1.6;color:var(--ink2);margin-top:10px}
 .tblwrap{width:100%;overflow-x:auto}
@@ -189,21 +198,14 @@ svg{display:block;max-width:100%}
     <h2>エンゲージメント（アルゴリズム三大指標）</h2>
     <p class="csub">2026年の伸びる指標＝視聴完了率・保存/シェア・コメント。数値が高いほど拡散に乗る</p>
     <div class="eng" id="engage"></div>
-  </div>
-
-  <div class="card">
-    <h2>📖 数字の見方（根拠と意味）</h2>
-    <p class="csub">このレポートの各数値が「どこから来て」「何を意味するか」</p>
-    <div class="tblwrap"><table class="idea-tbl" id="metricGuide">
-      <thead><tr><th>指標</th><th>数字の根拠（出典・算出）</th><th>意味（どう読むか）</th></tr></thead>
-      <tbody></tbody>
-    </table></div>
+    <div class="hint"><span class="h">📖 見方</span>この3つが多いほどYouTubeに「良い動画」と判定され<b>おすすめに露出しやすくなる</b>。特に<b>完了率</b>と<b>保存/シェア</b>が伸びのカギ。<br><span class="h">根拠</span>YouTube Analytics（averageViewPercentage / shares / likes / comments）</div>
   </div>
 
   <div class="card">
     <h2>視聴回数の推移</h2>
     <p class="csub">直近90日間・日次</p>
     <div class="svgwrap"><svg id="trend" viewBox="0 0 920 260" preserveAspectRatio="xMidYMid meet"></svg></div>
+    <div class="hint"><span class="h">📖 見方</span>日ごとの視聴回数。<b>山=バズった日、谷=平常</b>。1本の当たりが長く効き続けていれば“資産化”できている合図。<br><span class="h">根拠</span>Analytics: views（日次）</div>
   </div>
 
   <div class="grid2">
@@ -211,11 +213,13 @@ svg{display:block;max-width:100%}
       <h2>流入元</h2>
       <p class="csub">視聴回数ベース・上位</p>
       <div id="traffic"></div>
+      <div class="hint"><span class="h">📖 見方</span>どこ経由で見られたか。<b>検索＝来院意欲の高い見込み客</b>、<b>登録者フィード＝既存ファン</b>、<b>ショート＝新規認知</b>。<br><span class="h">根拠</span>Analytics: insightTrafficSourceType</div>
     </div>
     <div class="card">
       <h2>視聴デバイス</h2>
       <p class="csub">視聴回数ベース</p>
       <div id="devices"></div>
+      <div class="hint"><span class="h">📖 見方</span>視聴環境。<b>スマホ中心</b>なら縦画面・大きいテロップ・音無し前提で作るのが正解。<br><span class="h">根拠</span>Analytics: deviceType</div>
     </div>
   </div>
 
@@ -223,12 +227,14 @@ svg{display:block;max-width:100%}
     <h2>人気動画 TOP10</h2>
     <p class="csub">直近90日の視聴回数</p>
     <div id="topvids"></div>
+    <div class="hint"><span class="h">📖 見方</span>直近90日で最も見られた動画。<b>伸びている“型”を把握して横展開</b>する。公開日が古いのに上位＝資産化。<br><span class="h">根拠</span>Analytics: views（動画別）＋公開日</div>
   </div>
 
   <div class="card">
     <h2>登録者を増やした動画 TOP5（ファン化ドライバー）</h2>
     <p class="csub">再生数より「登録＝見込み客化」に効いた動画。送客の起点になりやすい</p>
     <div id="subsdrivers"></div>
+    <div class="hint"><span class="h">📖 見方</span>再生数ではなく<b>「登録＝見込み客の増加」に効いた動画</b>。ここが送客ファネルの入口。似た企画を増やすと登録が伸びる。<br><span class="h">根拠</span>Analytics: subscribersGained（動画別）</div>
   </div>
 
   <div class="card">
@@ -239,13 +245,14 @@ svg{display:block;max-width:100%}
       <span><i class="dot" style="background:var(--s1)"></i>男性</span>
     </div>
     <div id="demo"></div>
+    <div class="hint"><span class="h">📖 見方</span>誰が見ているか。<b>実際の患者層（40〜60代女性）と一致しているか</b>を確認。ズレていればサムネ・訴求を調整。<br><span class="h">根拠</span>Analytics: ageGroup × gender（viewerPercentage）</div>
   </div>
 
   <div class="card">
     <h2>視聴維持率（離脱ポイント）</h2>
     <p class="csub" id="retSub"></p>
+    <div class="hint"><span class="h">📖 これは何？</span>各動画を<b>「どこまで見られたか」</b>の曲線。左=再生開始、右=最後。線が右まで高いほど<b>最後まで見られている＝良い動画</b>。<span style="color:var(--bad)">▼</span>＝一番離脱が大きい場所（ここを直すと伸びる）。<br>バッジの意味 → <b>類似比</b>=似た動画と比べた維持率の順位（高い＝良い） ／ <b>冒頭</b>=最初の2秒で残った割合 ／ <b>完了</b>=最後まで見た割合。<br>※ショートはループ再生のため、序盤が100%を超えることがあります（正常）。</div>
     <div class="ret-grid" id="retention"></div>
-    <p class="csub" style="margin-top:12px">※ 横軸=動画の再生位置（0〜100%）、縦軸=維持率。ショートはループ再生のため序盤が100%超になります。破線=100%基準。<span style="color:var(--bad)">▼</span>=最大の離脱ポイント。</p>
   </div>
 
   <div class="card">
@@ -481,6 +488,11 @@ document.getElementById('devices').innerHTML=D.devices.map(d=>{
     const relPct=(r.relPerf*100).toFixed(0);
     const relCls=r.relPerf>=0.75?'good':(r.relPerf>=0.5?'mut':'warn');
     const hookCls=r.hook>=1?'good':(r.hook>=0.7?'mut':'warn');
+    // 一言診断（この動画をどう読むか）
+    let vcls='mid', vtxt='中盤以降でゆるやかに離脱';
+    if(r.dropAt!=null && r.dropAt<=0.1){ vcls='warn'; vtxt='⚠️ 冒頭で離脱 → 最初の2秒(フック)を要改善'; }
+    else if(r.end>=0.9){ vcls='good'; vtxt='◎ 最後までしっかり見られている（完走型）'; }
+    else if(r.relPerf>=0.75){ vcls='good'; vtxt='◎ 似た動画より維持率が高い（良い型）'; }
     return '<div class="ret-card">'+
       '<div class="ret-title">'+r.title+'</div>'+
       '<div class="ret-badges">'+
@@ -492,9 +504,10 @@ document.getElementById('devices').innerHTML=D.devices.map(d=>{
         '<line x1="'+pad.l+'" x2="'+(W-pad.r)+'" y1="'+base+'" y2="'+base+'" stroke="var(--axis)" stroke-width="1" stroke-dasharray="3 3"/>'+
         '<path d="'+path+'" fill="none" stroke="var(--s1)" stroke-width="2"/>'+
         mark+
-        '<text x="'+pad.l+'" y="'+(H-4)+'" font-size="9" fill="var(--muted)">0%</text>'+
-        '<text x="'+(W-pad.r)+'" y="'+(H-4)+'" text-anchor="end" font-size="9" fill="var(--muted)">100%</text>'+
-      '</svg></div>';
+        '<text x="'+pad.l+'" y="'+(H-4)+'" font-size="9" fill="var(--muted)">開始</text>'+
+        '<text x="'+(W-pad.r)+'" y="'+(H-4)+'" text-anchor="end" font-size="9" fill="var(--muted)">最後</text>'+
+      '</svg>'+
+      '<div class="verdict '+vcls+'">'+vtxt+'</div></div>';
   }).join('');
 })();
 
@@ -778,19 +791,6 @@ document.getElementById('devices').innerHTML=D.devices.map(d=>{
   document.getElementById('ideaIntro').innerHTML='計20本（ショート10・長尺10）。配分は<b>認知'+cnt('awr')+'：教育'+cnt('edu')+'：ファン化'+cnt('fan')+'</b>。Google「HHH戦略」では<b>教育（検索対応）を多めが定石</b>で、あなたの<b>検索流入26%</b>がそれを裏付けます。20本中<b>'+nGen+'本が爾今の原案そのまま</b>（▶参考リンク付き）、残りが当分析での設計です。';
   document.getElementById('secNote').innerHTML='<b>出典：</b><span class="tag gen">原案</span>＝爾今のSNS投稿提案（5チャネル2,062投稿の勝ちパターン×2026トレンド調査、参考URL付き）。<span class="tag adp">参考</span>＝それを土台に当分析の維持率データで設計。長尺は爾今提案が短尺中心のため参考が多め。<b>コンプラの肝：</b>「医師が原理・リスク・回避を教える教育コンテンツ」に寄せ、体験談・BA広告と見なされない設計に。';
 
-  // 指標の見方（根拠と意味）
-  const mg=[
-    ['視聴回数','YouTube Analytics: views（実測）','その期間の再生総数＝リーチの母数。多いほど認知が広がっている'],
-    ['視聴維持率（平均）','Analytics: averageViewPercentage','動画の何%まで平均で見られたか。高いほどアルゴリズム評価↑で露出が増える'],
-    ['類似動画比パーセンタイル','Analytics: relativeRetentionPerformance','同じ長さ・種類の動画と比べた維持率順位。89=似た動画100本中およそ上位11位相当'],
-    ['送客ファネル率（41/91/34%）','爾今マーケKPIシート実測（2026年1〜6月）','LINE登録100人→予約41→来院37→成約13人。YouTubeの先の"お金の流れ"'],
-    ['客単価 63万円','爾今KPI（2025年実績61.8万／安牌30万）','1成約あたりの売上。送客1件の金銭価値＝YouTube投資対効果の基準'],
-    ['流入元 %','Analytics: insightTrafficSourceType','どこ経由で見られたか。検索=見込み客(高意欲)、登録者フィード=既存ファン、ショート=新規認知'],
-    ['シェア/いいね/コメント','Analytics: shares / likes / comments','アルゴリズム三大指標の一部。多いほど「良い動画」と判定され拡散されやすい'],
-    ['登録者 純増','Analytics: subscribersGained − subscribersLost','見込み客の増加数。フィード露出の母数になり、送客の土台になる'],
-  ];
-  document.querySelector('#metricGuide tbody').innerHTML=mg.map(r=>
-    '<tr><td class="k">'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>').join('');
 })();
 </script>
 </body>
