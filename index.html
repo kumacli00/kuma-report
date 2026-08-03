@@ -122,6 +122,14 @@ svg{display:block;max-width:100%}
 .idea-tbl td.k{white-space:nowrap;color:var(--ink);font-weight:600}
 .tag{font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px;white-space:nowrap}
 .tag.s{background:rgba(42,120,214,.15);color:var(--s1)}.tag.l{background:rgba(235,104,52,.15);color:var(--orange)}
+.tag.gen{background:rgba(0,131,0,.16);color:var(--good)}       /* 原案そのまま */
+.tag.adp{background:rgba(74,58,167,.16);color:#9085e9}          /* 参考・当分析 */
+.tag.awr{background:rgba(235,104,52,.16);color:var(--orange)}   /* 認知 */
+.tag.edu{background:rgba(42,120,214,.16);color:var(--s1)}       /* 教育 */
+.tag.fan{background:rgba(232,123,164,.18);color:var(--mag)}     /* ファン化 */
+.legend2{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:11px;color:var(--ink2);margin:6px 0 12px}
+.legend2 b{color:var(--ink)}
+.subh{font-size:13px;font-weight:700;margin:14px 0 6px;color:var(--ink)}
 .note{background:rgba(235,104,52,.08);border-left:3px solid var(--orange);border-radius:6px;
   padding:10px 14px;font-size:12.5px;line-height:1.6;color:var(--ink2);margin-top:10px}
 .tblwrap{width:100%;overflow-x:auto}
@@ -168,6 +176,15 @@ svg{display:block;max-width:100%}
     <h2>エンゲージメント（アルゴリズム三大指標）</h2>
     <p class="csub">2026年の伸びる指標＝視聴完了率・保存/シェア・コメント。数値が高いほど拡散に乗る</p>
     <div class="eng" id="engage"></div>
+  </div>
+
+  <div class="card">
+    <h2>📖 数字の見方（根拠と意味）</h2>
+    <p class="csub">このレポートの各数値が「どこから来て」「何を意味するか」</p>
+    <div class="tblwrap"><table class="idea-tbl" id="metricGuide">
+      <thead><tr><th>指標</th><th>数字の根拠（出典・算出）</th><th>意味（どう読むか）</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
   </div>
 
   <div class="card">
@@ -237,10 +254,26 @@ svg{display:block;max-width:100%}
     <div class="sec-t"><span class="n">5</span>差別化（このチャンネルの強み活用）</div>
     <ul class="slist" id="secDiff"></ul>
 
-    <div class="sec-t"><span class="n">6</span>次回企画案 10本</div>
+    <div class="sec-t"><span class="n">6</span>次回企画案（ショート10・長尺10）</div>
+    <p class="csub" id="ideaIntro"></p>
+    <div class="legend2">
+      <span><span class="tag gen">原案</span> = 爾今の提案そのまま</span>
+      <span><span class="tag adp">参考</span> = 爾今を参考に当分析で設計</span>
+      <span><span class="tag awr">認知</span>=拡散/新規（Hero）</span>
+      <span><span class="tag edu">教育</span>=検索/疑問解決（Help）</span>
+      <span><span class="tag fan">ファン化</span>=関係構築（Hub）</span>
+    </div>
+    <div class="subh">■ ショート（20〜35秒）× 10本</div>
     <div class="tblwrap">
-      <table class="idea-tbl" id="secIdeas">
-        <thead><tr><th>形式</th><th>テーマ</th><th>内容</th><th>ターゲット</th><th>狙い・目的</th></tr></thead>
+      <table class="idea-tbl" id="ideaShort">
+        <thead><tr><th>区分</th><th>種別</th><th>テーマ</th><th>狙い・ターゲット</th><th>時期</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="subh">■ 横動画（長尺 10〜20分）× 10本</div>
+    <div class="tblwrap">
+      <table class="idea-tbl" id="ideaLong">
+        <thead><tr><th>区分</th><th>種別</th><th>テーマ</th><th>狙い・ターゲット</th><th>時期</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
@@ -609,31 +642,62 @@ document.getElementById('devices').innerHTML=D.devices.map(d=>{
     '<div class="step"><b>序盤</b>：「今日わかること」を箇条書き提示（離脱防止）</div>'+
     '<div class="step"><b>中盤</b>：症例解説＋失敗パターン＋回避法（チャプター必須）</div>'+
     '<div class="step"><b>終盤</b>：質問回収＆次動画への導線（指名検索・来院へ）</div></div>';
-  // 爾今ネタバンク（勝ちパターン×時期カレンダー）× 私の維持率データ で統合した企画
-  // 列: [形式, カテゴリ, テーマ, 内容, ターゲット, 狙い, 時期]
-  const ideas=[
-    ['s','本丸','そのクマ、脱脂したら5年後に凹みます','素人の"とりあえず脱脂" vs プロの裏ハムラを解剖学的に対比。冒頭2秒で結論','比較検討中のCS巡り層','勝ちパターン②比較（対比型は2026バズ1位）','通年'],
-    ['s','本丸','クマ取りでゾンビ顔になる人が増えています','過剰脱脂の落とし穴（くぼみ・骨影・老け見え）を院長が忖度なく','失敗を恐れる慎重層','告発型＝Xで最も伸びる／院長専門領域','通年'],
-    ['s','季節','お盆に仕込むクマ取りカレンダー【最大9連休】','8/13-17＋有休のDT日数を横軸で図解「8日空けばここまで治る」','連休に手術したい会社員','連休需要×失敗回避。今が予約喚起の適期','7月中〜8月上'],
-    ['s','時事','Netflix『ダウンタイム』を美容外科医がガチ解説','9/17世界配信（松岡茉優主演）便乗。ドラマ描写と実DTの違い','ドラマで美容に興味を持った新規','話題便乗で非フォロワーへ最大リーチ','9/17前後'],
-    ['s','時事','痩せ薬で"こけ顔"になる前に【GLP-1注意喚起】','8月薬価25%下げ直前。急減量で目元がこける注意喚起','ダイエット×美容関心層','旬ニュース便乗（中）。自院は痩身やらない前提','8月'],
-    ['s','拡張','その目、クマ？それとも眼瞼下垂？【1分セルフ診断】','「眠そう」「まぶた重い」で若年検索急増。鏡でチェック','眠そうな目に悩む層','セルフ診断＝保存の鉄板。目元総合窓口化','通年'],
-    ['s','型','あなたのクマ、脱脂向き？裏ハムラ向き？30秒診断','引っ張って影が消える/消えないでYES/NO分岐。「保存」で締め','自分のタイプを知りたい層','完視聴率↑＋保存率（三大指標）を意図設計','通年'],
-    ['l','本丸','症例◯件でわかった「失敗する人」共通点3つ','実績・症例数を冒頭提示し3つ目をコメント欄へ誘導','医師で選ぶ指名層','勝ちパターン③。症例数No.1を失敗回避メリットに変換','通年'],
-    ['l','本丸','【保存版】クマ取り術式ぜんぶ解説','脱脂/裏ハムラ/表ハムラ/注入を費用・リスク・DT・ケアまで(4要件網羅)','本格検討層','検討層の刈り取り／滞在時間↑／送客直結','通年'],
-    ['l','拡張','男のクマ取りが当たり前になる日【市場1.8倍】','20代男性の美容利用率が女性を初逆転。疲れ顔が損する層へ','30-60代ビジネスマン','銀座立地×男性は穴場。競合発信が薄い','通年'],
-  ];
   const li=a=>a.map(x=>'<li>'+x+'</li>').join('');
   document.getElementById('secTrend').innerHTML=li(trend);
   document.getElementById('secEdit').innerHTML=li(edit);
   document.getElementById('secDiff').innerHTML=li(diff);
   document.getElementById('secStruct').innerHTML=struct;
-  document.querySelector('#secIdeas thead tr').innerHTML='<th>形式</th><th>分類</th><th>テーマ</th><th>内容</th><th>ターゲット</th><th>狙い</th><th>時期</th>';
-  document.querySelector('#secIdeas tbody').innerHTML=ideas.map(r=>
-    '<tr><td><span class="tag '+r[0]+'">'+(r[0]==='s'?' short':'long')+'</span></td>'+
-    '<td><span class="tag '+(r[1]==='本丸'?'l':'s')+'">'+r[1]+'</span></td>'+
-    '<td class="k">'+r[2]+'</td><td>'+r[3]+'</td><td>'+r[4]+'</td><td>'+r[5]+'</td><td class="k">'+r[6]+'</td></tr>').join('');
-  document.getElementById('secNote').innerHTML='<b>出典：</b>企画は爾今のSNS投稿提案（5チャネル2,062投稿の勝ちパターン×2026トレンド調査）と、当分析の維持率データ（勝ちパターンが独立に一致）を統合。<b>コンプラの肝：</b>「医師が原理・リスク・回避を教える教育コンテンツ」に寄せ、体験談広告・BA広告と見なされない設計に。';
+
+  // 企画: [区分 gen=原案そのまま/adp=参考, 種別 awr=認知/edu=教育/fan=ファン化, テーマ, 狙い・ターゲット, 時期, YouTube参考ID(原案のみ)]
+  const shorts=[
+    ['gen','edu','そのクマ、脱脂したら5年後に凹みます','素人vsプロを解剖学的に対比／比較検討中のCS巡り層','通年','cvRLXLcMKjU'],
+    ['gen','awr','クマ取りでゾンビ顔になる人が増えています','過剰脱脂の告発型・拡散狙い／失敗を恐れる慎重層','通年','rW6HitvJspU'],
+    ['gen','awr','Netflix『ダウンタイム』を美容外科医がガチ解説','9/17配信便乗で非フォロワー最大リーチ／新規','9/17前後','4Mopkx0DAZg'],
+    ['gen','awr','痩せたのに老けた…マンジャロ顔でくぼむのは目の下','GLP-1こけ顔の注意喚起／ダイエット×美容関心層','8月','TW9q7ZK7894'],
+    ['gen','edu','その目、クマ？それとも眼瞼下垂？1分セルフ診断','若年検索急増ワード・保存の鉄板／眠そうな目に悩む層','通年','znopvru2aCY'],
+    ['gen','edu','あなたのクマ、脱脂向き？裏ハムラ向き？30秒診断','完視聴率↑保存率↑を意図設計／自分のタイプを知りたい層','通年','HYPA_JhIo4w'],
+    ['gen','edu','血色パンダチーク、クマがある人は逆に老け見えする理由','@cosme下半期トレンド筆頭に便乗／トレンド関心層','2026下期','-RFp0YuEWqI'],
+    ['gen','awr','お盆に仕込むクマ取りカレンダー【最大9連休】','DT逆算で予約喚起／連休に手術したい会社員','7月中〜8月上','gOx19RCAYTA'],
+    ['adp','edu','冒頭2秒改善版：人気動画の"失敗→回復"を30秒に再編集','早期離脱2本を維持率データで改善／既存視聴層','即','' ],
+    ['adp','fan','登録を最も増やした動画の続編（ドライバー横展開）','ファン化ドライバーの再現／登録者・見込み客','通年','' ],
+  ];
+  const longs=[
+    ['gen','edu','症例◯件でわかった「失敗する人」共通点3つ','症例数No.1を失敗回避メリットに変換／医師で選ぶ指名層','通年','JmasA0PQm0c'],
+    ['adp','edu','【保存版】クマ取り術式ぜんぶ解説（脱脂/裏ハムラ/表ハムラ/注入）','4要件網羅で検討層を刈る・送客直結／本格検討層','通年','' ],
+    ['adp','edu','クマ取り"失敗"の医学的原因と回避法','独自性最大化・教育型／一度失敗した・怖い層','通年','' ],
+    ['gen','awr','整形をやりすぎると10年後こうなる【芸能人例で解説】','芸能×失敗で検索・回遊／幅広い美容関心層','通年','DHobQBus7cU'],
+    ['adp','fan','院長の1日／6,000件の裏側（院内ツアー）','人柄・専門性の可視化で来院動機／院選び中の層','通年','' ],
+    ['gen','edu','男のクマ取りが当たり前になる日【市場1.8倍】','銀座×男性は穴場・競合薄い／30-60代ビジネスマン','通年','ONCj1SDONhI'],
+    ['adp','fan','質問50連発に専門医が回答（体験談転載はしない）','登録者フィード41%を最大化／既存ファン','通年','' ],
+    ['gen','edu','肌育注射5種を忖度なし比較・目元に打っていい/ダメ','ブーム俯瞰×専門仕分け／肌トレンド関心層','2026下期','kfTLnMyUscY'],
+    ['adp','edu','「切らないクマ取り」リジュラン/PDRN/ベビーコラーゲン徹底比較','爾今の成分ネタを統合・対比型／注入検討層','2026下期','' ],
+    ['gen','awr','渡韓美容もう損？免税終了で韓国vs日本どっちが安い本気計算','時事×銀座立地への導線／渡韓検討層','通年','sO8wrqT0WbM'],
+  ];
+  const tp={gen:'原案',adp:'参考'}, tk={awr:'認知',edu:'教育',fan:'ファン化'};
+  const yt=id=>id?' <a href="https://youtu.be/'+id+'" target="_blank" rel="noopener" style="color:var(--s1)">▶参考</a>':'';
+  const renderIdeas=(rows,sel)=>{document.querySelector(sel+' tbody').innerHTML=rows.map(r=>
+    '<tr><td><span class="tag '+r[0]+'">'+tp[r[0]]+'</span></td>'+
+    '<td><span class="tag '+r[1]+'">'+tk[r[1]]+'</span></td>'+
+    '<td class="k">'+r[2]+yt(r[5])+'</td><td>'+r[3]+'</td><td class="k">'+r[4]+'</td></tr>').join('');};
+  renderIdeas(shorts,'#ideaShort'); renderIdeas(longs,'#ideaLong');
+  const all=[...shorts,...longs], cnt=k=>all.filter(r=>r[1]===k).length;
+  const nGen=all.filter(r=>r[0]==='gen').length;
+  document.getElementById('ideaIntro').innerHTML='計20本（ショート10・長尺10）。配分は<b>認知'+cnt('awr')+'：教育'+cnt('edu')+'：ファン化'+cnt('fan')+'</b>。Google「HHH戦略」では<b>教育（検索対応）を多めが定石</b>で、あなたの<b>検索流入26%</b>がそれを裏付けます。20本中<b>'+nGen+'本が爾今の原案そのまま</b>（▶参考リンク付き）、残りが当分析での設計です。';
+  document.getElementById('secNote').innerHTML='<b>出典：</b><span class="tag gen">原案</span>＝爾今のSNS投稿提案（5チャネル2,062投稿の勝ちパターン×2026トレンド調査、参考URL付き）。<span class="tag adp">参考</span>＝それを土台に当分析の維持率データで設計。長尺は爾今提案が短尺中心のため参考が多め。<b>コンプラの肝：</b>「医師が原理・リスク・回避を教える教育コンテンツ」に寄せ、体験談・BA広告と見なされない設計に。';
+
+  // 指標の見方（根拠と意味）
+  const mg=[
+    ['視聴回数','YouTube Analytics: views（実測）','その期間の再生総数＝リーチの母数。多いほど認知が広がっている'],
+    ['視聴維持率（平均）','Analytics: averageViewPercentage','動画の何%まで平均で見られたか。高いほどアルゴリズム評価↑で露出が増える'],
+    ['類似動画比パーセンタイル','Analytics: relativeRetentionPerformance','同じ長さ・種類の動画と比べた維持率順位。89=似た動画100本中およそ上位11位相当'],
+    ['送客ファネル率（41/91/34%）','爾今マーケKPIシート実測（2026年1〜6月）','LINE登録100人→予約41→来院37→成約13人。YouTubeの先の"お金の流れ"'],
+    ['客単価 63万円','爾今KPI（2025年実績61.8万／安牌30万）','1成約あたりの売上。送客1件の金銭価値＝YouTube投資対効果の基準'],
+    ['流入元 %','Analytics: insightTrafficSourceType','どこ経由で見られたか。検索=見込み客(高意欲)、登録者フィード=既存ファン、ショート=新規認知'],
+    ['シェア/いいね/コメント','Analytics: shares / likes / comments','アルゴリズム三大指標の一部。多いほど「良い動画」と判定され拡散されやすい'],
+    ['登録者 純増','Analytics: subscribersGained − subscribersLost','見込み客の増加数。フィード露出の母数になり、送客の土台になる'],
+  ];
+  document.querySelector('#metricGuide tbody').innerHTML=mg.map(r=>
+    '<tr><td class="k">'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>').join('');
 })();
 </script>
 </body>
