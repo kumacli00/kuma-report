@@ -256,6 +256,7 @@ svg{display:block;max-width:100%}
 
     <div class="sec-t"><span class="n">6</span>次回企画案（ショート10・長尺10）</div>
     <p class="csub" id="ideaIntro"></p>
+    <p style="margin:0 0 12px"><a href="daihon/index.html" style="display:inline-block;background:var(--s1);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none">📝 全20本の台本（構成・テロップ・尺配分）を見る →</a></p>
     <div class="legend2">
       <span><span class="tag gen">原案</span> = 爾今の提案そのまま</span>
       <span><span class="tag adp">参考</span> = 爾今を参考に当分析で設計</span>
@@ -674,12 +675,13 @@ document.getElementById('devices').innerHTML=D.devices.map(d=>{
     ['gen','awr','渡韓美容もう損？免税終了で韓国vs日本どっちが安い本気計算','時事×銀座立地への導線／渡韓検討層','通年','sO8wrqT0WbM'],
   ];
   const tp={gen:'原案',adp:'参考'}, tk={awr:'認知',edu:'教育',fan:'ファン化'};
-  const yt=id=>id?' <a href="https://youtu.be/'+id+'" target="_blank" rel="noopener" style="color:var(--s1)">▶参考</a>':'';
-  const renderIdeas=(rows,sel)=>{document.querySelector(sel+' tbody').innerHTML=rows.map(r=>
-    '<tr><td><span class="tag '+r[0]+'">'+tp[r[0]]+'</span></td>'+
+  const yt=id=>id?' <a href="https://youtu.be/'+id+'" target="_blank" rel="noopener" style="color:var(--muted)">▶参考</a>':'';
+  const renderIdeas=(rows,sel,prefix)=>{document.querySelector(sel+' tbody').innerHTML=rows.map((r,i)=>{
+    const did=prefix+String(i+1).padStart(2,'0');
+    return '<tr><td><span class="tag '+r[0]+'">'+tp[r[0]]+'</span></td>'+
     '<td><span class="tag '+r[1]+'">'+tk[r[1]]+'</span></td>'+
-    '<td class="k">'+r[2]+yt(r[5])+'</td><td>'+r[3]+'</td><td class="k">'+r[4]+'</td></tr>').join('');};
-  renderIdeas(shorts,'#ideaShort'); renderIdeas(longs,'#ideaLong');
+    '<td class="k"><a href="daihon/'+did+'.html" style="color:var(--ink)">'+r[2]+'</a> <a href="daihon/'+did+'.html" style="color:var(--s1);font-size:11px;white-space:nowrap">📝台本</a>'+yt(r[5])+'</td><td>'+r[3]+'</td><td class="k">'+r[4]+'</td></tr>';}).join('');};
+  renderIdeas(shorts,'#ideaShort','s'); renderIdeas(longs,'#ideaLong','l');
   const all=[...shorts,...longs], cnt=k=>all.filter(r=>r[1]===k).length;
   const nGen=all.filter(r=>r[0]==='gen').length;
   document.getElementById('ideaIntro').innerHTML='計20本（ショート10・長尺10）。配分は<b>認知'+cnt('awr')+'：教育'+cnt('edu')+'：ファン化'+cnt('fan')+'</b>。Google「HHH戦略」では<b>教育（検索対応）を多めが定石</b>で、あなたの<b>検索流入26%</b>がそれを裏付けます。20本中<b>'+nGen+'本が爾今の原案そのまま</b>（▶参考リンク付き）、残りが当分析での設計です。';
