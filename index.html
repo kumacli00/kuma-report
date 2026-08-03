@@ -677,12 +677,23 @@ document.getElementById('devices').innerHTML=D.devices.map(d=>{
     ['gen','awr','渡韓美容もう損？免税終了で韓国vs日本どっちが安い本気計算','時事×銀座立地への導線／渡韓検討層','通年','sO8wrqT0WbM'],
   ];
   const tp={gen:'原案',adp:'参考'}, tk={awr:'認知',edu:'教育',fan:'ファン化'};
-  const yt=id=>id?' <a href="https://youtu.be/'+id+'" target="_blank" rel="noopener" style="color:var(--muted)">▶参考</a>':'';
+  const researchRef={
+    s09:'https://liartpromotion.co.jp/column/short-video-hook-examples/',
+    s10:'https://www.youtube.com/@kumatorinavi_sbc',
+    l02:'https://www.youtube.com/watch?v=dF01rczdqbU',
+    l03:'https://www.youtube.com/watch?v=B_KZykUhV8o',
+    l05:'https://www.youtube.com/watch?v=c_DmVjrwfzM',
+    l07:'https://www.youtube.com/channel/UCo3qCN17xUuS-bTHxFhiEuA',
+    l09:'https://www.youtube.com/watch?v=9FrS8gXguXI'};
+  const refLink=(ytid,did)=>{
+    if(ytid) return ' <a href="https://youtu.be/'+ytid+'" target="_blank" rel="noopener" style="color:var(--muted);font-size:11px;white-space:nowrap">▶参考</a>';
+    if(researchRef[did]) return ' <a href="'+researchRef[did]+'" target="_blank" rel="noopener" style="color:var(--muted);font-size:11px;white-space:nowrap">▶参考(調査)</a>';
+    return '';};
   const renderIdeas=(rows,sel,prefix)=>{document.querySelector(sel+' tbody').innerHTML=rows.map((r,i)=>{
     const did=prefix+String(i+1).padStart(2,'0');
     return '<tr><td><span class="tag '+r[0]+'">'+tp[r[0]]+'</span></td>'+
     '<td><span class="tag '+r[1]+'">'+tk[r[1]]+'</span></td>'+
-    '<td class="k"><a href="daihon/'+did+'.html" style="color:var(--ink)">'+r[2]+'</a> <a href="daihon/'+did+'.html" style="color:var(--s1);font-size:11px;white-space:nowrap">📝台本</a>'+yt(r[5])+'</td><td>'+r[3]+'</td><td class="k">'+r[4]+'</td></tr>';}).join('');};
+    '<td class="k"><a href="daihon/'+did+'.html" style="color:var(--ink)">'+r[2]+'</a> <a href="daihon/'+did+'.html" style="color:var(--s1);font-size:11px;white-space:nowrap">📝台本</a>'+refLink(r[5],did)+'</td><td>'+r[3]+'</td><td class="k">'+r[4]+'</td></tr>';}).join('');};
   renderIdeas(shorts,'#ideaShort','s'); renderIdeas(longs,'#ideaLong','l');
   const all=[...shorts,...longs], cnt=k=>all.filter(r=>r[1]===k).length;
   const nGen=all.filter(r=>r[0]==='gen').length;
