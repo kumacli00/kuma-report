@@ -130,6 +130,19 @@ svg{display:block;max-width:100%}
 .legend2{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:11px;color:var(--ink2);margin:6px 0 12px}
 .legend2 b{color:var(--ink)}
 .subh{font-size:13px;font-weight:700;margin:14px 0 6px;color:var(--ink)}
+.whybox{background:linear-gradient(135deg,rgba(42,120,214,.10),transparent);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin:10px 0 16px}
+.whybox h4{font-size:14px;margin:0 0 4px}
+.whybox .lead{font-size:12.5px;color:var(--ink2);margin:0 0 12px;line-height:1.6}
+.whybox .lead b{color:var(--ink)}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:12px}
+.role{border:1px solid var(--border);border-radius:8px;padding:8px 11px;font-size:12px}
+.role .rt{font-weight:700;margin-bottom:2px}
+.reasons{list-style:none;padding:0;margin:0}
+.reasons li{font-size:12.5px;line-height:1.55;padding:6px 0 6px 26px;position:relative;border-top:1px solid var(--border)}
+.reasons li:first-child{border-top:none}
+.reasons li .rn{position:absolute;left:0;top:6px;background:var(--s1);color:#fff;width:18px;height:18px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.reasons li b{color:var(--ink)}
+.concl{margin-top:12px;padding:10px 14px;background:var(--surface);border-left:3px solid var(--s1);border-radius:6px;font-size:12.5px;line-height:1.6}
 .note{background:rgba(235,104,52,.08);border-left:3px solid var(--orange);border-radius:6px;
   padding:10px 14px;font-size:12.5px;line-height:1.6;color:var(--ink2);margin-top:10px}
 .tblwrap{width:100%;overflow-x:auto}
@@ -255,6 +268,7 @@ svg{display:block;max-width:100%}
     <ul class="slist" id="secDiff"></ul>
 
     <div class="sec-t"><span class="n">6</span>次回企画案（ショート10・長尺10）</div>
+    <div class="whybox" id="whyRatio"></div>
     <p class="csub" id="ideaIntro"></p>
     <p style="margin:0 0 12px"><a href="daihon/index.html" style="display:inline-block;background:var(--s1);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none">📝 全20本の台本（構成・テロップ・尺配分）を見る →</a></p>
     <div class="legend2">
@@ -645,6 +659,35 @@ document.getElementById('devices').innerHTML=D.devices.map(d=>{
     '<div class="step"><b>序盤</b>：「今日わかること」を箇条書き提示（離脱防止）</div>'+
     '<div class="step"><b>中盤</b>：症例解説＋失敗パターン＋回避法（チャプター必須）</div>'+
     '<div class="step"><b>終盤</b>：質問回収＆次動画への導線（指名検索・来院へ）</div></div>';
+  // なぜ 教育2：認知1 なのか（このチャンネルの根拠・説得用）
+  (function(){
+    const s=D.summary, ch=D.channel;
+    const trTot=D.traffic.reduce((a,t)=>a+t.views,0);
+    const tr={}; D.traffic.forEach(t=>tr[t.source]=t.views);
+    const searchV=tr.YT_SEARCH||0, searchPct=(searchV/trTot*100).toFixed(0);
+    let femCore=0; D.demographics.forEach(r=>{if(r.gender==='female'&&['age35-44','age45-54','age55-64'].includes(r.age))femCore+=r.pct;});
+    const topV=D.topVideos&&D.topVideos[0]?D.topVideos[0]:null;
+    const topPub=topV&&topV.published?topV.published.replace(/-/g,'/'):'';
+    const roles=[
+      {t:'認知（Hero）',d:'新規に発見させる入口。旬ネタ・トレンド便乗で拡散するが、意欲は低く寿命は約2週間'},
+      {t:'教育（Help）',d:'検索で見つかる疑問解決。来院意欲が高い見込み客を集め、永続的に効く“資産”'},
+      {t:'ファン化（Hub）',d:'既存視聴者との関係構築。登録者フィードを厚くし送客の土台に'},
+    ];
+    const reasons=[
+      '<b>目的は再生数ではなく送客。</b>1成約＝客単価63万円（爾今KPI）。100万再生のYouTube広告収益（数千〜数万円）より、送客1件の方が桁違いに大きい。だから「何回見られたか」より「<b>誰が見たか</b>」が全て。',
+      '<b>検索流入が'+searchPct+'%（'+yen(searchV)+'回/90日）。</b>「クマ取り」等で検索する人は“今まさに悩んで調べている＝来院意欲が高い見込み客”。これを生むのは認知バズではなく<b>教育コンテンツ</b>。',
+      '<b>教育は“資産化”する。</b>最も見られている動画は'+(topPub?'<b>'+topPub+'公開</b>なのに今も1位':'1年以上前でも上位')+'＝作り続けなくても集客し続ける。逆に認知（トレンド便乗）は旬2週間で消える。',
+      '<b>視聴者の'+femCore.toFixed(0)+'%が40〜60代女性＝クリニックの実際の患者層。</b>バズ狙いの認知に偏ると“見て終わり”の非ターゲットが増え、数字は伸びても来院は増えない。',
+      '<b>順序が大事。</b>認知（1本）で新規に見つけてもらい→教育（2本）で信頼と来院意欲を育てる。この「入口1：刈り取り2」の比率が、限られた撮影本数で送客を最大化する。',
+    ];
+    document.getElementById('whyRatio').innerHTML=
+      '<h4>なぜ「教育2：認知1」なのか — このチャンネルの根拠</h4>'+
+      '<p class="lead">“とにかく再生数”では売上（送客）は増えません。<b>再生数は手段、目的は送客（来院・成約）</b>。だから配分には明確な根拠があります。</p>'+
+      '<div class="roles">'+roles.map(r=>'<div class="role"><div class="rt">'+r.t+'</div>'+r.d+'</div>').join('')+'</div>'+
+      '<ul class="reasons">'+reasons.map((r,i)=>'<li><span class="rn">'+(i+1)+'</span>'+r+'</li>').join('')+'</ul>'+
+      '<div class="concl"><b>結論：</b>再生数だけを追うのは“認知しか見ていない”発想。売上（送客）を最大化するなら、検索に強く資産化する<b>教育を主軸（2）</b>に、拡散の<b>認知を入口（1）</b>に置くのが、このチャンネルの目的（客単価63万の送客）に最も合う。</div>';
+  })();
+
   const li=a=>a.map(x=>'<li>'+x+'</li>').join('');
   document.getElementById('secTrend').innerHTML=li(trend);
   document.getElementById('secEdit').innerHTML=li(edit);
