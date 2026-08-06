@@ -93,6 +93,22 @@ svg{display:block;max-width:100%}
 .prio{font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;margin-right:6px;vertical-align:middle}
 .prio.hi{background:var(--bad);color:#fff}.prio.md{background:var(--orange);color:#fff}.prio.lo{background:var(--muted);color:#fff}
 /* エグゼクティブサマリー */
+.overview{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--s1);
+  border-radius:14px;padding:18px 20px;margin-bottom:18px}
+.overview h2{font-size:17px;margin:0 0 10px;display:flex;align-items:center;gap:10px}
+.ovbadge{font-size:12px;font-weight:800;padding:3px 12px;border-radius:999px}
+.ovbadge.good{background:rgba(0,131,0,.15);color:var(--good)}
+.ovbadge.mid{background:rgba(42,120,214,.14);color:var(--s1)}
+.ovbadge.warn{background:rgba(235,104,52,.16);color:var(--orange)}
+.ovlead{font-size:14px;line-height:1.7;color:var(--ink);margin:0 0 12px}
+.ovlead b{color:var(--ink)}
+.ovlist{list-style:none;padding:0;margin:0}
+.ovlist li{font-size:13px;line-height:1.6;padding:5px 0 5px 26px;position:relative;color:var(--ink2)}
+.ovlist li .ic{position:absolute;left:0;top:5px}
+.ovlist li b{color:var(--ink)}
+.ovconcl{margin-top:12px;padding:11px 15px;background:linear-gradient(135deg,var(--s1soft),transparent);
+  border-radius:8px;font-size:13.5px;line-height:1.65;color:var(--ink)}
+.ovconcl b{color:var(--ink)}
 .exec{background:linear-gradient(135deg,var(--s1soft),transparent);border:1px solid var(--border);
   border-radius:14px;padding:18px 20px;margin-bottom:22px}
 .exec h2{font-size:16px;margin:0 0 2px}
@@ -216,6 +232,8 @@ svg{display:block;max-width:100%}
     <span class="pill" id="subPill"></span>
   </div>
   <div class="period" id="period"></div>
+
+  <div class="overview" id="overview"></div>
 
   <div class="exec">
     <h2>📌 今週の要点</h2>
@@ -388,6 +406,41 @@ document.getElementById('chTitle').textContent = D.channel.title;
 document.getElementById('subPill').textContent = '登録者 '+yen(D.channel.subscribers)+'人';
 document.getElementById('period').textContent = '対象期間: '+D.period.start+' 〜 '+D.period.end+'（過去90日）';
 document.getElementById('foot').textContent = '生成日: '+D.generated+' ／ データ: YouTube Analytics API・Data API v3 ／ チャンネルID '+D.channel.id;
+
+// ---- 概要・総評（この分析で何が言えるか）----
+(function(){
+  const el=document.getElementById('overview'); if(!el) return;
+  const s=D.summary||{}, dl=D.daily||[];
+  const sum=(a,k)=>a.reduce((x,v)=>x+(v[k]||0),0);
+  const v7=sum(dl.slice(-7),'views'), vP=sum(dl.slice(-14,-7),'views');
+  const dV=vP?(v7-vP)/vP*100:0;
+  const R=(D.retention||[]).filter(r=>r.curve);
+  const relPct=R.length?Math.round(R.reduce((a,r)=>a+(r.relPerf||0),0)/R.length*100):0;
+  const trTot=(D.traffic||[]).reduce((a,t)=>a+t.views,0), tr={};
+  (D.traffic||[]).forEach(t=>tr[t.source]=t.views);
+  const searchPct=trTot?Math.round((tr.YT_SEARCH||0)/trTot*100):0;
+  let femCore=0;(D.demographics||[]).forEach(r=>{if(r.gender==='female'&&['age35-44','age45-54','age55-64'].includes(r.age))femCore+=r.pct;});
+  const A=D.analysis||{};
+  const worstAll=[...(A.shortWorst||[]),...(A.longWorst||[])];
+  const thumb=worstAll.filter(v=>{const isS=v.durSec&&v.durSec<=180;return v.avgViewPct!=null&&v.avgViewPct>=(isS?55:38);}).length;
+  // 判定
+  let verdict,vcls;
+  if(dV>=5){verdict='好調';vcls='good';}
+  else if(dV>-8){verdict='堅調';vcls='mid';}
+  else {verdict=relPct>=75?'地力あり・一時減速':'要注意';vcls=relPct>=75?'mid':'warn';}
+  const dvTxt=(dV>=0?'+':'')+dV.toFixed(0)+'%';
+  const pts=[
+    {ic:'💪',t:'<b>土台は強い。</b>維持率は同種動画の<b>上位'+(100-relPct)+'%</b>（勝ちパターン＝失敗→回復・告発・診断が確立）。作れば当たる型を持っている。'},
+    {ic:'🔎',t:'<b>来ているのは"買う気の層"。</b>検索流入'+searchPct+'%＝「クマ取り」で調べる見込み客。視聴者の'+femCore.toFixed(0)+'%が40〜60代女性＝実際の患者層と一致。'},
+    {ic:'📈',t:'<b>直近7日は前週比 '+dvTxt+'。</b>'+(dV>=0?'伸長':'一時減速')+'。ショート主体で波はあるが、当たり動画は1年以上"資産化"して稼ぎ続けている。'},
+    {ic:'🛠',t:'<b>最大の伸びしろは2つ。</b>① <b>サムネ改善</b>（維持率は高いのに再生が伸びない"宝の持ち腐れ"動画が'+thumb+'本）。② <b>YouTube→LINEの計測導線</b>（貢献が過小評価されている）。'},
+  ];
+  el.innerHTML=
+    '<h2>📋 概要・総評 <span class="ovbadge '+vcls+'">'+verdict+'</span></h2>'+
+    '<p class="ovlead">このチャンネルは<b>「専門性×正直さ」で明確な強み</b>を持ち、"作れば当たる型"が確立済み。伸び悩みの原因は中身ではなく、<b>①見つけてもらえていない（サムネ／露出）②成果が測れていない（送客計測）</b>の2点に集約されます。</p>'+
+    '<ul class="ovlist">'+pts.map(p=>'<li><span class="ic">'+p.ic+'</span>'+p.t+'</li>').join('')+'</ul>'+
+    '<div class="ovconcl"><b>結論：</b>目的は再生数ではなく<b>送客（客単価63万円）</b>。やるべきは「<b>勝ち型（失敗・告発・診断）を教育2:認知1で量産</b>」＋「<b>サムネ改善で埋もれた良作を掘り起こす</b>」＋「<b>概要欄に専用LINEリンクで送客を可視化</b>」。この3つで、今の地力が売上に変わります。</div>';
+})();
 
 // ---- KPI ----
 const s = D.summary;
