@@ -181,6 +181,7 @@ svg{display:block;max-width:100%}
 .vm{background:var(--plane);border:1px solid var(--border);border-radius:8px;padding:6px 4px;text-align:center}
 .vm .vml{font-size:10px;color:var(--muted);margin-bottom:2px}
 .vm .vmv{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
+.vm .vsub{font-size:9.5px;color:var(--muted);margin-top:1px;font-variant-numeric:tabular-nums}
 .win.bad{border-color:rgba(235,104,52,.4)}
 .win.bad .kata{background:rgba(235,104,52,.14);color:var(--orange)}
 .diagline{font-size:12.5px;line-height:1.55;margin:2px 0 4px}
@@ -600,13 +601,13 @@ document.getElementById('devices').innerHTML=D.devices.map(d=>{
   // 共通の指標行（勝ち/悪いで完全に同じ項目）
   function metricRow(v){
     const cells=[
-      ['再生数(累計)', yen(v.totalViews||v.views)],
-      ['維持率', v.avgViewPct!=null? v.avgViewPct+'%':'—'],
-      ['冒頭', pctOr(v.hook)],
-      ['完了', pctOr(v.end)],
-      ['類似比', relOr(v.relPerf)],
+      ['再生数', yen(v.totalViews||v.views), '90日 '+yen(v.views)],
+      ['維持率', v.avgViewPct!=null? v.avgViewPct+'%':'—', '平均'],
+      ['冒頭', pctOr(v.hook), '最初の2秒'],
+      ['完了', pctOr(v.end), '最後まで'],
+      ['類似比', relOr(v.relPerf), '同種比'],
     ];
-    return '<div class="varow">'+cells.map(c=>'<div class="vm"><div class="vml">'+c[0]+'</div><div class="vmv">'+c[1]+'</div></div>').join('')+'</div>';
+    return '<div class="varow">'+cells.map(c=>'<div class="vm"><div class="vml">'+c[0]+'</div><div class="vmv">'+c[1]+'</div>'+(c[2]?'<div class="vsub">'+c[2]+'</div>':'')+'</div>').join('')+'</div>';
   }
   // 1本を描画（mode: win / worst）— 表示する項目は完全に共通
   function render(v,i,mode){
