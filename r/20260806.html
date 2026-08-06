@@ -783,7 +783,7 @@ document.getElementById('devices').innerHTML=D.devices.map(d=>{
   html+='<div class="tblwrap"><table class="calc"><thead><tr><th>YouTube経由 LINE登録/月</th><th>→ 成約(見込)</th><th>→ 売上貢献(客単価63万)</th></tr></thead><tbody>'+
     [20,50,100].map(n=>{const cv=n*line2close; return '<tr><td>'+n+'件</td><td>約'+cv.toFixed(1)+'件</td><td>約'+yen(Math.round(cv*R.arpu))+'円</td></tr>';}).join('')+
     '</tbody></table></div>';
-  html+='<div class="note"><b>今の分析の改善点：</b>YouTubeの成果は最終的に<b>LINE登録→送客→成約（客単価63万円）</b>で測るべき。現状Analyticsだけでは「YouTube→LINE登録」が接続できていません。<b>概要欄のLINEに専用リンク/UTMを付けて登録経路を可視化</b>すれば、上の試算が"実測"になり、どの動画が売上を生んだかまで追えます（次の改善提案）。※レート出典＝爾今マーケKPIシート、CPA基準¥8,000/件。</div>';
+  html+='<div class="note"><b>今の分析の改善点：</b>YouTubeの成果は最終的に<b>LINE登録→送客→成約（客単価63万円）</b>で測るべき。現状Analyticsだけでは「YouTube→LINE登録」が接続できていません。<b>概要欄のLINEに専用リンク/UTMを付けて登録経路を可視化</b>すれば、上の試算が"実測"になり、どの動画が売上を生んだかまで追えます（次の改善提案）。※レート出典＝爾今マーケKPIシート、CPA基準¥8,000/件。<br><b>💡LINE実績からの裏付け：</b>LINE運用レポートでは<b>YouTube直接経由のLINE登録は少数</b>で、予約率の高い「不明」経路に埋もれている可能性大（＝YouTubeで知り後から指名検索→HPで登録）。<b>専用リンクで正しく可視化すれば、YouTubeの本当の貢献はこの数字より大きいはず</b>。</div>';
   document.getElementById('funnel').innerHTML=html;
 })();
 
@@ -827,6 +827,7 @@ document.getElementById('devices').innerHTML=D.devices.map(d=>{
     '<b>"失敗・地獄の日々"を正直に見せる稀有なスタンス</b> → 業界は成功例しか出さない中「正直＝信頼」で差別化（維持率上位11%の理由）。',
     '<b>「専門医が失敗を解剖する」ポジション</b>を確立。体験談ではなく<b>医学的教育コンテンツ</b>として設計＝ガイドライン適合＋独自性。',
     '<b>compliance自体を差別化に</b>：4要件をきちんと出す誠実さで信頼構築。体験談風構成（冒頭に成功談→末尾に誘導）は避け、削除・炎上リスクも回避。',
+    '<b>勝ちパターンが3チャネルで一致</b>：「失敗・告発・診断」系は、YouTube維持率（上位11%）だけでなく<b>LINE配信でも高反応</b>・爾今のSNS分析でも本丸。独立した3データが同じ結論＝この路線は"間違いない"。',
   ];
   const struct=
     '<div class="tmpl"><div class="step"><b>ショート（60〜90秒）</b></div>'+
