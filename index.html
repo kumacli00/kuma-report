@@ -866,7 +866,7 @@ document.getElementById('devices').innerHTML=D.devices.map(d=>{
   html+='<div class="tblwrap"><table class="calc"><thead><tr><th>YouTube経由 LINE登録/月</th><th>→ 成約(見込)</th><th>→ 売上貢献(客単価63万)</th></tr></thead><tbody>'+
     [20,50,100].map(n=>{const cv=n*line2close; return '<tr><td>'+n+'件</td><td>約'+cv.toFixed(1)+'件</td><td>約'+yen(Math.round(cv*R.arpu))+'円</td></tr>';}).join('')+
     '</tbody></table></div>';
-  html+='<div class="note"><b>今の分析の改善点：</b>YouTubeの成果は最終的に<b>LINE登録→送客→成約（客単価63万円）</b>で測るべき。現状Analyticsだけでは「YouTube→LINE登録」が接続できていません。<b>概要欄のLINEに専用リンク/UTMを付けて登録経路を可視化</b>すれば、上の試算が"実測"になり、どの動画が売上を生んだかまで追えます（次の改善提案）。※レート出典＝爾今マーケKPIシート、CPA基準¥8,000/件。<br><b>💡LINE実績からの裏付け：</b>LINE運用レポートでは<b>YouTube直接経由のLINE登録は少数</b>で、予約率の高い「不明」経路に埋もれている可能性大（＝YouTubeで知り後から指名検索→HPで登録）。<b>専用リンクで正しく可視化すれば、YouTubeの本当の貢献はこの数字より大きいはず</b>。</div>';
+  html+='<div class="note"><b>今の分析の改善点：</b>YouTubeの成果は最終的に<b>LINE登録→送客→成約（客単価63万円）</b>で測るべき。現状Analyticsだけでは「YouTube→LINE登録」が接続できていません。<b>概要欄のLINEに専用リンク/UTMを付けて登録経路を可視化</b>すれば、上の試算が"実測"になり、どの動画が売上を生んだかまで追えます（次の改善提案）。※レート出典＝<b>爾今マーケKPIシート（2026年1〜6月実測・この時点で固定）</b>、CPA基準¥8,000/件。KPIが更新されたら手動で差し替えます。<br><b>💡LINE実績からの裏付け：</b>LINE運用レポートでは<b>YouTube直接経由のLINE登録は少数</b>で、予約率の高い「不明」経路に埋もれている可能性大（＝YouTubeで知り後から指名検索→HPで登録）。<b>専用リンクで正しく可視化すれば、YouTubeの本当の貢献はこの数字より大きいはず</b>。</div>';
   document.getElementById('funnel').innerHTML=html;
 })();
 
