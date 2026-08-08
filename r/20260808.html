@@ -360,7 +360,7 @@ svg{display:block;max-width:100%}
 
     <div class="subh">◆ 定番企画（実績ベース・固定）</div>
     <p class="csub" id="ideaIntro"></p>
-    <p style="margin:0 0 12px"><a href="daihon/index.html" style="display:inline-block;background:var(--s1);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none">📝 全20本の台本（構成・テロップ・尺配分）を見る →</a></p>
+    <p style="margin:0 0 12px"><a href="https://kumacli00.github.io/kuma-report/daihon/index.html" style="display:inline-block;background:var(--s1);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none">📝 全20本の台本（構成・テロップ・尺配分）を見る →</a></p>
     <div class="legend2">
       <span><span class="tag gen">原案</span> = 爾今の提案そのまま</span>
       <span><span class="tag adp">参考</span> = 爾今を参考に当分析で設計</span>
@@ -386,7 +386,7 @@ svg{display:block;max-width:100%}
   </div>
 
   <div class="foot" id="foot"></div>
-  <div class="foot"><a href="archive.html" style="color:var(--s1)">📚 過去のレポート一覧</a></div>
+  <div class="foot"><a href="https://kumacli00.github.io/kuma-report/archive.html" style="color:var(--s1)">📚 過去のレポート一覧</a></div>
 </div>
 
 <div class="tt" id="tip"></div>
@@ -1013,7 +1013,7 @@ document.getElementById('devices').innerHTML=D.devices.map(d=>{
     const did=prefix+String(i+1).padStart(2,'0');
     return '<tr><td><span class="tag '+r[0]+'">'+tp[r[0]]+'</span></td>'+
     '<td><span class="tag '+r[1]+'">'+tk[r[1]]+'</span></td>'+
-    '<td class="k"><a href="daihon/'+did+'.html" style="color:var(--ink)">'+r[2]+'</a> <a href="daihon/'+did+'.html" style="color:var(--s1);font-size:11px;white-space:nowrap">📝台本</a>'+refLink(r[5],did)+'</td><td>'+r[3]+'</td><td class="k">'+r[4]+'</td></tr>';}).join('');};
+    '<td class="k"><a href="https://kumacli00.github.io/kuma-report/daihon/'+did+'.html" style="color:var(--ink)">'+r[2]+'</a> <a href="https://kumacli00.github.io/kuma-report/daihon/'+did+'.html" style="color:var(--s1);font-size:11px;white-space:nowrap">📝台本</a>'+refLink(r[5],did)+'</td><td>'+r[3]+'</td><td class="k">'+r[4]+'</td></tr>';}).join('');};
   renderIdeas(shorts,'#ideaShort','s'); renderIdeas(longs,'#ideaLong','l');
 
   // 今週の旬企画（自動生成）
@@ -1021,10 +1021,10 @@ document.getElementById('devices').innerHTML=D.devices.map(d=>{
     const W=D.ideasWeekly;
     if(!W||!Array.isArray(W.ideas)||!W.ideas.length) return;
     const date=W.updated||'latest';
-    const page='daihon/w/'+date+'.html';
+    const page='https://kumacli00.github.io/kuma-report/daihon/w/'+date+'.html';
     const tkm={'認知':'awr','教育':'edu','ファン化':'fan'};
     document.getElementById('weeklyIdeasWrap').style.display='';
-    document.getElementById('weeklyIdeasSub').innerHTML='🔄 自動生成: <b>'+date+'</b>（今週のトレンドに合わせてAIが新規作成）　<a href="'+page+'" style="color:var(--s1)">📝 台本を見る →</a>　過去分は<a href="daihon/index.html" style="color:var(--s1)">台本一覧</a>に蓄積<br><span style="color:var(--muted)">根拠＝下の「①トレンド」（各項目に出典つき）。その週のトレンドから逆算して企画化しています</span>';
+    document.getElementById('weeklyIdeasSub').innerHTML='🔄 自動生成: <b>'+date+'</b>（今週のトレンドに合わせてAIが新規作成）　<a href="'+page+'" style="color:var(--s1)">📝 台本を見る →</a>　過去分は<a href="https://kumacli00.github.io/kuma-report/daihon/index.html" style="color:var(--s1)">台本一覧</a>に蓄積<br><span style="color:var(--muted)">根拠＝下の「①トレンド」（各項目に出典つき）。その週のトレンドから逆算して企画化しています</span>';
     document.querySelector('#weeklyIdeas tbody').innerHTML=W.ideas.map(it=>{
       const fmt=it.fmt==='long'?'long':'s'; const flabel=it.fmt==='long'?'long':' short';
       return '<tr><td><span class="tag '+fmt+'">'+flabel+'</span></td>'+
