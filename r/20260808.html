@@ -251,10 +251,10 @@ svg{display:block;max-width:100%}
   </div>
 
   <div class="card">
-    <h2>エンゲージメント（アルゴリズム三大指標）</h2>
-    <p class="csub">2026年の伸びる指標＝視聴完了率・保存/シェア・コメント。数値が高いほど拡散に乗る</p>
+    <h2>エンゲージメント（拡散に効く指標）</h2>
+    <p class="csub">アルゴリズムが特に重視するのは<b>①視聴完了率 ②保存/シェア ③コメント</b>の3つ。数値が高いほど拡散に乗る（下の「いいね」は参考）</p>
     <div class="eng" id="engage"></div>
-    <div class="hint"><span class="h">📖 見方</span>この3つが多いほどYouTubeに「良い動画」と判定され<b>おすすめに露出しやすくなる</b>。特に<b>完了率</b>と<b>保存/シェア</b>が伸びのカギ。<br><span class="h">根拠</span>YouTube Analytics（averageViewPercentage / shares / likes / comments）</div>
+    <div class="hint"><span class="h">📖 見方</span>これらが多いほどYouTubeに「良い動画」と判定され<b>おすすめに露出しやすくなる</b>。特に<b>完了率</b>と<b>保存/シェア</b>が伸びのカギ。<br><span class="h">根拠</span>YouTube Analytics（averageViewPercentage / shares / likes / comments）</div>
   </div>
 
   <div class="card">
@@ -850,16 +850,18 @@ document.getElementById('devices').innerHTML=D.devices.map(d=>{
   const R={reserve:0.41, visit:0.911, close:0.344, arpu:630000, cpaLine:7472, cac:210000};
   const line2close=R.reserve*R.visit*R.close; // ≈0.1285（遂行率別途）
   const steps=[
-    {l:'LINE登録',w:100,note:'YouTubeが作る母数（要計測）'},
-    {l:'予約',w:100*R.reserve,note:'予約率 '+(R.reserve*100).toFixed(0)+'%'},
-    {l:'来院',w:100*R.reserve*R.visit,note:'来院率 '+(R.visit*100).toFixed(0)+'%'},
-    {l:'成約',w:100*line2close,note:'成約率 '+(R.close*100).toFixed(0)+'%'},
+    {l:'LINE登録',ppl:100,note:'YouTube経由の入口（100人と仮定）'},
+    {l:'予約',ppl:100*R.reserve,note:'登録→予約 '+(R.reserve*100).toFixed(0)+'%が進む'},
+    {l:'来院',ppl:100*R.reserve*R.visit,note:'予約→来院 '+(R.visit*100).toFixed(0)+'%が進む'},
+    {l:'成約',ppl:100*line2close,note:'来院→成約 '+(R.close*100).toFixed(0)+'%が進む'},
   ];
-  const maxw=100;
-  let html='<div class="funnel">'+steps.map(st=>
+  let html='<div class="hint"><span class="h">📖 考え方</span>YouTube経由で<b>LINE登録が100人</b>いたら、爾今の実測レートで下のように減っていきます（バー＝残った人数、右＝その段階で進む割合）。</div>';
+  html+='<div class="funnel">'+steps.map(st=>
     '<div class="fstep"><div class="fl">'+st.l+'</div>'+
-    '<div class="fbar" style="width:'+(st.w/maxw*100).toFixed(1)+'%">'+st.w.toFixed(st.w<10?1:0)+'%</div>'+
+    '<div class="fbar" style="width:'+(st.ppl).toFixed(1)+'%">'+Math.round(st.ppl)+'人</div>'+
     '<div class="fr">'+st.note+'</div></div>').join('')+'</div>';
+  const seiyaku=100*line2close;
+  html+='<div class="ovconcl" style="margin-top:2px"><b>まとめ：</b>LINE登録 <b>100人</b> → 成約 <b>約'+seiyaku.toFixed(0)+'人</b> → <b>売上 約'+yen(Math.round(seiyaku*R.arpu))+'円</b>（客単価63万）。だから"再生数"より、この<b>100人（LINE登録）を作る動画・導線</b>が大事。</div>';
   // 参考試算
   html+='<div class="tblwrap"><table class="calc"><thead><tr><th>YouTube経由 LINE登録/月</th><th>→ 成約(見込)</th><th>→ 売上貢献(客単価63万)</th></tr></thead><tbody>'+
     [20,50,100].map(n=>{const cv=n*line2close; return '<tr><td>'+n+'件</td><td>約'+cv.toFixed(1)+'件</td><td>約'+yen(Math.round(cv*R.arpu))+'円</td></tr>';}).join('')+
