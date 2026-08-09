@@ -412,8 +412,11 @@ document.getElementById('foot').textContent = '生成日: '+D.generated+' ／ �
   const el=document.getElementById('overview'); if(!el) return;
   const s=D.summary||{}, dl=D.daily||[];
   const sum=(a,k)=>a.reduce((x,v)=>x+(v[k]||0),0);
+  // 週次(ブレやすい)と月次(トレンド判定の主軸)の両方を出す
   const v7=sum(dl.slice(-7),'views'), vP=sum(dl.slice(-14,-7),'views');
-  const dV=vP?(v7-vP)/vP*100:0;
+  const dV=vP?(v7-vP)/vP*100:0;                                 // 週次(参考)
+  const v28=sum(dl.slice(-28),'views'), vP28=sum(dl.slice(-56,-28),'views');
+  const d28=vP28?(v28-vP28)/vP28*100:0;                         // 月次(主判定)
   const R=(D.retention||[]).filter(r=>r.curve);
   const relPct=R.length?Math.round(R.reduce((a,r)=>a+(r.relPerf||0),0)/R.length*100):0;
   const trTot=(D.traffic||[]).reduce((a,t)=>a+t.views,0), tr={};
@@ -423,41 +426,41 @@ document.getElementById('foot').textContent = '生成日: '+D.generated+' ／ �
   const A=D.analysis||{};
   const worstAll=[...(A.shortWorst||[]),...(A.longWorst||[])];
   const thumb=worstAll.filter(v=>{const isS=v.durSec&&v.durSec<=180;return v.avgViewPct!=null&&v.avgViewPct>=(isS?55:38);}).length;
-  // 判定
+  // 判定は「月次トレンド(d28)」を主軸に（週次のブレに惑わされない）
+  const declining = d28<=-5;
   let verdict,vcls;
-  if(dV>=5){verdict='好調';vcls='good';}
-  else if(dV>-8){verdict='堅調';vcls='mid';}
-  else {verdict=relPct>=75?'地力あり・一時減速':'要注意';vcls=relPct>=75?'mid':'warn';}
+  if(d28>=5){verdict='好調';vcls='good';}
+  else if(d28>-5){verdict='横ばい';vcls='mid';}
+  else {verdict=relPct>=75?'軟調・要テコ入れ':'要注意';vcls='warn';}
+  const d28Txt=(d28>=0?'+':'')+d28.toFixed(0)+'%';
   const dvTxt=(dV>=0?'+':'')+dV.toFixed(0)+'%';
-  // 直近の動きのトーン（週ごとに変わる）
   let mvTone;
-  if(dV>=10) mvTone='<b>大きく伸長</b>';
-  else if(dV>=0) mvTone='<b>伸長</b>';
-  else if(dV>-10) mvTone='ほぼ横ばい〜微減';
-  else mvTone='<b>減速（要チェック）</b>';
-  // 土台の強さ（維持率で変わる）
-  const baseTone = relPct>=75 ? '<b>土台は強い。</b>維持率は同種動画の<b>上位'+(100-relPct)+'%</b>'
+  if(d28>=10) mvTone='<b>伸長</b>';
+  else if(d28>=0) mvTone='微増';
+  else if(d28>-10) mvTone='<b>じわじわ減速</b>';
+  else mvTone='<b>明確に減速（要テコ入れ）</b>';
+  const baseTone = relPct>=75 ? '<b>土台（作品力）は強い。</b>維持率は同種動画の<b>上位'+(100-relPct)+'%</b>'
                  : relPct>=50 ? '<b>土台は標準以上。</b>維持率は同種動画の平均より上（上位'+(100-relPct)+'%）'
                  : '<b>維持率に改善余地。</b>同種動画比で平均以下（上位'+(100-relPct)+'%）';
-  // 伸びしろ＝その週に実際に見つかった課題だけを並べる（0本なら出さない）
+  // 伸びしろ＝実際に見つかった課題だけ
   const issues=[];
+  if(declining) issues.push('<b>再生の減速を止める</b>（投稿頻度の維持＋新規の初速づくり。※ショート込みの総数が減速＝横動画/長尺の落ち込みが効いている可能性）');
   if(thumb>0) issues.push('<b>サムネ改善</b>（維持率は高いのに再生が伸びない"宝の持ち腐れ"動画が'+thumb+'本）');
   issues.push('<b>YouTube→LINEの計測導線</b>（貢献が過小評価されている）');
-  if(dV<=-10) issues.push('<b>投稿頻度・初速</b>（直近の減速を止める）');
 
   const pts=[
-    {ic:'💪',t:baseTone+'（勝ちパターン＝失敗→回復・告発・診断が確立）。作れば当たる型を持っている。'},
+    {ic:'💪',t:baseTone+'（勝ちパターン＝失敗→回復・告発・診断が確立）。作れば当たる型は持っている。'},
+    {ic:'📉',t:'<b>ただし再生は月次で前月比 '+d28Txt+'</b>＝'+mvTone+'。※これが本当のトレンド（週単位は'+dvTxt+'と大きく振れるので当てにしない）。当たり動画の"資産"はあるが、新規の初速が鈍っている。'},
     {ic:'🔎',t:'<b>来ているのは"買う気の層"。</b>検索流入'+searchPct+'%＝「クマ取り」で調べる見込み客。視聴者の'+femCore.toFixed(0)+'%が40〜60代女性＝実際の患者層と一致。'},
-    {ic:'📈',t:'<b>直近7日は前週比 '+dvTxt+'</b>＝'+mvTone+'。ショート主体で波はあるが、当たり動画は1年以上"資産化"して稼ぎ続けている。'},
-    {ic:'🛠',t:'<b>今週の伸びしろ：</b>'+issues.join(' ／ ')+'。'},
+    {ic:'🛠',t:'<b>今の伸びしろ：</b>'+issues.join(' ／ ')+'。'},
   ];
-  // リード文＆結論の筆頭アクションを判定で切り替え
-  const leadHead = vcls==='warn'
-    ? 'このチャンネルは<b>「専門性×正直さ」の地力は健在</b>ですが、<b>直近は数字が落ちています</b>。'
+  const leadHead = declining
+    ? 'このチャンネルは<b>「専門性×正直さ」の地力は健在</b>ですが、<b>直近は再生数が月次で落ちています（前月比'+d28Txt+'）</b>。'
     : 'このチャンネルは<b>「専門性×正直さ」で明確な強み</b>を持ち、"作れば当たる型"が確立済み。';
-  const firstAction = (thumb>0)
-    ? '<b>サムネ改善で埋もれた良作を掘り起こす</b>（即効性・最優先）'
-    : '<b>勝ち型（失敗・告発・診断）を教育2:認知1で量産</b>';
+  const firstAction = declining
+    ? '<b>減速を止める：勝ち型（失敗・告発・診断）を投稿頻度を落とさず量産し、初速を作り直す</b>'
+    : (thumb>0 ? '<b>サムネ改善で埋もれた良作を掘り起こす</b>（即効性・最優先）'
+               : '<b>勝ち型（失敗・告発・診断）を教育2:認知1で量産</b>');
   el.innerHTML=
     '<h2>📋 概要・総評 <span class="ovbadge '+vcls+'">'+verdict+'</span></h2>'+
     '<p class="ovlead">'+leadHead+'伸び悩みの主因は中身ではなく、<b>①見つけてもらえていない（サムネ／露出）②成果が測れていない（送客計測）</b>に集約されます。</p>'+
