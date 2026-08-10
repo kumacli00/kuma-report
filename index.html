@@ -246,7 +246,7 @@ svg{display:block;max-width:100%}
 
   <div class="card">
     <h2>💰 ビジネス貢献（送客ファネル視点）</h2>
-    <p class="csub">YouTubeの最終ゴールは再生数ではなく「送客＝来院・成約」。爾今KPIの実測レートで接続</p>
+    <p class="csub">YouTubeの最終ゴールは再生数ではなく「送客＝来院・成約」。下の率は<b>FY2027計画の前提値（2026年1〜6月の実績平均）</b>で接続（＝"実績のいま"ではなく計画基準）</p>
     <div id="funnel"></div>
   </div>
 
@@ -1004,7 +1004,17 @@ document.getElementById('devices').innerHTML=D.devices.map(d=>{
   html+='<div class="tblwrap"><table class="calc"><thead><tr><th>YouTube経由 LINE登録/月</th><th>→ 成約(見込)</th><th>→ 売上貢献(客単価63万)</th></tr></thead><tbody>'+
     [20,50,100].map(n=>{const cv=n*line2close; return '<tr><td>'+n+'件</td><td>約'+cv.toFixed(1)+'件</td><td>約'+yen(Math.round(cv*R.arpu))+'円</td></tr>';}).join('')+
     '</tbody></table></div>';
-  html+='<div class="note"><b>今の分析の改善点：</b>YouTubeの成果は最終的に<b>LINE登録→送客→成約（客単価63万円）</b>で測るべき。現状Analyticsだけでは「YouTube→LINE登録」が接続できていません。<b>概要欄のLINEに専用リンク/UTMを付けて登録経路を可視化</b>すれば、上の試算が"実測"になり、どの動画が売上を生んだかまで追えます（次の改善提案）。※レート出典＝<b>爾今マーケKPIシート（2026年1〜6月実測・この時点で固定）</b>、CPA基準¥8,000/件。KPIが更新されたら手動で差し替えます。<br><b>💡LINE実績からの裏付け：</b>LINE運用レポートでは<b>YouTube直接経由のLINE登録は少数</b>で、予約率の高い「不明」経路に埋もれている可能性大（＝YouTubeで知り後から指名検索→HPで登録）。<b>専用リンクで正しく可視化すれば、YouTubeの本当の貢献はこの数字より大きいはず</b>。</div>';
+  html+='<div class="note" style="border-left:3px solid #d9534f;padding-left:10px"><b>⚠️ 計画前提 vs 直近実績：</b>上の率は<b>計画の前提値（1〜6月平均）</b>で、<b>足元の実績はこれを下回って推移</b>しています（議事録ベース）。'+
+    '<div class="tblwrap" style="margin:6px 0"><table class="calc"><thead><tr><th>指標</th><th>計画前提(1〜6月平均)</th><th>直近の実績(議事録)</th></tr></thead><tbody>'+
+    '<tr><td>LINE→予約率</td><td>41%</td><td>6月41% → 7月32% → <b>8月途中27%</b></td></tr>'+
+    '<tr><td>予約→来院率</td><td>91.1%</td><td>平常81〜84% → <b>7月58%</b>（8月は少数で85%）</td></tr>'+
+    '<tr><td>来院→成約率</td><td>34.4%</td><td>7月40.7% → <b>8月途中25%</b>（目標30%）</td></tr>'+
+    '</tbody></table></div>'+
+    '＝送客の"質"が落ちているサイン（YouTubeの再生減速とも符合）。ファネルは「なぜ送客が大事か」の計画基準として読み、<b>今の実力は下振れ</b>と理解してください。</div>';
+  html+='<div class="note"><b>今の分析の改善点：</b>YouTubeの成果は最終的に<b>LINE登録→送客→成約（客単価63万円）</b>で測るべき。現状Analyticsだけでは「YouTube→LINE登録」が接続できていません。<b>概要欄のLINEに専用リンク/UTMを付けて登録経路を可視化</b>すれば、上の試算が"実測"になり、どの動画が売上を生んだかまで追えます（次の改善提案）。<br><b>💡LINE実績からの裏付け：</b>LINE運用レポートでは<b>YouTube直接経由のLINE登録は少数</b>で、予約率の高い「不明」経路に埋もれている可能性大（＝YouTubeで知り後から指名検索→HPで登録）。<b>専用リンクで正しく可視化すれば、YouTubeの本当の貢献はこの数字より大きいはず</b>。</div>';
+  html+='<div class="note" style="font-size:12px;color:var(--muted)">📎 出典（毎週MTGで更新）：'+
+    '<a href="https://docs.google.com/spreadsheets/d/1r1ACMaJnk1FPKK_1PFnlwz-hPgwoCIEGTVzPnu0DPWQ/" target="_blank" rel="noopener"><b>マーケKPIシート</b></a>（計画前提の率・客単価63万・CPA基準¥8,000）／'+
+    '<a href="https://docs.google.com/document/d/1Dd87ohCjipRK49-YO5lWJSUCdDwyjy0u4kWnf3iIWmU/" target="_blank" rel="noopener"><b>お打ち合わせ議事録</b></a>（直近実績の出どころ）。数字が更新されたら反映します。</div>';
   document.getElementById('funnel').innerHTML=html;
 })();
 
