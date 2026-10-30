@@ -1,0 +1,2349 @@
+<!DOCTYPE html>
+<html lang="ja" class="theme-glow">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>YouTubeレポート — 職業、くまのお医者さん。</title>
+<style>
+/* ============================================================
+   クマクリ ダッシュボード 共通スタイル（全ページの土台）
+
+   どの gen_*.py も、まずこのファイルを <style> に展開してから
+   ページ固有の CSS を後ろに足す。順番が意味を持つので入れ替えないこと。
+
+   ■ 2つの見た目（参考画像に合わせて 2026-09-15 に決めた）
+     1. 明るい管理画面（既定）
+        薄いグレーの地に白いタイル。数字は色つきで大きく。
+        上に .topbar があるページ（業務・経営・ネタ・議事録・KPI）は
+        .topbar が左の濃い色のサイドバーになる（ナビ・検索・絞り込みはそこに入る）。
+     2. ダークの光る版（<html class="theme-glow">）
+        紺の地に紫〜オレンジの光。診断レポート4本（IG / X / TikTok / YouTube）で使う。
+        色トークンを丸ごと差し替えているだけなので、部品のクラスは共通。
+
+   ■ 書体
+     見出し・本文・数字すべてゴシック（Noto Sans JP）。明朝は使わない（読みにくい）。
+     等幅（IBM Plex Mono）はコードだけ。
+
+   ■ 旧変数の別名
+     各ページの古い CSS（--plane / --card / --s1 など）がそのまま動くよう、
+     末尾で新しい色に橋渡ししている。新しく書く CSS は新しい名前を使うこと。
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap');
+
+:root{
+  color-scheme:light;
+  --ground:#EEF1F5;
+  --surface:#FFFFFF;
+  --surface-2:#F4F6F9;
+  --ink:#1E2430;
+  --ink-soft:#586273;
+  --ink-faint:#76808F;
+  --rule:#E2E6EC;
+  --rule-soft:#EDF0F4;
+  --zebra:#F8FAFC;
+  /* 主色：ティール（道具・肯定） */
+  --accent:#149E9B;
+  --accent-soft:#DCF3F2;
+  --accent-ink:#0F7D7A;
+  /* 副色：紫（診断・強調） */
+  --kuma:#7C5CFF;
+  --kuma-soft:#ECE7FF;
+  --kuma-ink:#5A3FE0;
+  /* 状態 */
+  --warn:#E14B50;
+  --warn-soft:#FDE8E9;
+  --good:#2FB36A;
+  --good-soft:#E2F6EA;
+  --gold:#D99A00;
+  --gold-soft:#FFF3D1;
+  /* タイルの数字を順に塗る色（参考画像2の色つき数字） */
+  --n1:#1E2430;--n2:#2FB36A;--n3:#E14B50;--n4:#149E9B;--n5:#7C5CFF;--n6:#F08A24;
+  /* サイドバー */
+  --side:#20434E;
+  --side-2:#183740;
+  --side-ink:rgba(255,255,255,.78);
+  --shadow:0 1px 2px rgba(30,36,48,.04),0 10px 30px rgba(30,36,48,.06);
+  --r:14px;
+  --glow:linear-gradient(90deg,#7C5CFF,#FF7A59);
+  --display:"Noto Sans JP","Hiragino Sans","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  --body:"Noto Sans JP","Hiragino Sans","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  --mono:"Noto Sans JP","Hiragino Sans","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  --code:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+/* ---- ダークの光る版（診断レポート） ---- */
+html.theme-glow{
+  color-scheme:dark;
+  --ground:#0F1326;
+  --surface:#171C35;
+  --surface-2:#1F2544;
+  --ink:#EEF0FA;
+  --ink-soft:#B5BBD4;
+  --ink-faint:#8A92B0;
+  --rule:#2B3358;
+  --rule-soft:#242B4C;
+  --zebra:rgba(255,255,255,.025);
+  --accent:#FF7A59;
+  --accent-soft:rgba(255,122,89,.16);
+  --accent-ink:#FF9E86;
+  --kuma:#A66CFF;
+  --kuma-soft:rgba(166,108,255,.18);
+  --kuma-ink:#C7A4FF;
+  --warn:#FF5C7A;
+  --warn-soft:rgba(255,92,122,.16);
+  --good:#3FE0A6;
+  --good-soft:rgba(63,224,166,.14);
+  --gold:#FFC857;
+  --gold-soft:rgba(255,200,87,.16);
+  --n1:#EEF0FA;--n2:#3FE0A6;--n3:#FF7A59;--n4:#5AD8FF;--n5:#C7A4FF;--n6:#FFC857;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 14px 40px rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;overflow-x:hidden}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--body);font-size:15.5px;line-height:1.8;
+  -webkit-font-smoothing:antialiased;
+}
+html.theme-glow body{
+  background:var(--ground);
+  background-image:
+    radial-gradient(60% 40% at 15% 0%,rgba(124,92,255,.35),transparent 60%),
+    radial-gradient(45% 35% at 90% 5%,rgba(255,122,89,.28),transparent 60%),
+    radial-gradient(50% 40% at 60% 100%,rgba(90,216,255,.10),transparent 60%);
+  background-attachment:fixed;
+}
+h1,h2,h3,h4{font-family:var(--display);font-weight:700;text-wrap:balance;letter-spacing:-.005em;line-height:1.4;color:var(--ink)}
+a{color:var(--accent-ink)}
+b,strong{font-weight:700;color:var(--ink)}
+code,kbd{font-family:var(--code);font-size:.9em;background:var(--surface-2);border:1px solid var(--rule-soft);border-radius:4px;padding:1px 5px}
+.mono{font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+::selection{background:var(--accent-soft)}
+
+/* ---- ページ幅 ---- */
+.wrap{max-width:960px;margin:0 auto;padding:0 24px 88px}
+
+/* ---- マストヘッド（レポート型・日次道具） ----
+   <header>
+     <span class="karte">Instagram 診断</span>   ← 小さな札になる
+     <div class="eyebrow">…</div> <h1>…</h1> <p class="lede">…</p> <div class="provenance">…</div>
+   </header> */
+header{position:relative;padding:44px 0 26px;margin:0 0 26px;border-bottom:1px solid var(--rule)}
+header > h1{font-size:32px;margin:0 0 16px;line-height:1.4;font-weight:900;letter-spacing:-.01em}
+.karte{
+  display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.12em;
+  padding:4px 12px;border-radius:999px;margin:0 0 14px;
+  color:#fff;background:var(--kuma);
+}
+.karte.tool{background:var(--accent)}
+.eyebrow{font-size:12.5px;letter-spacing:.06em;color:var(--ink-faint);font-weight:700;margin:0 0 10px}
+.lede{font-size:16px;color:var(--ink-soft);max-width:64ch;margin:0 0 6px;line-height:1.85}
+.provenance{margin-top:20px;font-size:12.5px;color:var(--ink-faint);display:flex;flex-wrap:wrap;gap:6px 20px;font-variant-numeric:tabular-nums}
+.provenance span{white-space:nowrap}
+/* 光る版：見出しの下に光の線 */
+html.theme-glow header{border-bottom:0;padding-top:52px}
+html.theme-glow header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:2px;background:var(--glow)}
+html.theme-glow .karte{background:var(--glow);color:#fff}
+html.theme-glow header > h1{font-size:34px;color:#fff;text-shadow:0 2px 24px rgba(124,92,255,.35)}
+html.theme-glow .eyebrow{color:var(--kuma-ink)}
+
+/* ---- アプリ型（左サイドバー） ----
+   <div class="topbar">
+     <header class="app">
+       <span class="karte tool">業務ナレッジ</span>
+       <div class="app-t"><h1>…</h1><div class="sub">…</div></div>
+     </header>
+     <nav class="tabs"><button class="tab active">…</button>…</nav>
+     （#searchbar / .controls などもこの中に入れてよい）
+   </div>
+   <main>…</main>
+   広い画面では .topbar が左の縦長サイドバーに、狭い画面では上の帯になる。 */
+body:has(> .topbar){display:grid;grid-template-columns:256px minmax(0,1fr);min-height:100vh;align-items:start}
+body:has(> .topbar) > main,body:has(> .topbar) > .wrap{grid-column:2;min-width:0}
+.topbar{
+  grid-column:1;grid-row:1 / span 20;position:sticky;top:0;height:100vh;overflow:auto;
+  background:var(--side);background-image:linear-gradient(180deg,var(--side),var(--side-2));
+  color:#fff;display:flex;flex-direction:column;gap:6px;padding:18px 14px 24px;
+  scrollbar-width:thin;
+}
+header.app{border:0;padding:6px 8px 14px;margin:0;display:block;border-bottom:1px solid rgba(255,255,255,.12)}
+header.app > .karte{
+  display:inline-block;background:rgba(255,255,255,.14);color:#fff;
+  font-size:10.5px;letter-spacing:.14em;padding:3px 10px;border-radius:999px;margin:0 0 12px;
+}
+header.app h1{font-size:18px;margin:0;line-height:1.35;font-weight:900;color:#fff}
+header.app .sub{color:var(--side-ink);font-size:12px;margin-top:6px;line-height:1.6;font-variant-numeric:tabular-nums}
+nav.tabs,nav.index{display:flex;flex-direction:column;gap:2px;padding:8px 0 4px}
+nav.tabs .tab,nav.index .tab{
+  appearance:none;border:0;background:transparent;color:var(--side-ink);cursor:pointer;text-align:left;
+  font-family:var(--body);font-size:14px;font-weight:700;padding:10px 12px;border-radius:9px;
+  text-decoration:none;line-height:1.4;display:flex;align-items:center;gap:10px;
+}
+nav.tabs .tab::before,nav.index .tab::before{content:"";width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.28);flex:none}
+nav.tabs .tab:hover,nav.index .tab:hover{background:rgba(255,255,255,.08);color:#fff}
+nav.tabs .tab.active,nav.index .tab.active{background:#fff;color:var(--side);box-shadow:0 4px 14px rgba(0,0,0,.18)}
+nav.tabs .tab.active::before,nav.index .tab.active::before{background:var(--accent)}
+/* サイドバーの中の検索・絞り込み（work の #searchbar、neta の .controls） */
+.topbar #searchbar,.topbar .controls{padding:10px 6px 4px;background:transparent;border:0;display:block}
+.topbar input[type=search],.topbar input[type=text],.topbar #searchbar input,.topbar #kw{
+  width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);color:#fff;
+  border-radius:9px;padding:9px 12px;font:inherit;font-size:13.5px;outline:none;
+}
+.topbar input::placeholder{color:rgba(255,255,255,.5)}
+.topbar input:focus,.topbar #searchbar input:focus,.topbar #kw:focus{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.4)}
+.topbar #searchinfo,.topbar .findhint{display:block;color:var(--side-ink);font-size:12px;margin-top:6px}
+.topbar .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.topbar .chip{
+  border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:var(--side-ink);
+  padding:4px 10px;border-radius:999px;font-size:12px;cursor:pointer;font-weight:700;font-family:var(--body);
+}
+.topbar .chip:hover{background:rgba(255,255,255,.12);color:#fff}
+.topbar .chip.active{background:#fff;color:var(--side);border-color:#fff}
+main{padding:28px 32px 80px}
+@media (max-width:900px){
+  body:has(> .topbar){display:block}
+  .topbar{position:sticky;top:0;z-index:10;height:auto;max-height:none;overflow:visible;grid-row:auto;padding:12px 14px 10px;gap:4px}
+  header.app{display:flex;align-items:center;gap:12px;padding:0 0 8px}
+  header.app > .karte{margin:0}
+  header.app h1{font-size:16px}
+  header.app .sub{display:none}
+  nav.tabs,nav.index{flex-direction:row;flex-wrap:nowrap;overflow-x:auto;gap:6px;padding:4px 0 2px;scrollbar-width:none}
+  nav.tabs::-webkit-scrollbar,nav.index::-webkit-scrollbar{display:none}
+  nav.tabs .tab,nav.index .tab{padding:7px 12px;font-size:13px;white-space:nowrap}
+  nav.tabs .tab::before,nav.index .tab::before{display:none}
+  .topbar .chips{margin-top:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  main{padding:18px 16px 70px}
+}
+
+/* ---- 節見出し ---- */
+section{margin-top:56px}
+.sec-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-top:6px}
+.sec-num{font-size:12px;font-weight:900;color:#fff;background:var(--kuma);letter-spacing:.06em;flex:none;padding:3px 10px;border-radius:999px;line-height:1.5;font-variant-numeric:tabular-nums}
+html.theme-glow .sec-num{background:var(--glow)}
+h2{font-size:24px;margin:0;font-weight:900}
+.sec-sub{color:var(--ink-soft);margin:8px 0 24px;max-width:64ch;font-size:15px}
+h3{font-size:17px;margin:24px 0 8px}
+p{margin:0 0 18px}
+
+/* ---- カード ---- */
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:20px 22px;margin:16px 0;box-shadow:var(--shadow)}
+html.theme-glow .card{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.09);backdrop-filter:blur(8px)}
+
+/* ---- 数字タイル（白いタイル・色つきの数字） ---- */
+.stats,.kpis,.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin:26px 0;background:none;border:0}
+.stat,.kpis>.kpi,.kpi-grid>.kpi{
+  background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:20px 20px 18px;margin:0;
+  box-shadow:var(--shadow);position:relative;min-width:0;
+}
+html.theme-glow .stat,html.theme-glow .kpis>.kpi,html.theme-glow .kpi-grid>.kpi{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.09)}
+.stat .k,.kpi .label,.kpi-label{font-size:12px;color:var(--ink-faint);letter-spacing:.02em;margin-bottom:10px;line-height:1.5;font-weight:700}
+.stat .v,.kpi .val,.kpi-val{font-size:34px;font-weight:900;line-height:1.05;font-variant-numeric:tabular-nums;letter-spacing:-.02em;margin:0;color:var(--n1)}
+.stat .n,.kpi .note,.kpi-sub{font-size:12.5px;color:var(--ink-soft);margin-top:10px;line-height:1.55}
+.stat:nth-child(6n+2) .v,.kpi:nth-child(6n+2) .val,.kpi:nth-child(6n+2) .kpi-val{color:var(--n2)}
+.stat:nth-child(6n+3) .v,.kpi:nth-child(6n+3) .val,.kpi:nth-child(6n+3) .kpi-val{color:var(--n3)}
+.stat:nth-child(6n+4) .v,.kpi:nth-child(6n+4) .val,.kpi:nth-child(6n+4) .kpi-val{color:var(--n4)}
+.stat:nth-child(6n+5) .v,.kpi:nth-child(6n+5) .val,.kpi:nth-child(6n+5) .kpi-val{color:var(--n5)}
+.stat:nth-child(6n+6) .v,.kpi:nth-child(6n+6) .val,.kpi:nth-child(6n+6) .kpi-val{color:var(--n6)}
+.v.warn,.val.warn,.stat .v.warn{color:var(--warn)!important} .v.good,.val.good,.stat .v.good{color:var(--good)!important} .v.acc,.val.acc{color:var(--accent)!important}
+
+/* ---- ファネル ---- */
+.funnel{display:flex;flex-direction:column;gap:10px;margin:26px 0}
+.fstep{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:16px 20px;flex-wrap:wrap;box-shadow:var(--shadow)}
+html.theme-glow .fstep{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.09)}
+.fbar{height:26px;background:var(--glow);flex:none;border-radius:8px;min-width:4px;max-width:100%}
+.fmeta{flex:1;min-width:0}
+.fname{font-size:14.5px;font-weight:700}
+.fnote{font-size:12.5px;color:var(--ink-faint);line-height:1.6}
+.fval{font-size:22px;font-weight:900;flex:none;font-variant-numeric:tabular-nums}
+.fstep.est{border-style:dashed}
+.fstep.est .fbar{background:var(--ink-faint);opacity:.5}
+
+/* ---- 良い点リスト ---- */
+.good-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:26px 0}
+.good-item{background:var(--surface);border:1px solid var(--rule);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
+html.theme-glow .good-item{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.09)}
+.good-item h3{font-size:15px;margin:0 0 8px;font-weight:700}
+.good-item h3::before{content:"✓";color:var(--good);margin-right:8px;font-weight:900}
+.good-item p{font-size:13.5px;color:var(--ink-soft);margin:0}
+
+/* ---- 表 ---- */
+.tw{overflow-x:auto;margin:26px 0;border:1px solid var(--rule);background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow)}
+html.theme-glow .tw{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.09)}
+table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.6}
+th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--rule-soft);vertical-align:top}
+thead th{background:var(--surface-2);font-size:12px;letter-spacing:.03em;color:var(--ink-soft);font-weight:700;border-bottom:1px solid var(--rule);white-space:nowrap}
+html.theme-glow thead th{background:rgba(255,255,255,.05)}
+tbody tr:nth-child(even) td{background:var(--zebra)}
+tbody tr:last-child td{border-bottom:none}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+tr.hi td{background:var(--kuma-soft)!important}
+tr.lo td{background:var(--warn-soft)!important}
+
+/* ---- 目次 ---- */
+.toc{margin:28px 0 0;border:1px solid var(--rule);border-radius:var(--r);background:var(--surface);overflow:hidden;box-shadow:var(--shadow)}
+html.theme-glow .toc{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.09)}
+.toc-head,.toc>h2,.toc>b{display:block;padding:12px 20px;border-bottom:1px solid var(--rule);font-size:13px;letter-spacing:.04em;color:var(--ink-soft);font-weight:700;margin:0}
+.toc ol{list-style:none;margin:0;padding:8px 0;display:grid;grid-template-columns:1fr 1fr;gap:0;columns:auto}
+.toc li{margin:0;font-size:14.5px;break-inside:avoid}
+.toc a{display:flex;gap:12px;align-items:baseline;padding:7px 20px;color:var(--ink);text-decoration:none;line-height:1.6}
+.toc a:hover{background:var(--surface-2);color:var(--accent-ink)}
+.toc .tn{font-size:12px;font-weight:900;color:var(--kuma-ink);flex:none;min-width:2.2em;font-variant-numeric:tabular-nums}
+@media (max-width:640px){.toc ol{grid-template-columns:1fr}}
+
+/* ---- 先頭へ戻る ---- */
+.to-top,.to-toc{
+  position:fixed;right:16px;bottom:16px;z-index:50;display:none;align-items:center;gap:7px;
+  padding:10px 15px;border-radius:999px;background:var(--surface);border:1px solid var(--rule);
+  box-shadow:var(--shadow);color:var(--ink);text-decoration:none;font:inherit;font-size:13px;font-weight:700;line-height:1;cursor:pointer;
+}
+.to-top.is-on,.to-toc.is-on{display:inline-flex}
+.to-top:hover,.to-toc:hover{color:var(--accent-ink);border-color:var(--accent)}
+
+/* ---- 札（タグ・状態） ---- */
+.tag,.badge,.pill,.chip{font-family:var(--body);font-weight:700;border-radius:999px}
+
+/* ---- ボタン ---- */
+button{font-family:var(--body)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:var(--body);font-size:14px;font-weight:700;padding:10px 18px;border-radius:999px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;text-decoration:none;line-height:1.3}
+.btn:hover{background:var(--accent-ink);border-color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--accent-ink)}
+.btn.ghost:hover{background:var(--accent-soft)}
+
+/* ---- 畳む ---- */
+details>summary{cursor:pointer}
+details>summary::-webkit-details-marker{display:none}
+
+/* ---- 注記の帯 ---- */
+.callout,.note-box{background:var(--surface-2);border-left:4px solid var(--accent);border-radius:0 var(--r) var(--r) 0;padding:12px 16px;margin:14px 0;font-size:14px;color:var(--ink-soft)}
+.callout.warn{border-left-color:var(--warn);background:var(--warn-soft);color:var(--ink)}
+
+/* ---- 印刷 ---- */
+@media print{
+  body{background:#fff}
+  .to-top,.to-toc{display:none!important}
+  .topbar{position:static;height:auto}
+}
+
+/* ---- 動きを抑える ---- */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+
+/* ---- 狭い画面 ---- */
+@media (max-width:640px){
+  .wrap{padding:0 16px 64px}
+  header{padding:26px 0 20px;margin-bottom:22px}
+  header > h1{font-size:26px;overflow-wrap:anywhere}
+  html.theme-glow header > h1{font-size:27px}
+  h2{font-size:21px}
+  .stat .v,.kpi .val,.kpi-val{font-size:28px}
+  .stats,.kpis,.kpi-grid{gap:10px;grid-template-columns:repeat(2,1fr)}
+  th,td{padding:9px 11px}
+}
+
+/* ============================================================
+   旧変数の別名（各ページの既存 CSS を新しい色で動かすため）
+   ============================================================ */
+:root,html.theme-glow{
+  --plane:var(--ground);--border:var(--rule);--muted:var(--ink-faint);--ink2:var(--ink-soft);
+  --accentsoft:var(--accent-soft);--goodsoft:var(--good-soft);--bad:var(--warn);--badsoft:var(--warn-soft);
+  --warnsoft:var(--gold-soft);--goldsoft:var(--gold-soft);--done:var(--ink-faint);
+  --s1:var(--kuma);--s1soft:var(--kuma-soft);--grid:var(--rule-soft);--axis:var(--rule);--bd:var(--rule);
+  --bg:var(--ground);--card:var(--surface);--line:var(--rule);--line-soft:var(--rule-soft);--sub:var(--ink-faint);
+  --fg:var(--ink);--paper:var(--ground);--sunken:var(--surface-2);--faint:var(--ink-faint);
+  --accent-bg:var(--accent-soft);--gold-bg:var(--gold-soft);
+}
+
+/* ---- ページ固有（共通スタイル sns/report_base.css の後ろに足す）----
+   配色・書体・マストヘッド・数字タイル・表・目次・先頭へ戻るは共通側。
+   ここにはグラフ専用色と、このページだけの部品を置く。 */
+:root{ --mag:#B5567E; --aqua:#2B8F79; --orange:#C9642F; }
+.wrap{max-width:960px}
+.up{color:var(--good)} .down{color:var(--bad)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 18px 14px;margin:0 0 20px}
+.card h2{font-size:15px;margin:0 0 2px;font-family:var(--body);font-weight:700}
+.card .csub{font-size:12px;color:var(--muted);margin:0 0 14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:680px){.grid2{grid-template-columns:1fr}}
+.bar-row{display:grid;grid-template-columns:130px 1fr auto;align-items:center;gap:10px;margin:7px 0;font-size:13px}
+.bar-row .name{color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{background:var(--grid);border-radius:2px;height:16px;overflow:hidden}
+.bar-fill{height:100%;border-radius:2px;background:var(--s1)}
+.bar-val{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--ink);font-size:12px;min-width:52px;text-align:right}
+.vid-row{display:grid;grid-template-columns:22px 1fr;gap:12px;align-items:center;margin:10px 0}
+.vid-rank{font-family:var(--mono);font-weight:700;color:var(--muted);font-size:13px;text-align:center}
+.vid-body .vt{font-size:13px;margin-bottom:4px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.vid-body .vt a{color:var(--ink);text-decoration:none}
+.vid-body .vt a:hover{color:var(--s1);text-decoration:underline}
+.watch{color:var(--s1);font-size:12px;text-decoration:none;white-space:nowrap;margin-left:8px}
+.watch:hover{text-decoration:underline}
+.vid-meta{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--ink2);margin-bottom:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+.demo-row{display:grid;grid-template-columns:56px 1fr 1fr;align-items:center;gap:8px;margin:6px 0;font-size:12px}
+.demo-lab{color:var(--ink2);text-align:right;font-variant-numeric:tabular-nums}
+.demo-half{display:flex;align-items:center;gap:6px}
+.demo-half.l{flex-direction:row-reverse}
+.demo-bar{height:14px;border-radius:2px}
+.demo-num{font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:34px}
+.svgwrap{width:100%;max-width:100%;overflow-x:auto}
+/* グリッドの子は既定で min-width:auto（＝中身の最小幅）になるため、
+   中に横長SVGや長い語が入ると枠を押し広げてページ全体が横スクロールする。
+   投稿ペースの520pxグラフでこれが起きていた。 */
+.grid2>*,.kpis>*,.chips>*,.eng>*,.varow>*,.ret-grid>*,.roles>*{min-width:0}
+svg{display:block;max-width:100%}
+.tt{position:fixed;pointer-events:none;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:8px 10px;font-size:12px;color:var(--ink);box-shadow:var(--shadow);
+  opacity:0;transition:opacity .08s;z-index:20;white-space:nowrap}
+.foot{color:var(--muted);font-size:11px;margin-top:8px;text-align:center}
+.pill{display:inline-block;background:var(--s1soft);color:var(--s1);font-size:12px;font-weight:700;
+  padding:2px 10px;border-radius:999px}
+.ret-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.ret-card{border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;background:var(--surface)}
+.ret-title{font-size:12px;color:var(--ink2);line-height:1.35;height:2.7em;overflow:hidden;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:6px}
+.ret-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.badge{font-size:11px;padding:1px 8px;border-radius:999px;font-weight:700}
+.badge.good{background:var(--good-soft);color:var(--good)}
+.badge.warn{background:var(--gold-soft);color:var(--gold)}
+.badge.mut{background:var(--grid);color:var(--ink2)}
+.act{border-left:3px solid var(--s1);padding:2px 0 2px 14px;margin:0 0 16px}
+.act h3{font-size:14px;margin:0 0 4px;font-family:var(--body);font-weight:700}
+.act p{font-size:13px;color:var(--ink2);margin:0 0 4px;line-height:1.5}
+.act .why{font-size:12px;color:var(--muted)}
+.act .why b{color:var(--ink2);font-weight:700}
+.prio{font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;margin-right:6px;vertical-align:middle}
+.prio.hi{background:var(--warn);color:#fff}.prio.md{background:var(--gold);color:#fff}.prio.lo{background:var(--ink-faint);color:#fff}
+/* エグゼクティブサマリー */
+.overview{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--kuma);
+  border-radius:var(--r);padding:18px 20px;margin-bottom:18px}
+.overview h2{font-size:17px;margin:0 0 10px;display:flex;align-items:center;gap:10px}
+.ovbadge{font-family:var(--body);font-size:12px;font-weight:700;padding:3px 12px;border-radius:999px}
+.ovbadge.good{background:var(--good-soft);color:var(--good)}
+.ovbadge.mid{background:var(--kuma-soft);color:var(--kuma)}
+.ovbadge.warn{background:var(--gold-soft);color:var(--gold)}
+.ovlead{font-size:14px;line-height:1.7;color:var(--ink);margin:0 0 12px}
+.ovlead b{color:var(--ink)}
+.ovlist{list-style:none;padding:0;margin:0}
+.ovlist li{font-size:13px;line-height:1.6;padding:5px 0 5px 26px;position:relative;color:var(--ink2)}
+.ovlist li .ic{position:absolute;left:0;top:5px}
+.ovlist li b{color:var(--ink)}
+.ovconcl{margin-top:12px;padding:11px 15px;background:var(--kuma-soft);
+  border-radius:var(--r);font-size:13.5px;line-height:1.65;color:var(--ink)}
+.ovconcl b{color:var(--ink)}
+/* 縦横（横動画／ショート）で分けて見せる箱と切替 */
+.fmtgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:4px 0 12px}
+.fmtbox{background:var(--grid);border:1px solid var(--border);border-radius:10px;padding:10px 12px 6px}
+.fmtbox.wide{margin:4px 0 12px}
+.fmtbox h3{font-size:13.5px;margin:0 0 4px;display:flex;align-items:center;gap:8px;color:var(--ink)}
+.fmtbox .ovlist li{padding:4px 0 4px 22px}
+.fmtseg{display:inline-flex;gap:4px;background:var(--grid);border:1px solid var(--border);border-radius:999px;padding:3px;margin:0 0 10px}
+.fmtseg button{border:0;background:transparent;color:var(--ink2);font:inherit;font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px;cursor:pointer}
+.fmtseg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.fmtbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 10px;margin:4px 0 12px}
+.fmtseg.big button{font-size:13px;padding:6px 16px}
+.fmtbar-note{font-size:11px;color:var(--muted)}
+@media(max-width:680px){.fmtgrid{grid-template-columns:1fr}}
+.exec{background:var(--kuma-soft);border:1px solid var(--border);
+  border-radius:var(--r);padding:18px 20px;margin-bottom:22px}
+.exec h2{font-size:16px;margin:0 0 2px}
+.exec .esub{font-size:12px;color:var(--muted);margin:0 0 14px}
+/* 要点の数字タイル：共通の .kpis と同じ「罫線1本で区切る」型 */
+.chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;
+  background:var(--rule);border:1px solid var(--rule);border-radius:var(--r);overflow:hidden;margin-bottom:14px}
+.chip{background:var(--surface);border:0;border-radius:0;padding:14px 16px;font-weight:400}
+.chip .cl{font-size:11.5px;color:var(--ink-faint);font-weight:700;letter-spacing:.04em;margin-bottom:6px}
+.chip .cv{font-family:var(--mono);font-size:22px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.chip .cd{font-size:12px;margin-top:6px;font-weight:700}
+.pts{list-style:none;padding:0;margin:0}
+.pts li{font-size:13px;line-height:1.55;padding:4px 0 4px 24px;position:relative;color:var(--ink)}
+.pts li .ic{position:absolute;left:0;top:4px}
+/* 戦略セクション */
+.sec-t{font-size:13px;font-weight:700;margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px}
+.sec-t .n{background:var(--kuma);color:#fff;width:22px;height:22px;border-radius:var(--r);display:inline-flex;
+  align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;flex:none}
+.slist{list-style:none;padding:0;margin:0 0 6px}
+.slist li{font-size:13px;line-height:1.55;padding:5px 0 5px 20px;position:relative;color:var(--ink2)}
+.slist li:before{content:"▸";position:absolute;left:2px;color:var(--s1)}
+.slist li b{color:var(--ink)}
+.tsrc{display:inline-block;font-size:11px;color:var(--muted);background:var(--plane);border:1px solid var(--border);border-radius:3px;padding:0 7px;margin-left:6px}
+.tmpl{background:var(--plane);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;margin:8px 0;font-size:12.5px;line-height:1.7}
+.tmpl .step{color:var(--ink)}.tmpl .step b{color:var(--s1)}
+.idea-tbl{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:4px}
+.idea-tbl th,.idea-tbl td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+.idea-tbl th{color:var(--muted);font-weight:700;font-size:11px;white-space:nowrap}
+.idea-tbl td.k{white-space:nowrap;color:var(--ink);font-weight:700}
+.tag{font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px;white-space:nowrap}
+.tag.s{background:var(--kuma-soft);color:var(--kuma)}.tag.l{background:var(--gold-soft);color:var(--gold)}
+.tag.gen{background:var(--good-soft);color:var(--good)}          /* 原案そのまま */
+.tag.adp{background:var(--kuma-soft);color:var(--kuma-ink)}      /* 参考・当分析 */
+.tag.ext{background:var(--s1soft);color:var(--s1)}                /* 拡張＝Xと同じジャンルへ広げた分 */
+.tag.awr{background:var(--gold-soft);color:var(--gold)}          /* 認知 */
+.tag.edu{background:var(--kuma-soft);color:var(--kuma)}          /* 教育 */
+.tag.fan{background:color-mix(in srgb,var(--mag) 18%,transparent);color:var(--mag)}   /* ファン化 */
+.legend2{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:11px;color:var(--ink2);margin:6px 0 12px}
+.legend2 b{color:var(--ink)}
+.subh{font-size:13px;font-weight:700;margin:14px 0 6px;color:var(--ink)}
+.whybox{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin:10px 0 16px}
+.whybox h4{font-size:14px;margin:0 0 4px;font-family:var(--body);font-weight:700}
+.whybox .lead{font-size:12.5px;color:var(--ink2);margin:0 0 12px;line-height:1.6}
+.whybox .lead b{color:var(--ink)}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:12px}
+.role{border:1px solid var(--border);border-radius:var(--r);padding:8px 11px;font-size:12px;background:var(--surface)}
+.role .rt{font-weight:700;margin-bottom:2px}
+.reasons{list-style:none;padding:0;margin:0}
+.reasons li{font-size:12.5px;line-height:1.55;padding:6px 0 6px 26px;position:relative;border-top:1px solid var(--border)}
+.reasons li:first-child{border-top:none}
+.reasons li .rn{position:absolute;left:0;top:6px;background:var(--kuma);color:#fff;width:18px;height:18px;border-radius:var(--r);display:inline-flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700}
+.reasons li b{color:var(--ink)}
+.concl{margin-top:12px;padding:10px 14px;background:var(--surface);border-left:3px solid var(--s1);border-radius:var(--r);font-size:12.5px;line-height:1.6}
+.hint{font-size:11.5px;color:var(--ink2);background:var(--plane);border:1px solid var(--border);border-radius:var(--r);padding:8px 12px;margin:2px 0 12px;line-height:1.55}
+.hint b{color:var(--ink)}
+.hint .h{color:var(--s1);font-weight:700;margin-right:4px}
+.verdict{font-size:11px;margin-top:6px;font-weight:700;display:inline-block;padding:1px 8px;border-radius:999px}
+.verdict.good{background:var(--good-soft);color:var(--good)}
+.verdict.warn{background:var(--gold-soft);color:var(--gold)}
+.verdict.mid{background:var(--grid);color:var(--ink2)}
+.badge-legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11px;color:var(--ink2);margin:2px 0 12px}
+.badge-legend b{color:var(--ink)}
+.win{border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:16px;background:var(--surface)}
+.win .wt{font-size:14px;font-weight:700;line-height:1.4;margin-bottom:8px}
+.win .kata{display:inline-block;font-size:11px;font-weight:700;background:var(--good-soft);color:var(--good);
+  padding:2px 10px;border-radius:999px;margin-bottom:10px}
+.win .wrow{display:grid;grid-template-columns:74px 1fr;gap:10px;margin:7px 0;font-size:12.5px;line-height:1.55}
+.win .wlab{color:var(--muted);font-weight:700;font-size:11px;padding-top:2px}
+.win .why{list-style:none;padding:0;margin:0}
+.win .why li{font-size:12.5px;color:var(--ink2);padding:3px 0 3px 20px;position:relative;line-height:1.5}
+.win .why li:before{content:"✔";position:absolute;left:0;color:var(--good);font-weight:700}
+.win .flow{background:var(--plane);border:1px solid var(--border);border-radius:var(--r);padding:8px 12px;font-size:12px;line-height:1.7}
+.win .flow b{color:var(--s1)}
+.win .serifu{border-left:3px solid var(--s1);padding:2px 0 2px 12px;font-size:12.5px;color:var(--ink);line-height:1.6}
+.win .reason{background:var(--kuma-soft);border-radius:var(--r);padding:9px 13px;font-size:12.5px;color:var(--ink2);line-height:1.55;margin-top:2px}
+.win .reason b{color:var(--ink)}
+.wv{border:1px solid var(--border);border-radius:var(--r);padding:11px 14px;margin-bottom:10px;background:var(--surface)}
+.wv .wvt{font-size:13px;font-weight:700;line-height:1.4;margin-bottom:5px}
+.wv .wvm{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:7px;font-variant-numeric:tabular-nums}
+.wv .diag{display:inline-block;font-size:11px;font-weight:700;padding:2px 10px;border-radius:999px;margin-right:6px}
+.wv .diag.th{background:var(--gold-soft);color:var(--gold)}
+.wv .diag.ct{background:var(--kuma-soft);color:var(--kuma)}
+.wv .diag.rx{background:var(--grid);color:var(--ink2)}
+.wv .fix{font-size:12.5px;color:var(--ink2);line-height:1.5;margin-top:6px}
+.wv .fix b{color:var(--ink)}
+/* 勝ち/悪い 共通の指標行 */
+.varow{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:8px 0 10px}
+.vm{background:var(--plane);border:1px solid var(--border);border-radius:var(--r);padding:6px 4px;text-align:center}
+.vm .vml{font-size:10px;color:var(--muted);margin-bottom:2px}
+.vm .vmv{font-family:var(--mono);font-size:16px;font-weight:600;font-variant-numeric:tabular-nums}
+.vm .vsub{font-size:9.5px;color:var(--muted);margin-top:1px;font-variant-numeric:tabular-nums}
+.win.bad{border-color:var(--gold)}
+.win.bad .kata{background:var(--gold-soft);color:var(--gold)}
+.diagline{font-size:12.5px;line-height:1.55;margin:2px 0 4px}
+.diagline .tag{font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;margin-right:6px}
+.diagline .tag.th{background:var(--gold-soft);color:var(--gold)}
+.diagline .tag.cn{background:var(--warn-soft);color:var(--warn)}
+.diagline .tag.rc{background:var(--grid);color:var(--ink2)}
+.diagline .tag.gd{background:var(--good-soft);color:var(--good)}
+.note{background:var(--gold-soft);border-left:3px solid var(--gold);border-radius:0 var(--r) var(--r) 0;
+  padding:10px 14px;font-size:12.5px;line-height:1.6;color:var(--ink2);margin-top:10px}
+/* 取得できなかった項目・データの鮮度の告知（黙って消えるのを防ぐ） */
+.miss{background:var(--warn-soft);border:1px solid var(--border);border-left:4px solid var(--warn);
+  border-radius:var(--r);padding:12px 16px;font-size:13px;line-height:1.65;color:var(--ink);margin-bottom:18px}
+.miss b{color:var(--ink)}
+.miss ul{margin:6px 0 0;padding-left:20px}
+.miss li{margin:2px 0;color:var(--ink2)}
+.miss .mh{font-weight:700;display:block;margin-bottom:2px}
+.missbox{background:var(--warn-soft);border:1px dashed var(--warn);border-radius:var(--r);
+  padding:16px;font-size:13px;line-height:1.65;color:var(--ink2);text-align:center;margin:8px 0}
+.missbox b{color:var(--ink)}
+.tblwrap{width:100%;overflow-x:auto}
+.calc{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+.calc th,.calc td{padding:7px 10px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums}
+.calc th{color:var(--muted);font-weight:700;font-size:11px}
+.calc td:first-child,.calc th:first-child{text-align:left}
+.eng{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;margin-top:6px;
+  background:var(--rule);border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
+.eng .e{background:var(--surface);padding:12px 14px}
+.eng .el{font-size:12px;color:var(--ink2)}.eng .ev{font-family:var(--mono);font-size:20px;font-weight:600;margin:2px 0 1px;font-variant-numeric:tabular-nums}
+.eng .en{font-size:12px;color:var(--muted);line-height:1.5}
+.eng .ej{font-size:12.5px;color:var(--ink2);line-height:1.55;margin-top:4px}
+
+/* ---- 目次 ----
+   枠・見出し帯・2列の並びは共通側（.toc / .toc>h2 / .toc ol）。ここは説明文だけ。 */
+.toc p{padding:8px 20px 0;margin:0;font-size:12px;color:var(--ink-faint)}
+/* 見出しへ飛んだとき、固定物に隠れないよう少し余白を取る */
+.card,.exec,.overview,.toc{scroll-margin-top:12px}
+
+/* ---- 長い節は畳む（開かないと読まなくてよい、と分かる形にする）---- */
+details.fold{border:1px solid var(--border);border-radius:var(--r);background:var(--plane);
+  margin:8px 0 14px;overflow:hidden}
+details.fold>summary{cursor:pointer;list-style:none;padding:12px 14px;
+  font-size:13.5px;font-weight:700;color:var(--s1);display:flex;align-items:center;gap:8px}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::after{content:"▼ 開く";margin-left:auto;font-size:12px;font-weight:700;color:var(--muted)}
+details.fold[open]>summary::after{content:"▲ 閉じる"}
+details.fold>summary .fcnt{font-size:12px;font-weight:700;color:var(--ink2)}
+details.fold>.fbody{padding:2px 14px 14px}
+details.fold>summary:hover{background:var(--kuma-soft)}
+
+/* ---- 来院までの流れ（ファネル）----
+   枠は共通の .funnel（罫線1本で段を区切る）を使い、段の中身だけこちらで組む。
+   バーは必ず「灰色の枠（=100%）の中の塗り」として描く。
+   以前は .fbar そのものに width:% と min-width:60px を与えていたため、
+   375px では 100%/41%/37%/13% の4本が全部 60px になり、
+   「減っていく」というこの図の唯一の主張が逆に消えていた。 */
+.funnel{gap:1px;margin:8px 0 14px}
+.fstep{display:grid;grid-template-columns:1fr;gap:5px;padding:12px 16px}
+.fhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.fhead .fl{font-size:13px;font-weight:700;color:var(--ink)}
+.fhead .fv{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--s1);font-variant-numeric:tabular-nums}
+.fhead .fp{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ftrack{background:var(--grid);border-radius:2px;height:26px;overflow:hidden}
+.fbar{height:100%;border-radius:2px;background:var(--s1);min-width:3px}
+.fbar.ghost{background:repeating-linear-gradient(135deg,var(--grid),var(--grid) 6px,var(--surface) 6px,var(--surface) 12px)}
+.fstep .fr{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* ---- グラフの凡例（図の外の「見方」欄に置いていたものを図の中へ）---- */
+.chartleg{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--ink2);margin:0 0 8px}
+.chartleg span{display:inline-flex;align-items:center;gap:6px}
+.chartleg i{width:12px;height:12px;border-radius:3px;display:inline-block}
+
+/* ---- スマホ ----
+   以前はメディアクエリが .grid2 の1行だけで、13px未満の文字が600か所以上あった。 */
+@media(max-width:680px){
+  .grid2{grid-template-columns:1fr;gap:14px}
+  .card{padding:15px 14px 12px}
+  .card h2{font-size:15px}
+  .card .csub,.hint,.note,.act .why,.win .why li,.win .reason,.win .flow,.win .serifu,
+  .diagline,.slist li,.reasons li,.tmpl,.legend2,.badge-legend,.ovlist li,.pts li{font-size:13px}
+  .kpi .val{font-size:23px}
+  .kpis,.chips{grid-template-columns:1fr 1fr}
+  .chip .cv{font-size:19px}
+  /* 5列固定だと1列65pxで、数字が折り返して読めなくなる */
+  .varow{grid-template-columns:repeat(2,1fr);gap:8px}
+  .vm{padding:8px 6px}
+  .vm .vml{font-size:12px}
+  .vm .vmv{font-size:18px}
+  .vm .vsub{font-size:11px}
+  /* 棒グラフ：ラベル欄130px＋数値欄52pxで、本体が103pxしか残らなかった。
+     ラベルを上の行に逃がして、バーに横幅を全部渡す */
+  .bar-row{grid-template-columns:1fr auto;gap:4px 8px}
+  .bar-row .name{grid-column:1/-1;font-size:13px;white-space:normal}
+  .bar-val{font-size:13px}
+  .bar-track{height:18px}
+  .demo-row{font-size:12.5px}
+  .demo-num{font-size:12px;min-width:40px}
+  .win .wrow{grid-template-columns:1fr;gap:3px}
+  .win .wlab{font-size:12px;padding-top:0}
+  .ret-grid{grid-template-columns:1fr}
+  .ret-title{font-size:13px}
+  .badge{font-size:12px}
+  .vid-body .vt{font-size:13.5px}
+  .bar-val,.vid-meta .bar-val{font-size:12px}
+  .vid-meta{grid-template-columns:1fr;gap:4px}
+  .vid-meta .bar-val{text-align:left}
+  .sec-t{font-size:13.5px}
+  .tsrc,.foot{font-size:12px}
+  .vm .vsub{font-size:12px}
+  .tag,.prio{font-size:11.5px}
+  .win .kata,.verdict{font-size:12px}
+  .idea-tbl th{font-size:12px}
+}
+/* 狭い画面で表とグラフが「切れていることに気づけない」問題を消す共通部品。
+   report_mobile.js と対で使う。各媒体の gen_report.py がインライン展開する。
+
+   背景: スマホ(343px)に min-width:560px の表を入れているため右半分が画面外に出る。
+   横スクロールはできるが、影も矢印も無いので「切れている」と分からない。
+   数字の桁の途中で切れるため 5,362 が 5 に見えるなど、誤読も起きていた。 */
+
+/* JS が各 table / 横長SVG をこれで包む */
+.tbl-scroll{
+  position:relative;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  /* 右端にフェードを出して「まだ続きがある」と分かるようにする。スクロールしきると消える（JSが is-end を付ける） */
+}
+.tbl-scroll::after{
+  content:"";
+  position:absolute; top:0; right:0; bottom:0; width:34px;
+  pointer-events:none;
+  background:linear-gradient(to right, transparent, var(--ground, #0E141A));
+  opacity:1; transition:opacity .18s;
+}
+.tbl-scroll.is-end::after{opacity:0}
+.tbl-scroll:not(.is-scrollable)::after{opacity:0}
+
+/* 「→ 横にスクロールできます」の案内。はみ出している時だけ出す */
+.tbl-hint{
+  display:none;
+  font-size:12.5px; line-height:1.6;
+  margin:.1rem 0 .45rem;
+  color:var(--ink-soft, #9BA9B6);
+}
+.tbl-scroll.is-scrollable + .tbl-hint,
+.tbl-hint.is-on{display:block}
+.tbl-hint::before{content:"→ "; font-weight:700}
+
+/* 横に振っても「どの行か」を見失わないように1列目を固定 */
+@media (max-width:640px){
+  .tbl-scroll table th:first-child,
+  .tbl-scroll table td:first-child{
+    position:sticky; left:0; z-index:2;
+    background:var(--surface, var(--card, #131B23));
+    /* 固定列と本体の境目 */
+    box-shadow:1px 0 0 var(--rule, var(--line, #243039));
+  }
+  .tbl-scroll table thead th{
+    position:sticky; top:0; z-index:3;
+    background:var(--surface, var(--card, #131B23));
+  }
+  .tbl-scroll table thead th:first-child{z-index:4}
+
+  /* 最小文字サイズの底上げ。10〜11px が多用されていて読めなかった */
+  .tbl-scroll table{font-size:13px}
+  .tbl-scroll table th,
+  .tbl-scroll table td{padding:.5rem .55rem; white-space:nowrap}
+}
+
+/* 型名などが1文字ずつ縦に割れるのを防ぐ（「症状の見分け・雑学」が9行になっていた） */
+.tbl-scroll table td:first-child,
+.tbl-scroll table th:first-child{white-space:nowrap}
+
+/* 横長SVGが縮んで軸ラベルが3〜4pxになる問題。縮めずに横スクロールさせる */
+.svg-scroll{position:relative; overflow-x:auto; -webkit-overflow-scrolling:touch}
+.svg-scroll > svg{max-width:none}   /* width:100% による強制縮小をやめる */
+
+@media (max-width:640px){
+  /* グラフは縮小せず、実寸のまま横に送る */
+  .svg-scroll > svg{height:auto}
+}
+
+/* 冒頭の用語ボックス（report_terms.glossary_html が出すHTML） */
+.glossary{
+  border:1px solid var(--rule, var(--line, #243039));
+  border-radius:var(--r, 10px);
+  padding:1rem 1.1rem 1.15rem;
+  margin:1.4rem 0 1.8rem;
+  background:var(--surface, var(--card, #131B23));
+}
+.glossary h2{font-size:15px; margin:0 0 .2rem}
+.glossary .g-lead{
+  font-size:12.5px; margin:0 0 .8rem;
+  color:var(--ink-soft, #9BA9B6);
+}
+.glossary dl{margin:0}
+.glossary .g-row{
+  display:grid; grid-template-columns:9.5rem 1fr;
+  gap:.3rem .9rem; padding:.42rem 0;
+  border-top:1px solid var(--rule, var(--line, #243039));
+}
+.glossary .g-row:first-child{border-top:0}
+.glossary dt{font-weight:700; font-size:14px}
+.glossary dd{margin:0; font-size:14px; line-height:1.7}
+.glossary .g-note{
+  display:block; font-size:12.5px; margin-top:.12rem;
+  color:var(--ink-soft, #9BA9B6);
+}
+@media (max-width:640px){
+  .glossary .g-row{grid-template-columns:1fr; gap:.1rem}
+  .glossary dt{font-size:13.5px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="karte">YouTube 週報</span>
+    <div class="eyebrow">YouTube 週次レポート</div>
+    <h1 id="chTitle"></h1>
+    <p class="lede"><span class="pill" id="subPill"></span></p>
+    <div class="provenance"><span id="period"></span></div>
+  </header>
+
+  <div class="miss" id="dataWarn" style="display:none"></div>
+
+  <div class="overview" id="overview"></div>
+
+  <div class="exec" id="sec-exec">
+    <h2>今週の要点</h2>
+    <p class="esub" id="execSub"></p>
+    <div class="chips" id="execChips"></div>
+    <ul class="pts" id="execPts"></ul>
+  </div>
+
+  <nav class="toc" id="toc">
+    <h2>このページの中身</h2>
+    <p>読みたいところへ飛べます。長い節は畳んであるので、開かなければ読まなくて大丈夫です。</p>
+    <ol>
+      <li><a href="#sec-exec">今週の要点</a></li>
+      <li><a href="#sec-words">このページで使う言葉</a></li>
+      <li><a href="#sec-kpi">主な数字（累計と直近90日）</a></li>
+      <li><a href="#sec-funnel">来院までの流れ</a></li>
+      <li><a href="#sec-engage">反応（広がりやすさに効く数字）</a></li>
+      <li><a href="#sec-trend">視聴回数の推移</a></li>
+      <li><a href="#sec-cadence">投稿ペース</a></li>
+      <li><a href="#sec-source">視聴の出どころ</a></li>
+      <li><a href="#sec-traffic">どこから見に来たか</a></li>
+      <li><a href="#sec-device">何で見ているか</a></li>
+      <li><a href="#sec-top">人気動画 TOP10</a></li>
+      <li><a href="#sec-subs">登録者を増やした動画</a></li>
+      <li><a href="#sec-demo">視聴者層</a></li>
+      <li><a href="#sec-ret">どこまで見られているか</a></li>
+      <li><a href="#sec-best">再生数トップの動画を分解</a></li>
+      <li><a href="#sec-worst">再生数が少ない動画の診断</a></li>
+      <li><a href="#sec-next">ネクストアクション（戦略）</a></li>
+    </ol>
+  </nav>
+
+  <div id="sec-words"><section class='glossary'><h2>このページで使う言葉</h2><p class='g-lead'>この3〜5語だけ押さえれば、以下は読めます。</p><dl><div class='g-row'><dt>視聴維持率</dt><dd>最後まで見られた割合<span class='g-note'>呼び方は「完視聴率」「見られ方」などもあるが同じもの</span></dd></div><div class='g-row'><dt>クリック率</dt><dd>表示された中で、実際に押された割合<span class='g-note'>サムネイルとタイトルが効いているかの目安</span></dd></div><div class='g-row'><dt>ファネル</dt><dd>見た人が予約までたどる道のり<span class='g-note'>見た → プロフィールを見た → リンクを押した → 予約した、と各段階で人数が減っていく</span></dd></div><div class='g-row'><dt>指名検索</dt><dd>院名や先生の名前で直接検索されること<span class='g-note'>認知が育っているかの目安</span></dd></div><div class='g-row'><dt>KPI</dt><dd>目標として追いかける数字</dd></div></dl></section></div>
+
+  <div id="fmtbar" class="fmtbar"></div>
+
+  <div id="sec-kpi" style="scroll-margin-top:12px">
+  <div class="kpis" id="kpis"></div>
+  <div class="hint"><span class="h">📖 見方</span>上の5つは<b>「累計＝チャンネルを始めてからの合計」</b>と<b>「直近90日＝この3か月ぶん」</b>を並べたものです。大きい数字が累計、下の小さい行が90日ぶん。<b>今の勢いを見るのは下の行</b>のほうです。</div>
+  </div>
+
+  <div class="card" id="sec-funnel">
+    <h2>売上への貢献（来院までの流れ）</h2>
+    <p class="csub">YouTubeのゴールは再生回数ではなく「見てもらう→来院→ご成約」。下は<b>計画の前提から置いた目安</b>で、"実績のいま"ではありません（各段階の率・金額などの社内の数字は、社外からも見えるこのページには載せていません）</p>
+    <div id="funnel"></div>
+  </div>
+
+  <div class="card" id="sec-engage">
+    <h2>反応（広がりやすさに効く数字）</h2>
+    <p class="csub">YouTubeのおすすめに乗りやすくなるのは<b>①最後まで見られた割合 ②シェア ③コメント</b>の3つ。数字が大きいほど広がります（「いいね」は参考）。すべて<b>直近90日ぶんの合計</b>です</p>
+    <div class="eng" id="engage"></div>
+    <div class="hint"><span class="h">📖 見方</span>これらが多いほどYouTubeに「良い動画」と判定され<b>おすすめに露出しやすくなる</b>。数の大小は本数によって変わるので、<b>「1,000回再生あたり何件か」</b>を併記しています。<br>※「保存（再生リストに追加された数）」は<b>このレポートでは取得していません</b>。上の3つに保存は含まれていないので、「保存が何件だったか」はこのページからは分かりません。<br><span class="h">📊 数字の出どころ</span>YouTube公式データ（直近90日の、最後まで見られた割合・シェア・いいね・コメント）</div>
+  </div>
+
+  <div class="card" id="sec-trend">
+    <h2>視聴回数の推移</h2>
+    <p class="csub">直近90日間・1日ごと（単位：回）</p>
+    <div class="svgwrap"><svg id="trend" width="920" height="260" viewBox="0 0 920 260" preserveAspectRatio="xMidYMid meet"></svg></div>
+    <div class="hint"><span class="h">📖 見方</span>1日ごとの再生回数。<b>山＝伸びた日、谷＝いつも通り</b>。1本のヒットが何ヶ月も見られ続けていれば、その動画が“ずっと働いてくれている”合図です。<br><span class="h">📊 数字の出どころ</span>YouTube公式データ（1日ごとの再生回数）</div>
+  </div>
+
+  <div class="grid2">
+    <div class="card" id="sec-cadence" style="display:none">
+      <h2>投稿ペース（1週間に何本出したか）</h2>
+      <p class="csub">1本の棒が1週間。<b>ショートは数を出すほど当たりが出やすい＝本数が減ると当たりも減ります</b></p>
+      <div class="chartleg" id="cadLegend"></div>
+      <div class="svgwrap"><svg id="cadChart" width="460" height="240" viewBox="0 0 460 240" preserveAspectRatio="xMidYMid meet"></svg></div>
+      <div class="hint" id="cadHint"></div>
+    </div>
+    <div class="card" id="sec-source" style="display:none">
+      <h2>視聴の出どころ</h2>
+      <p class="csub">直近28日の再生を「新しく出した動画」と「前から出している動画」に分けて表示</p>
+      <div id="srcViz" style="margin-top:8px"></div>
+      <div class="hint" id="srcHint"></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card" id="sec-traffic">
+      <h2>どこから見に来たか</h2>
+      <p class="csub">再生回数の多い順（上位7つ）</p>
+      <div id="traffic"></div>
+      <div class="hint"><span class="h">📖 見方</span>どこ経由で見られたか。<b>検索から＝クマ取りを本気で調べている人（来院につながりやすい）</b>／<b>登録者フィード＝すでにファンの人</b>／<b>ショート＝はじめて知る新しい人</b>。バーが短すぎて見えない項目もあるので、<b>右の「回数（全体の何%か）」</b>で読んでください。<br><span class="h">📊 数字の出どころ</span>YouTube公式データ（どこ経由で見られたか）</div>
+    </div>
+    <div class="card" id="sec-device">
+      <h2>何で見ているか（スマホ／PCなど）</h2>
+      <p class="csub">再生回数の割合</p>
+      <div id="devices"></div>
+      <div class="hint"><span class="h">📖 見方</span>視聴環境。<b>スマホで見る人が多い</b>なら、縦向き・大きい字幕で、ひと目で内容が分かる作りが効果的です。<br><span class="h">📊 数字の出どころ</span>YouTube公式データ（見た機器）</div>
+    </div>
+  </div>
+
+  <div class="card" id="sec-top">
+    <h2>人気動画 TOP10</h2>
+    <p class="csub">合計の再生回数が多い順（YouTubeの表示と同じ数字）</p>
+    <div id="topvids"></div>
+    <div class="hint"><span class="h">📖 見方</span><b>合計の再生回数（YouTubeの表示と同じ）</b>が多い順。よく伸びた動画の“作り方”を真似して数を増やします。右に出る「90日 1,234」は、直近90日ぶんの再生回数です。<br><span class="h">📊 数字の出どころ</span>YouTube公式データ（合計の再生回数＋直近90日）</div>
+  </div>
+
+  <div class="card" id="sec-subs">
+    <h2>新しい登録者を増やした動画 TOP5</h2>
+    <p class="csub">再生回数より「チャンネル登録」を増やした動画。将来の来院につながる入口になりやすい</p>
+    <div id="subsdrivers"></div>
+    <div class="hint"><span class="h">📖 見方</span>再生回数ではなく<b>「チャンネル登録が増えた」動画</b>。登録した人は将来の来院につながりやすい大事な入口です。似た企画を増やすと登録が伸びます。<br><span class="h">📊 数字の出どころ</span>YouTube公式データ（動画ごとの新規登録者数）</div>
+  </div>
+
+  <div class="card" id="sec-demo">
+    <h2>視聴者層</h2>
+    <p class="csub">年齢×性別で、見ている人の割合。真ん中の縦線が0%で、左右に伸びるほど多い</p>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--mag)"></i>女性（左に伸びる）</span>
+      <span><i class="dot" style="background:var(--s1)"></i>男性（右に伸びる）</span>
+    </div>
+    <div id="demo"></div>
+    <div class="hint" id="demoHint"></div>
+  </div>
+
+  <div class="card" id="sec-ret">
+    <h2>動画がどこまで見られているか</h2>
+    <p class="csub" id="retSub"></p>
+    <div class="hint"><span class="h">📖 これは何？</span>動画ごとに<b>「どこまで見られたか」</b>を線にしたもの。横軸は左＝再生スタート、右＝終わり。縦軸は<b>「スタート時の人数を100%としたとき、何%の人がまだ見ているか」</b>。線が右まで高いほど<b>最後まで見られている＝良い動画</b>。<span style="color:var(--bad)">▼</span>＝見るのをやめる人が一番多い場所（ここを直すと伸びます）。<b>点線＝100%の高さ</b>の目印です。<br>ラベルの意味 → <b>似た動画と比べて</b>＝同じくらいの動画の中での順位（「上位10%」なら、似た動画100本中10位くらい） ／ <b>出だし</b>＝最初の2秒で残っている割合 ／ <b>最後まで</b>＝最後まで見た割合。<br>※ショートは自動でくり返し再生されるため、YouTubeの元データは100%を超えることがあります。このページでは<b>混乱を避けるため100%を上限にして表示</b>し、超えていた場合は「くり返し再生ぶんを除く」と添えています（線のグラフだけは形が分かるよう、そのまま描いています）。</div>
+    <details class="fold"><summary>動画6本の「どこまで見られたか」グラフを見る</summary>
+      <div class="fbody"><div class="ret-grid" id="retention"></div></div></details>
+  </div>
+
+  <div class="card" id="sec-best">
+    <h2>再生数トップの動画を分解</h2>
+    <p class="csub"><b>「ベスト」＝直近90日の再生回数が多い順</b>です。最後まで見られた割合などの品質で選んだ順位ではありません（そのため、下の「似た動画と比べて」の数字は順位と一致しません）。それぞれについて、<b>参考にできる型・流れ・セリフ例</b>を並べています</p>
+    <details class="fold"><summary>ショート（短い縦動画）の再生数トップ3を見る <span class="fcnt">3本</span></summary>
+      <div class="fbody"><div id="winShort"></div></div></details>
+    <details class="fold"><summary>長尺（横動画）の再生数トップ3を見る <span class="fcnt">3本</span></summary>
+      <div class="fbody"><div id="winLong"></div></div></details>
+  </div>
+
+  <div class="card" id="sec-worst">
+    <h2>再生数が少ない動画の改善診断</h2>
+    <p class="csub"><b>「ワースト」＝直近90日の再生回数が少ない順</b>です。上のベストと“同じ項目”で並べ、「サムネ画像の問題か／中身の問題か」を、最後まで見られた割合から自動で判定します</p>
+    <details class="fold"><summary>ショート（短い縦動画）の再生数が少ない3本を見る <span class="fcnt">3本</span></summary>
+      <div class="fbody"><div id="worstShort"></div></div></details>
+    <details class="fold"><summary>長尺（横動画）の再生数が少ない3本を見る <span class="fcnt">3本</span></summary>
+      <div class="fbody"><div id="worstLong"></div></div></details>
+    <div class="note" id="worstNote"></div>
+  </div>
+
+  <div class="card" id="sec-next">
+    <h2>ネクストアクション（戦略）</h2>
+    <p class="csub">2026年のショート/リール・美容業界トレンド × このチャンネルの実データ</p>
+
+    <div class="sec-t"><span class="n">1</span>トレンド（2026・ショート/リール/美容）</div>
+    <p class="csub" id="trendUpdated"></p>
+    <div class="hint"><span class="h">📊 数字の出どころ</span>ローカルのAIが毎週Web検索で、<b>X・TikTok・Instagramリール・YouTubeショート・美容メディア（@cosme／トリビュー等）・業界ニュース</b>を横断的に調べています。<b>各項目の末尾に「出典」を明記</b>（どこ発の話かが分かります）。<br>※各SNSの中身を直接取得はできないため、「メディア/記事が報じたトレンドを拾う（間接）」形です。生のバズをリアルタイムに拾うものではありません。</div>
+    <details class="fold"><summary>2026年のトレンドを見る</summary>
+      <div class="fbody"><ul class="slist" id="secTrend"></ul></div></details>
+
+    <div class="sec-t"><span class="n">2</span>編集の仕方</div>
+    <details class="fold"><summary>編集で効く6つのポイントを見る</summary>
+      <div class="fbody"><ul class="slist" id="secEdit"></ul></div></details>
+
+    <div class="sec-t"><span class="n">3</span>構成テンプレート</div>
+    <details class="fold"><summary>ショート・長尺それぞれの組み立て方を見る</summary>
+      <div class="fbody"><div id="secStruct"></div></div></details>
+
+    <div class="sec-t"><span class="n">4</span>データに基づく改善アクション</div>
+    <div id="actions"></div>
+
+    <div class="sec-t"><span class="n">5</span>差別化（このチャンネルの強み活用）</div>
+    <details class="fold"><summary>このチャンネルが勝てる5つの理由を見る</summary>
+      <div class="fbody"><ul class="slist" id="secDiff"></ul></div></details>
+
+    <div class="sec-t"><span class="n">6</span>次回企画案（定番の台本）</div>
+    <details class="fold"><summary>なぜ「教育2：認知1」なのか、その根拠を見る</summary>
+      <div class="fbody"><div class="whybox" id="whyRatio" style="margin:0"></div></div></details>
+
+    <div id="weeklyIdeasWrap" style="display:none">
+      <div class="subh">今週の旬企画（毎週トレンドから自動生成）</div>
+      <p class="csub">今週のトレンドから起こした<b>旬企画</b>は、撮影前の企画（テーマ・テロップ・撮影指示・費用の扱いまで）なので<b>このページには載せていません</b>。社内で配布しているものをご覧ください。下の「定番企画」は公開しています。</p>
+    </div>
+
+    <div class="subh">定番企画（実績ベース・固定）</div>
+    <p class="csub" id="ideaIntro"></p>
+    <p style="margin:0 0 12px"><a href="https://kumacli00.github.io/kuma-report/daihon/index.html" style="display:inline-block;background:var(--s1);color:#fff;padding:8px 16px;border-radius:var(--r);font-size:13px;font-weight:600;text-decoration:none">台本の一覧（Xと同じジャンル別・構成・テロップ）を見る →</a></p>
+    <details class="fold"><summary>企画の一覧を見る <span class="fcnt" id="ideaCnt"></span></summary>
+    <div class="fbody">
+    <div class="legend2">
+      <span><span class="tag gen">原案</span> = 爾今の提案そのまま</span>
+      <span><span class="tag adp">参考</span> = 爾今を参考に当分析で設計</span>
+      <span><span class="tag ext">拡張</span> = Xの引用候補と同じジャンルへ広げるため追加（2026-10-30）</span>
+      <span><span class="tag awr">認知</span>＝拡散・新しく知ってもらう</span>
+      <span><span class="tag edu">教育</span>＝検索・疑問を解決</span>
+      <span><span class="tag fan">ファン化</span>＝関係を深める</span>
+    </div>
+    <div class="subh">ショート（60〜90秒）</div>
+    <div class="tblwrap">
+      <table class="idea-tbl" id="ideaShort">
+        <thead><tr><th>区分</th><th>種別</th><th>テーマ</th><th>狙い・ターゲット</th><th>時期</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="subh">横動画（長尺 10〜20分）</div>
+    <div class="tblwrap">
+      <table class="idea-tbl" id="ideaLong">
+        <thead><tr><th>区分</th><th>種別</th><th>テーマ</th><th>狙い・ターゲット</th><th>時期</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    </div></details>
+    <div class="note" id="secNote"></div>
+  </div>
+
+  <div class="foot" id="foot"></div>
+  <div class="foot"><a href="https://kumacli00.github.io/kuma-report/archive.html" style="color:var(--s1)">過去のレポート一覧</a></div>
+</div>
+
+<a class="to-top" id="toTop" href="#toc">↑ 目次へ戻る</a>
+<div class="tt" id="tip"></div>
+
+<script>
+const D = {"period": {"start": "2026-07-29", "end": "2026-10-27"}, "generated": "2026-10-30", "warnings": [], "channel": {"title": "職業、くまのお医者さん。毛利理人 / クマ取り専門クリニック院長", "id": "UCOiUrgmKgxfA9o09cENY_ZQ", "subscribers": 8370, "totalViews": 5604910, "videoCount": 694}, "summary": {"views": 1383968, "minutesWatched": 661242, "avgViewDurationSec": 61, "avgViewPct": 53.6, "subsGained": 661, "subsLost": 279, "subsNet": 382, "shares": 263, "likes": 4143, "comments": 399}, "lifetime": {"views": 7152686, "minutes": 9097399, "since": "2019-10-16"}, "daily": [{"date": "2026-07-29", "views": 4829, "minutes": 3347, "subsNet": 3}, {"date": "2026-07-30", "views": 8501, "minutes": 4699, "subsNet": 3}, {"date": "2026-07-31", "views": 7064, "minutes": 3976, "subsNet": 0}, {"date": "2026-08-01", "views": 4843, "minutes": 3287, "subsNet": -1}, {"date": "2026-08-02", "views": 4418, "minutes": 2652, "subsNet": -2}, {"date": "2026-08-03", "views": 3806, "minutes": 2885, "subsNet": 5}, {"date": "2026-08-04", "views": 3703, "minutes": 2324, "subsNet": 1}, {"date": "2026-08-05", "views": 3551, "minutes": 2388, "subsNet": 3}, {"date": "2026-08-06", "views": 4561, "minutes": 2938, "subsNet": 5}, {"date": "2026-08-07", "views": 3200, "minutes": 2379, "subsNet": 1}, {"date": "2026-08-08", "views": 4543, "minutes": 2533, "subsNet": 0}, {"date": "2026-08-09", "views": 4121, "minutes": 2681, "subsNet": 4}, {"date": "2026-08-10", "views": 6135, "minutes": 4038, "subsNet": 2}, {"date": "2026-08-11", "views": 5509, "minutes": 3715, "subsNet": 5}, {"date": "2026-08-12", "views": 3733, "minutes": 2901, "subsNet": 1}, {"date": "2026-08-13", "views": 4251, "minutes": 2758, "subsNet": 5}, {"date": "2026-08-14", "views": 3915, "minutes": 2744, "subsNet": -1}, {"date": "2026-08-15", "views": 4414, "minutes": 2625, "subsNet": 1}, {"date": "2026-08-16", "views": 6547, "minutes": 3463, "subsNet": 1}, {"date": "2026-08-17", "views": 4828, "minutes": 3216, "subsNet": 2}, {"date": "2026-08-18", "views": 4112, "minutes": 2919, "subsNet": 4}, {"date": "2026-08-19", "views": 4350, "minutes": 2946, "subsNet": 2}, {"date": "2026-08-20", "views": 4484, "minutes": 2987, "subsNet": 1}, {"date": "2026-08-21", "views": 5705, "minutes": 3146, "subsNet": 2}, {"date": "2026-08-22", "views": 5829, "minutes": 3250, "subsNet": 1}, {"date": "2026-08-23", "views": 4769, "minutes": 2791, "subsNet": 3}, {"date": "2026-08-24", "views": 4871, "minutes": 3028, "subsNet": 4}, {"date": "2026-08-25", "views": 6028, "minutes": 3435, "subsNet": 3}, {"date": "2026-08-26", "views": 4228, "minutes": 2454, "subsNet": 0}, {"date": "2026-08-27", "views": 5753, "minutes": 2739, "subsNet": 1}, {"date": "2026-08-28", "views": 4882, "minutes": 2491, "subsNet": 4}, {"date": "2026-08-29", "views": 6507, "minutes": 3101, "subsNet": 1}, {"date": "2026-08-30", "views": 5305, "minutes": 2841, "subsNet": -1}, {"date": "2026-08-31", "views": 5310, "minutes": 3553, "subsNet": 3}, {"date": "2026-09-01", "views": 6464, "minutes": 4437, "subsNet": 0}, {"date": "2026-09-02", "views": 5127, "minutes": 4510, "subsNet": 4}, {"date": "2026-09-03", "views": 5273, "minutes": 4543, "subsNet": 1}, {"date": "2026-09-04", "views": 6093, "minutes": 4390, "subsNet": 2}, {"date": "2026-09-05", "views": 4857, "minutes": 3458, "subsNet": 7}, {"date": "2026-09-06", "views": 7078, "minutes": 4914, "subsNet": 1}, {"date": "2026-09-07", "views": 5809, "minutes": 4910, "subsNet": 0}, {"date": "2026-09-08", "views": 6022, "minutes": 4746, "subsNet": 4}, {"date": "2026-09-09", "views": 4936, "minutes": 3552, "subsNet": 1}, {"date": "2026-09-10", "views": 4814, "minutes": 3504, "subsNet": 0}, {"date": "2026-09-11", "views": 5728, "minutes": 4762, "subsNet": 3}, {"date": "2026-09-12", "views": 7596, "minutes": 5602, "subsNet": 6}, {"date": "2026-09-13", "views": 5874, "minutes": 4199, "subsNet": 2}, {"date": "2026-09-14", "views": 5600, "minutes": 3957, "subsNet": 6}, {"date": "2026-09-15", "views": 5951, "minutes": 4877, "subsNet": 0}, {"date": "2026-09-16", "views": 5032, "minutes": 3965, "subsNet": 8}, {"date": "2026-09-17", "views": 4472, "minutes": 3066, "subsNet": 2}, {"date": "2026-09-18", "views": 6260, "minutes": 3421, "subsNet": 3}, {"date": "2026-09-19", "views": 5821, "minutes": 3717, "subsNet": 2}, {"date": "2026-09-20", "views": 6961, "minutes": 4083, "subsNet": -3}, {"date": "2026-09-21", "views": 10841, "minutes": 4898, "subsNet": 7}, {"date": "2026-09-22", "views": 18360, "minutes": 8505, "subsNet": 5}, {"date": "2026-09-23", "views": 10428, "minutes": 5644, "subsNet": 1}, {"date": "2026-09-24", "views": 7844, "minutes": 4526, "subsNet": 0}, {"date": "2026-09-25", "views": 8643, "minutes": 4383, "subsNet": 3}, {"date": "2026-09-26", "views": 5756, "minutes": 3529, "subsNet": 0}, {"date": "2026-09-27", "views": 6163, "minutes": 3507, "subsNet": 5}, {"date": "2026-09-28", "views": 5787, "minutes": 3323, "subsNet": 5}, {"date": "2026-09-29", "views": 5578, "minutes": 3351, "subsNet": 0}, {"date": "2026-09-30", "views": 4569, "minutes": 3205, "subsNet": 4}, {"date": "2026-10-01", "views": 5470, "minutes": 3629, "subsNet": 1}, {"date": "2026-10-02", "views": 5856, "minutes": 3213, "subsNet": 3}, {"date": "2026-10-03", "views": 5883, "minutes": 3340, "subsNet": -4}, {"date": "2026-10-04", "views": 4943, "minutes": 4065, "subsNet": 0}, {"date": "2026-10-05", "views": 4004, "minutes": 2706, "subsNet": -1}, {"date": "2026-10-06", "views": 3903, "minutes": 2700, "subsNet": 0}, {"date": "2026-10-07", "views": 3695, "minutes": 2732, "subsNet": 4}, {"date": "2026-10-08", "views": 4794, "minutes": 2883, "subsNet": 3}, {"date": "2026-10-09", "views": 3698, "minutes": 2604, "subsNet": 3}, {"date": "2026-10-10", "views": 5390, "minutes": 2503, "subsNet": 0}, {"date": "2026-10-11", "views": 34005, "minutes": 12141, "subsNet": 10}, {"date": "2026-10-12", "views": 86316, "minutes": 28549, "subsNet": 4}, {"date": "2026-10-13", "views": 259724, "minutes": 110536, "subsNet": 67}, {"date": "2026-10-14", "views": 176252, "minutes": 74060, "subsNet": 53}, {"date": "2026-10-15", "views": 114187, "minutes": 47550, "subsNet": 28}, {"date": "2026-10-16", "views": 90313, "minutes": 38226, "subsNet": 16}, {"date": "2026-10-17", "views": 31640, "minutes": 14898, "subsNet": 8}, {"date": "2026-10-18", "views": 19099, "minutes": 9199, "subsNet": 7}, {"date": "2026-10-19", "views": 18055, "minutes": 8299, "subsNet": 5}, {"date": "2026-10-20", "views": 11108, "minutes": 5194, "subsNet": 0}, {"date": "2026-10-21", "views": 8992, "minutes": 4358, "subsNet": 0}, {"date": "2026-10-22", "views": 8291, "minutes": 4156, "subsNet": -1}, {"date": "2026-10-23", "views": 8571, "minutes": 3677, "subsNet": 7}, {"date": "2026-10-24", "views": 14824, "minutes": 7083, "subsNet": 6}, {"date": "2026-10-25", "views": 42648, "minutes": 14722, "subsNet": 12}, {"date": "2026-10-26", "views": 18853, "minutes": 6935, "subsNet": 3}, {"date": "2026-10-27", "views": 25112, "minutes": 8526, "subsNet": 3}], "topVideos": [{"id": "SXoB_vnU3iI", "title": "汗疱（かんぽう）のコメント180件に、皮膚科専門医がガチ回答。ネットでよく見る情報の中には、別の病気（掌蹠膿疱症）の話が混ざっていたりと、誤解されやすいものも...", "published": "2026-10-11", "views": 802351, "totalViews": 807673, "minutes": 326653, "avgSec": 56, "fmt": "short", "subsGained": 151, "shares": 110}, {"id": "qYiKSLCnhKo", "title": "クマ取り失敗。地獄の日々...あれから3ヶ月経ちました。 #クマ取り #若返り治療　#エイジングケア", "published": "2025-03-07", "views": 54579, "totalViews": 313196, "minutes": 16642, "avgSec": 36, "fmt": "short", "subsGained": 11, "shares": 7}, {"id": "5Y9Hf7NKe6M", "title": "クマ取り失敗。地獄の日々...#クマ取りダウンタイム　#クマ取り #ダウンタイム", "published": "2025-03-30", "views": 45579, "totalViews": 256163, "minutes": 9761, "avgSec": 25, "fmt": "short", "subsGained": 7, "shares": 4}, {"id": "CsdyaiLXZ_k", "title": "【クマ治療】40代のクマ取り劇的ビフォーアフター#クマ取り #目の下のクマ取り #目の下のクマ #shorts", "published": "2024-10-28", "views": 23215, "totalViews": 250718, "minutes": 2859, "avgSec": 16, "fmt": "short", "subsGained": 13, "shares": 6}, {"id": "jyqvUuonp1w", "title": "【目の下たるみ】50代のクマ取り治療#クマ取り #ダウンタイム #shorts", "published": "2024-05-12", "views": 23950, "totalViews": 200412, "minutes": 2077, "avgSec": 12, "fmt": "short", "subsGained": 7, "shares": 1}, {"id": "IS1vYtuuV5k", "title": "クマ取り失敗？地獄の日々...#クマ治療 #クマ取り #美容整形 #アンチエイジング #若返り", "published": "2025-04-26", "views": 10228, "totalViews": 131650, "minutes": 2604, "avgSec": 30, "fmt": "short", "subsGained": 0, "shares": 0}, {"id": "cq2hrVh7Q_M", "title": "口周りのぶつぶつは実はステロイド！？", "published": "2026-10-25", "views": 44252, "totalViews": 59815, "minutes": 11011, "avgSec": 27, "fmt": "short", "subsGained": 10, "shares": 7}, {"id": "rvMJuZoQIv0", "title": "【クマ治療】クマ取り失敗、地獄の日々、#クマ取り #クマ改善 #クマ取り失敗#shorts", "published": "2025-03-25", "views": 12175, "totalViews": 46513, "minutes": 3193, "avgSec": 34, "fmt": "short", "subsGained": 0, "shares": 0}, {"id": "RKB93SxtPvY", "title": "目の下のマッサージでクマは治るの？　#クマ取り整形 #目の下のクマ #マッサージ", "published": "2023-12-20", "views": 5698, "totalViews": 31788, "minutes": 1980, "avgSec": 39, "fmt": "short", "subsGained": 0, "shares": 0}, {"id": "DQH9q9zTg1o", "title": "湘南美容クリニックの元ドクターが暴露【LAST CALLでも話題】【SBCの秘密教えます】", "published": "2026-05-31", "views": 20236, "totalViews": 29619, "minutes": 45195, "avgSec": 199, "fmt": "long", "subsGained": 24, "shares": 11}], "topVideosAll": [{"id": "SXoB_vnU3iI", "title": "汗疱（かんぽう）のコメント180件に、皮膚科専門医がガチ回答。ネットでよく見る情報の中には、別の病気（掌蹠膿疱症）の話が混ざっていたりと、誤解されやすいものも...", "published": "2026-10-11", "views": 802351, "totalViews": 807673, "minutes": 326653, "avgSec": 56, "fmt": "short", "subsGained": 151, "shares": 110}, {"id": "qYiKSLCnhKo", "title": "クマ取り失敗。地獄の日々...あれから3ヶ月経ちました。 #クマ取り #若返り治療　#エイジングケア", "published": "2025-03-07", "views": 54579, "totalViews": 313196, "minutes": 16642, "avgSec": 36, "fmt": "short", "subsGained": 11, "shares": 7}, {"id": "5Y9Hf7NKe6M", "title": "クマ取り失敗。地獄の日々...#クマ取りダウンタイム　#クマ取り #ダウンタイム", "published": "2025-03-30", "views": 45579, "totalViews": 256163, "minutes": 9761, "avgSec": 25, "fmt": "short", "subsGained": 7, "shares": 4}, {"id": "CsdyaiLXZ_k", "title": "【クマ治療】40代のクマ取り劇的ビフォーアフター#クマ取り #目の下のクマ取り #目の下のクマ #shorts", "published": "2024-10-28", "views": 23215, "totalViews": 250718, "minutes": 2859, "avgSec": 16, "fmt": "short", "subsGained": 13, "shares": 6}, {"id": "jyqvUuonp1w", "title": "【目の下たるみ】50代のクマ取り治療#クマ取り #ダウンタイム #shorts", "published": "2024-05-12", "views": 23950, "totalViews": 200412, "minutes": 2077, "avgSec": 12, "fmt": "short", "subsGained": 7, "shares": 1}, {"id": "IS1vYtuuV5k", "title": "クマ取り失敗？地獄の日々...#クマ治療 #クマ取り #美容整形 #アンチエイジング #若返り", "published": "2025-04-26", "views": 10228, "totalViews": 131650, "minutes": 2604, "avgSec": 30, "fmt": "short", "subsGained": 0, "shares": 0}, {"id": "cq2hrVh7Q_M", "title": "口周りのぶつぶつは実はステロイド！？", "published": "2026-10-25", "views": 44252, "totalViews": 59815, "minutes": 11011, "avgSec": 27, "fmt": "short", "subsGained": 10, "shares": 7}, {"id": "rvMJuZoQIv0", "title": "【クマ治療】クマ取り失敗、地獄の日々、#クマ取り #クマ改善 #クマ取り失敗#shorts", "published": "2025-03-25", "views": 12175, "totalViews": 46513, "minutes": 3193, "avgSec": 34, "fmt": "short", "subsGained": 0, "shares": 0}, {"id": "RKB93SxtPvY", "title": "目の下のマッサージでクマは治るの？　#クマ取り整形 #目の下のクマ #マッサージ", "published": "2023-12-20", "views": 5698, "totalViews": 31788, "minutes": 1980, "avgSec": 39, "fmt": "short", "subsGained": 0, "shares": 0}, {"id": "DQH9q9zTg1o", "title": "湘南美容クリニックの元ドクターが暴露【LAST CALLでも話題】【SBCの秘密教えます】", "published": "2026-05-31", "views": 20236, "totalViews": 29619, "minutes": 45195, "avgSec": 199, "fmt": "long", "subsGained": 24, "shares": 11}, {"id": "7tgViHqC9fs", "title": "脱脂は再発するって本当？ #クマ取り #脱脂 #裏ハムラ", "published": "2023-12-09", "views": 6808, "totalViews": 21791, "minutes": 2013, "avgSec": 40, "fmt": "short", "subsGained": 0, "shares": 0}, {"id": "nhLJY7VpOOA", "title": "【保存版】裏ハムラと何が違うの？ダウンタイムは？クマ治療で失敗したくない人のための“表ハムラ”の全てを解説します！", "published": "2024-08-30", "views": 3043, "totalViews": 21486, "minutes": 6005, "avgSec": 213, "fmt": "long", "subsGained": 14, "shares": 2}, {"id": "sKJCN1S0cCg", "title": "【クマ治療】クマ取り劇的ビフォーアフター#クマ取り #クマ改善 #目の下のクマ取り #shorts", "published": "2024-12-09", "views": 11552, "totalViews": 19545, "minutes": 1932, "avgSec": 22, "fmt": "short", "subsGained": 6, "shares": 0}, {"id": "jLHERMNPOKk", "title": "【見てて気持ちいい…けど痛くないの？】足の裏の角質やタコ（胼胝）を削る動画、つい見入っちゃいますよね。#かかと #魚の目 #たこ #胼胝 #かかとケア", "published": "2026-09-22", "views": 19065, "totalViews": 19090, "minutes": 6167, "avgSec": 38, "fmt": "short", "subsGained": 11, "shares": 2}, {"id": "9ZNKuhEN0BA", "title": "クマ取り＝脱脂　だけじゃありませんから！ #クマ取り #クマ治療", "published": "2026-06-18", "views": 6912, "totalViews": 18329, "minutes": 2936, "avgSec": 43, "fmt": "short", "subsGained": 4, "shares": 0}, {"id": "bMkyr3ev2GA", "title": "自分が裏ハムラ法で腫れる人、腫れない人かはこれを見れば分かります【クマ取り】【ダウンタイム】", "published": "2025-02-23", "views": 4790, "totalViews": 18238, "minutes": 8487, "avgSec": 185, "fmt": "long", "subsGained": 9, "shares": 5}, {"id": "X3BSWqpurEg", "title": "【手足が木の幹に…？衝撃の「ツリーマン症候群」とは】 #クマ取り #クマ治療 #美容 #美容整形 #ツリーマン症候群", "published": "2026-09-22", "views": 17412, "totalViews": 17631, "minutes": 6761, "avgSec": 35, "fmt": "short", "subsGained": 0, "shares": 0}, {"id": "29BbfyfWclo", "title": "【注意喚起⚠️】大人気治療 ジュベルックでしこり⁉️韓国日本でも大人気のJuvelook💉まだ目の下に入れている方が多くいますが危険です⚠️この動画を見たらお友達にもシェアしてあげて下さい🙏", "published": "2025-07-22", "views": 3084, "totalViews": 12744, "minutes": 1121, "avgSec": 34, "fmt": "short", "subsGained": 0, "shares": 0}, {"id": "2qt89ZuJyiw", "title": "腕のブツブツ、治す方法はあるの？⚡️ #毛孔性苔癬　#皮膚科専門医 #皮膚科治療", "published": "2026-10-24", "views": 10889, "totalViews": 11526, "minutes": 4451, "avgSec": 53, "fmt": "short", "subsGained": 0, "shares": 0}, {"id": "HjQ6j3Nht-M", "title": "重症のアトピーを良くする注射の治療、知ってましたか？⚡️#アトピー #アトピー性皮膚炎 #生物学的製剤 #atopy", "published": "2026-10-24", "views": 9589, "totalViews": 10609, "minutes": 2676, "avgSec": 32, "fmt": "short", "subsGained": 4, "shares": 4}, {"id": "jSHNpM5rL0U", "title": "指の横にできる「猛烈に痒いブツブツ」の正体⚡️ #クマ取り #クマ治療 #汗疱", "published": "2026-08-25", "views": 6225, "totalViews": 6649, "minutes": 2540, "avgSec": 37, "fmt": "short", "subsGained": 4, "shares": 2}, {"id": "UgAMjoalDOw", "title": "2026年9月27日", "published": "2026-09-28", "views": 5939, "totalViews": 6279, "minutes": 2102, "avgSec": 37, "fmt": "short", "subsGained": 0, "shares": 0}, {"id": "pbabv1FiwZw", "title": "クマ治療と併用で倍！美人になれる治療 #クマ取り #クマ治療 #糸リフト #眼瞼下垂 #眉下切開", "published": "2026-07-24", "views": 4211, "totalViews": 6065, "minutes": 1920, "avgSec": 54, "fmt": "short", "subsGained": 4, "shares": 1}, {"id": "3wqrPNR5CZ0", "title": "クマ取りが「再発する人」と「しない人」、分かれ目はここです。 #クマ取り #クマ治療 #整形失敗", "published": "2026-08-16", "views": 5939, "totalViews": 5946, "minutes": 2069, "avgSec": 51, "fmt": "short", "subsGained": 0, "shares": 0}, {"id": "sJikbU65wpc", "title": "ニキビ跡のクレーター、実は皮膚の下でくっついてるせいかも⁉️「ニキビは治ったのに、凹みだけ残ってしまった…」クレーターに悩んでいる方、実はとても多いんです。#クレーター #ニキビ跡 #ニキビ改善", "published": "2026-10-02", "views": 5347, "totalViews": 5726, "minutes": 1790, "avgSec": 35, "fmt": "short", "subsGained": 4, "shares": 0}, {"id": "WJVGY_fGaBA", "title": "汗管腫でお困りの方はぜひKumaCLIへ🐻", "published": "2026-07-30", "views": 5229, "totalViews": 5236, "minutes": 1459, "avgSec": 26, "fmt": "short", "subsGained": 0, "shares": 0}, {"id": "jHXm3bZVcfI", "title": "おでこの謎のブツブツ、放置してない？#クマ取り #クマ治療 #美容 #美容整形", "published": "2026-09-21", "views": 4722, "totalViews": 4849, "minutes": 1326, "avgSec": 28, "fmt": "short", "subsGained": 0, "shares": 0}, {"id": "4duBHeaAf-g", "title": "これ、拷問じゃないです。クマ治療です。 #クマ取り #クマ治療 #ダウンタイム #美容整形", "published": "2026-08-09", "views": 3901, "totalViews": 3906, "minutes": 1504, "avgSec": 33, "fmt": "short", "subsGained": 0, "shares": 0}, {"id": "23NJmKA2BCw", "title": "「クマがあるから寝不足でしょ」↑ 医師としてこれは違うと言わせてください。 #クマ取り #クマ治療 #堀大輔 #ショートスリーパー", "published": "2026-08-11", "views": 3505, "totalViews": 3532, "minutes": 1080, "avgSec": 34, "fmt": "short", "subsGained": 0, "shares": 0}, {"id": "0CXRwUa4bVU", "title": "脱脂しか勧めない医師が、裏ハムラを批判する時の4選💡 #クマ取り #クマ治療 #裏ハムラ #脱脂", "published": "2026-09-06", "views": 3385, "totalViews": 3394, "minutes": 1622, "avgSec": 78, "fmt": "short", "subsGained": 3, "shares": 0}], "topBySubs": [{"id": "SXoB_vnU3iI", "title": "汗疱（かんぽう）のコメント180件に、皮膚科専門医がガチ回答。ネットでよく見る情報の中には、別の病気（掌蹠膿疱症）の話が混ざっていたりと、誤解されやすいものも...", "published": "2026-10-11", "views": 802351, "totalViews": 807673, "minutes": 326653, "avgSec": 56, "fmt": "short", "subsGained": 151, "shares": 110}, {"id": "DQH9q9zTg1o", "title": "湘南美容クリニックの元ドクターが暴露【LAST CALLでも話題】【SBCの秘密教えます】", "published": "2026-05-31", "views": 20236, "totalViews": 29619, "minutes": 45195, "avgSec": 199, "fmt": "long", "subsGained": 24, "shares": 11}, {"id": "nhLJY7VpOOA", "title": "【保存版】裏ハムラと何が違うの？ダウンタイムは？クマ治療で失敗したくない人のための“表ハムラ”の全てを解説します！", "published": "2024-08-30", "views": 3043, "totalViews": 21486, "minutes": 6005, "avgSec": 213, "fmt": "long", "subsGained": 14, "shares": 2}, {"id": "CsdyaiLXZ_k", "title": "【クマ治療】40代のクマ取り劇的ビフォーアフター#クマ取り #目の下のクマ取り #目の下のクマ #shorts", "published": "2024-10-28", "views": 23215, "totalViews": 250718, "minutes": 2859, "avgSec": 16, "fmt": "short", "subsGained": 13, "shares": 6}, {"id": "qYiKSLCnhKo", "title": "クマ取り失敗。地獄の日々...あれから3ヶ月経ちました。 #クマ取り #若返り治療　#エイジングケア", "published": "2025-03-07", "views": 54579, "totalViews": 313196, "minutes": 16642, "avgSec": 36, "fmt": "short", "subsGained": 11, "shares": 7}], "retention": [{"curve": [{"t": 0.01, "watch": 1.238}, {"t": 0.02, "watch": 1.2025}, {"t": 0.03, "watch": 1.1693}, {"t": 0.04, "watch": 1.1409}, {"t": 0.05, "watch": 1.1205}, {"t": 0.06, "watch": 1.0834}, {"t": 0.07, "watch": 1.0347}, {"t": 0.08, "watch": 0.999}, {"t": 0.09, "watch": 0.9631}, {"t": 0.1, "watch": 0.9343}, {"t": 0.11, "watch": 0.9162}, {"t": 0.12, "watch": 0.9038}, {"t": 0.13, "watch": 0.8777}, {"t": 0.14, "watch": 0.8485}, {"t": 0.15, "watch": 0.8361}, {"t": 0.16, "watch": 0.8249}, {"t": 0.17, "watch": 0.8133}, {"t": 0.18, "watch": 0.8015}, {"t": 0.19, "watch": 0.7907}, {"t": 0.2, "watch": 0.7824}, {"t": 0.21, "watch": 0.774}, {"t": 0.22, "watch": 0.7645}, {"t": 0.23, "watch": 0.7539}, {"t": 0.24, "watch": 0.7457}, {"t": 0.25, "watch": 0.7385}, {"t": 0.26, "watch": 0.7298}, {"t": 0.27, "watch": 0.7168}, {"t": 0.28, "watch": 0.7037}, {"t": 0.29, "watch": 0.697}, {"t": 0.3, "watch": 0.6924}, {"t": 0.31, "watch": 0.687}, {"t": 0.32, "watch": 0.6823}, {"t": 0.33, "watch": 0.6789}, {"t": 0.34, "watch": 0.669}, {"t": 0.35, "watch": 0.6606}, {"t": 0.36, "watch": 0.6561}, {"t": 0.37, "watch": 0.6519}, {"t": 0.38, "watch": 0.6481}, {"t": 0.39, "watch": 0.6445}, {"t": 0.4, "watch": 0.6417}, {"t": 0.41, "watch": 0.6374}, {"t": 0.42, "watch": 0.632}, {"t": 0.43, "watch": 0.6289}, {"t": 0.44, "watch": 0.6266}, {"t": 0.45, "watch": 0.6249}, {"t": 0.46, "watch": 0.6231}, {"t": 0.47, "watch": 0.621}, {"t": 0.48, "watch": 0.6181}, {"t": 0.49, "watch": 0.6151}, {"t": 0.5, "watch": 0.6126}, {"t": 0.51, "watch": 0.6093}, {"t": 0.52, "watch": 0.6064}, {"t": 0.53, "watch": 0.604}, {"t": 0.54, "watch": 0.6017}, {"t": 0.55, "watch": 0.5996}, {"t": 0.56, "watch": 0.5979}, {"t": 0.57, "watch": 0.5965}, {"t": 0.58, "watch": 0.5946}, {"t": 0.59, "watch": 0.5932}, {"t": 0.6, "watch": 0.5919}, {"t": 0.61, "watch": 0.5901}, {"t": 0.62, "watch": 0.5881}, {"t": 0.63, "watch": 0.5863}, {"t": 0.64, "watch": 0.5841}, {"t": 0.65, "watch": 0.5822}, {"t": 0.66, "watch": 0.5802}, {"t": 0.67, "watch": 0.5748}, {"t": 0.68, "watch": 0.5704}, {"t": 0.69, "watch": 0.5667}, {"t": 0.7, "watch": 0.563}, {"t": 0.71, "watch": 0.5587}, {"t": 0.72, "watch": 0.5552}, {"t": 0.73, "watch": 0.5508}, {"t": 0.74, "watch": 0.5461}, {"t": 0.75, "watch": 0.5401}, {"t": 0.76, "watch": 0.5354}, {"t": 0.77, "watch": 0.5321}, {"t": 0.78, "watch": 0.5292}, {"t": 0.79, "watch": 0.5257}, {"t": 0.8, "watch": 0.5228}, {"t": 0.81, "watch": 0.5188}, {"t": 0.82, "watch": 0.5132}, {"t": 0.83, "watch": 0.5081}, {"t": 0.84, "watch": 0.5065}, {"t": 0.85, "watch": 0.5034}, {"t": 0.86, "watch": 0.5005}, {"t": 0.87, "watch": 0.4975}, {"t": 0.88, "watch": 0.4927}, {"t": 0.89, "watch": 0.4849}, {"t": 0.9, "watch": 0.4811}, {"t": 0.91, "watch": 0.4756}, {"t": 0.92, "watch": 0.4647}, {"t": 0.93, "watch": 0.4364}, {"t": 0.94, "watch": 0.4184}, {"t": 0.95, "watch": 0.389}, {"t": 0.96, "watch": 0.3529}, {"t": 0.97, "watch": 0.3231}, {"t": 0.98, "watch": 0.2917}, {"t": 0.99, "watch": 0.2676}, {"t": 1, "watch": 0.2531}], "hook": 1.121, "mid": 0.613, "end": 0.253, "relPerf": 0.613, "dropAt": 0.07, "dropAmt": 0.049, "id": "SXoB_vnU3iI", "title": "汗疱（かんぽう）のコメント180件に、皮膚科専門医がガチ回答。ネットでよく見る情報の中には、別の病気（掌蹠膿疱症）の話が混ざっていたりと、誤解されやすいものも...", "views": 802351, "published": "2026-10-11", "avgViewPct": 64.0}, {"curve": [{"t": 0.01, "watch": 1.8002}, {"t": 0.02, "watch": 1.7645}, {"t": 0.03, "watch": 1.7357}, {"t": 0.04, "watch": 1.6821}, {"t": 0.05, "watch": 1.6258}, {"t": 0.06, "watch": 1.5845}, {"t": 0.07, "watch": 1.5547}, {"t": 0.08, "watch": 1.5113}, {"t": 0.09, "watch": 1.4858}, {"t": 0.1, "watch": 1.469}, {"t": 0.11, "watch": 1.4425}, {"t": 0.12, "watch": 1.4273}, {"t": 0.13, "watch": 1.409}, {"t": 0.14, "watch": 1.3896}, {"t": 0.15, "watch": 1.3718}, {"t": 0.16, "watch": 1.3595}, {"t": 0.17, "watch": 1.3495}, {"t": 0.18, "watch": 1.3361}, {"t": 0.19, "watch": 1.327}, {"t": 0.2, "watch": 1.3203}, {"t": 0.21, "watch": 1.3083}, {"t": 0.22, "watch": 1.3005}, {"t": 0.23, "watch": 1.2945}, {"t": 0.24, "watch": 1.2861}, {"t": 0.25, "watch": 1.2788}, {"t": 0.26, "watch": 1.2733}, {"t": 0.27, "watch": 1.2678}, {"t": 0.28, "watch": 1.2609}, {"t": 0.29, "watch": 1.2567}, {"t": 0.3, "watch": 1.2522}, {"t": 0.31, "watch": 1.2469}, {"t": 0.32, "watch": 1.2432}, {"t": 0.33, "watch": 1.2406}, {"t": 0.34, "watch": 1.2365}, {"t": 0.35, "watch": 1.2326}, {"t": 0.36, "watch": 1.227}, {"t": 0.37, "watch": 1.221}, {"t": 0.38, "watch": 1.217}, {"t": 0.39, "watch": 1.2158}, {"t": 0.4, "watch": 1.2109}, {"t": 0.41, "watch": 1.2062}, {"t": 0.42, "watch": 1.2015}, {"t": 0.43, "watch": 1.1981}, {"t": 0.44, "watch": 1.1956}, {"t": 0.45, "watch": 1.1923}, {"t": 0.46, "watch": 1.1906}, {"t": 0.47, "watch": 1.1888}, {"t": 0.48, "watch": 1.1856}, {"t": 0.49, "watch": 1.1843}, {"t": 0.5, "watch": 1.1828}, {"t": 0.51, "watch": 1.181}, {"t": 0.52, "watch": 1.1799}, {"t": 0.53, "watch": 1.1798}, {"t": 0.54, "watch": 1.1789}, {"t": 0.55, "watch": 1.179}, {"t": 0.56, "watch": 1.1781}, {"t": 0.57, "watch": 1.1775}, {"t": 0.58, "watch": 1.177}, {"t": 0.59, "watch": 1.1757}, {"t": 0.6, "watch": 1.1763}, {"t": 0.61, "watch": 1.1749}, {"t": 0.62, "watch": 1.1745}, {"t": 0.63, "watch": 1.175}, {"t": 0.64, "watch": 1.1747}, {"t": 0.65, "watch": 1.1742}, {"t": 0.66, "watch": 1.1732}, {"t": 0.67, "watch": 1.1718}, {"t": 0.68, "watch": 1.1705}, {"t": 0.69, "watch": 1.1682}, {"t": 0.7, "watch": 1.1673}, {"t": 0.71, "watch": 1.1645}, {"t": 0.72, "watch": 1.1628}, {"t": 0.73, "watch": 1.1624}, {"t": 0.74, "watch": 1.1602}, {"t": 0.75, "watch": 1.1577}, {"t": 0.76, "watch": 1.1536}, {"t": 0.77, "watch": 1.1502}, {"t": 0.78, "watch": 1.1455}, {"t": 0.79, "watch": 1.1384}, {"t": 0.8, "watch": 1.1324}, {"t": 0.81, "watch": 1.1239}, {"t": 0.82, "watch": 1.1152}, {"t": 0.83, "watch": 1.1062}, {"t": 0.84, "watch": 1.0977}, {"t": 0.85, "watch": 1.088}, {"t": 0.86, "watch": 1.0813}, {"t": 0.87, "watch": 1.0731}, {"t": 0.88, "watch": 1.0633}, {"t": 0.89, "watch": 1.0547}, {"t": 0.9, "watch": 1.0474}, {"t": 0.91, "watch": 1.0347}, {"t": 0.92, "watch": 1.0234}, {"t": 0.93, "watch": 1.0136}, {"t": 0.94, "watch": 1.0001}, {"t": 0.95, "watch": 0.9655}, {"t": 0.96, "watch": 0.9339}, {"t": 0.97, "watch": 0.8975}, {"t": 0.98, "watch": 0.725}, {"t": 0.99, "watch": 0.7209}, {"t": 1, "watch": 0.7176}], "hook": 1.626, "mid": 1.183, "end": 0.718, "relPerf": 0.88, "dropAt": 0.98, "dropAmt": 0.172, "id": "qYiKSLCnhKo", "title": "クマ取り失敗。地獄の日々...あれから3ヶ月経ちました。 #クマ取り #若返り治療　#エイジングケア", "views": 54579, "published": "2025-03-07", "avgViewPct": 118.1}, {"curve": [{"t": 0.01, "watch": 1.596}, {"t": 0.02, "watch": 1.5698}, {"t": 0.03, "watch": 1.546}, {"t": 0.04, "watch": 1.52}, {"t": 0.05, "watch": 1.4903}, {"t": 0.06, "watch": 1.4487}, {"t": 0.07, "watch": 1.4278}, {"t": 0.08, "watch": 1.4093}, {"t": 0.09, "watch": 1.3926}, {"t": 0.1, "watch": 1.3744}, {"t": 0.11, "watch": 1.3557}, {"t": 0.12, "watch": 1.3458}, {"t": 0.13, "watch": 1.3372}, {"t": 0.14, "watch": 1.3299}, {"t": 0.15, "watch": 1.3194}, {"t": 0.16, "watch": 1.3124}, {"t": 0.17, "watch": 1.3067}, {"t": 0.18, "watch": 1.2996}, {"t": 0.19, "watch": 1.2908}, {"t": 0.2, "watch": 1.281}, {"t": 0.21, "watch": 1.2709}, {"t": 0.22, "watch": 1.2615}, {"t": 0.23, "watch": 1.2524}, {"t": 0.24, "watch": 1.2425}, {"t": 0.25, "watch": 1.2345}, {"t": 0.26, "watch": 1.2275}, {"t": 0.27, "watch": 1.22}, {"t": 0.28, "watch": 1.2137}, {"t": 0.29, "watch": 1.208}, {"t": 0.3, "watch": 1.1996}, {"t": 0.31, "watch": 1.1862}, {"t": 0.32, "watch": 1.1733}, {"t": 0.33, "watch": 1.1627}, {"t": 0.34, "watch": 1.1535}, {"t": 0.35, "watch": 1.1468}, {"t": 0.36, "watch": 1.1406}, {"t": 0.37, "watch": 1.1363}, {"t": 0.38, "watch": 1.132}, {"t": 0.39, "watch": 1.1298}, {"t": 0.4, "watch": 1.1277}, {"t": 0.41, "watch": 1.1265}, {"t": 0.42, "watch": 1.1241}, {"t": 0.43, "watch": 1.1232}, {"t": 0.44, "watch": 1.1217}, {"t": 0.45, "watch": 1.1197}, {"t": 0.46, "watch": 1.1177}, {"t": 0.47, "watch": 1.1162}, {"t": 0.48, "watch": 1.1142}, {"t": 0.49, "watch": 1.1109}, {"t": 0.5, "watch": 1.1087}, {"t": 0.51, "watch": 1.1063}, {"t": 0.52, "watch": 1.1061}, {"t": 0.53, "watch": 1.1043}, {"t": 0.54, "watch": 1.1035}, {"t": 0.55, "watch": 1.1025}, {"t": 0.56, "watch": 1.1015}, {"t": 0.57, "watch": 1.1011}, {"t": 0.58, "watch": 1.1009}, {"t": 0.59, "watch": 1.1001}, {"t": 0.6, "watch": 1.0992}, {"t": 0.61, "watch": 1.0991}, {"t": 0.62, "watch": 1.0981}, {"t": 0.63, "watch": 1.0976}, {"t": 0.64, "watch": 1.097}, {"t": 0.65, "watch": 1.0957}, {"t": 0.66, "watch": 1.0949}, {"t": 0.67, "watch": 1.0946}, {"t": 0.68, "watch": 1.0954}, {"t": 0.69, "watch": 1.0961}, {"t": 0.7, "watch": 1.0969}, {"t": 0.71, "watch": 1.0987}, {"t": 0.72, "watch": 1.0993}, {"t": 0.73, "watch": 1.0986}, {"t": 0.74, "watch": 1.0979}, {"t": 0.75, "watch": 1.0976}, {"t": 0.76, "watch": 1.0979}, {"t": 0.77, "watch": 1.0974}, {"t": 0.78, "watch": 1.0952}, {"t": 0.79, "watch": 1.0937}, {"t": 0.8, "watch": 1.092}, {"t": 0.81, "watch": 1.0899}, {"t": 0.82, "watch": 1.0879}, {"t": 0.83, "watch": 1.0834}, {"t": 0.84, "watch": 1.075}, {"t": 0.85, "watch": 1.0648}, {"t": 0.86, "watch": 1.0533}, {"t": 0.87, "watch": 1.0394}, {"t": 0.88, "watch": 1.0157}, {"t": 0.89, "watch": 0.9975}, {"t": 0.9, "watch": 0.9719}, {"t": 0.91, "watch": 0.9426}, {"t": 0.92, "watch": 0.8904}, {"t": 0.93, "watch": 0.8384}, {"t": 0.94, "watch": 0.7951}, {"t": 0.95, "watch": 0.7517}, {"t": 0.96, "watch": 0.6476}, {"t": 0.97, "watch": 0.6181}, {"t": 0.98, "watch": 0.6133}, {"t": 0.99, "watch": 0.608}, {"t": 1, "watch": 0.6041}], "hook": 1.49, "mid": 1.109, "end": 0.604, "relPerf": 0.805, "dropAt": 0.96, "dropAmt": 0.104, "id": "5Y9Hf7NKe6M", "title": "クマ取り失敗。地獄の日々...#クマ取りダウンタイム　#クマ取り #ダウンタイム", "views": 45579, "published": "2025-03-30", "avgViewPct": 109.0}, {"curve": [{"t": 0.01, "watch": 1.8697}, {"t": 0.02, "watch": 1.8632}, {"t": 0.03, "watch": 1.8358}, {"t": 0.04, "watch": 1.8116}, {"t": 0.05, "watch": 1.7677}, {"t": 0.06, "watch": 1.7244}, {"t": 0.07, "watch": 1.6946}, {"t": 0.08, "watch": 1.6374}, {"t": 0.09, "watch": 1.5992}, {"t": 0.1, "watch": 1.5752}, {"t": 0.11, "watch": 1.5489}, {"t": 0.12, "watch": 1.5345}, {"t": 0.13, "watch": 1.5154}, {"t": 0.14, "watch": 1.4961}, {"t": 0.15, "watch": 1.4782}, {"t": 0.16, "watch": 1.4543}, {"t": 0.17, "watch": 1.4302}, {"t": 0.18, "watch": 1.4141}, {"t": 0.19, "watch": 1.3976}, {"t": 0.2, "watch": 1.3871}, {"t": 0.21, "watch": 1.3704}, {"t": 0.22, "watch": 1.3584}, {"t": 0.23, "watch": 1.3445}, {"t": 0.24, "watch": 1.3253}, {"t": 0.25, "watch": 1.3197}, {"t": 0.26, "watch": 1.3117}, {"t": 0.27, "watch": 1.3035}, {"t": 0.28, "watch": 1.2981}, {"t": 0.29, "watch": 1.2905}, {"t": 0.3, "watch": 1.2835}, {"t": 0.31, "watch": 1.2759}, {"t": 0.32, "watch": 1.2662}, {"t": 0.33, "watch": 1.2583}, {"t": 0.34, "watch": 1.2513}, {"t": 0.35, "watch": 1.2456}, {"t": 0.36, "watch": 1.2401}, {"t": 0.37, "watch": 1.234}, {"t": 0.38, "watch": 1.2301}, {"t": 0.39, "watch": 1.225}, {"t": 0.4, "watch": 1.2206}, {"t": 0.41, "watch": 1.2176}, {"t": 0.42, "watch": 1.2118}, {"t": 0.43, "watch": 1.2068}, {"t": 0.44, "watch": 1.2012}, {"t": 0.45, "watch": 1.1983}, {"t": 0.46, "watch": 1.1947}, {"t": 0.47, "watch": 1.1902}, {"t": 0.48, "watch": 1.1861}, {"t": 0.49, "watch": 1.1834}, {"t": 0.5, "watch": 1.1803}, {"t": 0.51, "watch": 1.1759}, {"t": 0.52, "watch": 1.1731}, {"t": 0.53, "watch": 1.1699}, {"t": 0.54, "watch": 1.1669}, {"t": 0.55, "watch": 1.1628}, {"t": 0.56, "watch": 1.1601}, {"t": 0.57, "watch": 1.1568}, {"t": 0.58, "watch": 1.1531}, {"t": 0.59, "watch": 1.1484}, {"t": 0.6, "watch": 1.1449}, {"t": 0.61, "watch": 1.1423}, {"t": 0.62, "watch": 1.1398}, {"t": 0.63, "watch": 1.1377}, {"t": 0.64, "watch": 1.1353}, {"t": 0.65, "watch": 1.1327}, {"t": 0.66, "watch": 1.1298}, {"t": 0.67, "watch": 1.1269}, {"t": 0.68, "watch": 1.1249}, {"t": 0.69, "watch": 1.1223}, {"t": 0.7, "watch": 1.1197}, {"t": 0.71, "watch": 1.1174}, {"t": 0.72, "watch": 1.1155}, {"t": 0.73, "watch": 1.1134}, {"t": 0.74, "watch": 1.1124}, {"t": 0.75, "watch": 1.1118}, {"t": 0.76, "watch": 1.1105}, {"t": 0.77, "watch": 1.1081}, {"t": 0.78, "watch": 1.1077}, {"t": 0.79, "watch": 1.1051}, {"t": 0.8, "watch": 1.1019}, {"t": 0.81, "watch": 1.1008}, {"t": 0.82, "watch": 1.0993}, {"t": 0.83, "watch": 1.0977}, {"t": 0.84, "watch": 1.093}, {"t": 0.85, "watch": 1.0883}, {"t": 0.86, "watch": 1.0775}, {"t": 0.87, "watch": 1.0679}, {"t": 0.88, "watch": 1.0576}, {"t": 0.89, "watch": 1.0426}, {"t": 0.9, "watch": 1.0309}, {"t": 0.91, "watch": 1.018}, {"t": 0.92, "watch": 1.0054}, {"t": 0.93, "watch": 0.8953}, {"t": 0.94, "watch": 0.8827}, {"t": 0.95, "watch": 0.88}, {"t": 0.96, "watch": 0.8793}, {"t": 0.97, "watch": 0.8778}, {"t": 0.98, "watch": 0.8758}, {"t": 0.99, "watch": 0.8739}, {"t": 1, "watch": 0.8717}], "hook": 1.768, "mid": 1.18, "end": 0.872, "relPerf": 0.862, "dropAt": 0.93, "dropAmt": 0.11, "id": "CsdyaiLXZ_k", "title": "【クマ治療】40代のクマ取り劇的ビフォーアフター#クマ取り #目の下のクマ取り #目の下のクマ #shorts", "views": 23215, "published": "2024-10-28", "avgViewPct": 116.1}, {"curve": [{"t": 0.01, "watch": 1.8453}, {"t": 0.02, "watch": 2.0931}, {"t": 0.03, "watch": 2.0896}, {"t": 0.04, "watch": 2.0725}, {"t": 0.05, "watch": 2.0651}, {"t": 0.06, "watch": 2.0562}, {"t": 0.07, "watch": 2.0371}, {"t": 0.08, "watch": 2.0223}, {"t": 0.09, "watch": 1.9972}, {"t": 0.1, "watch": 1.9722}, {"t": 0.11, "watch": 1.9501}, {"t": 0.12, "watch": 1.9214}, {"t": 0.13, "watch": 1.8898}, {"t": 0.14, "watch": 1.8496}, {"t": 0.15, "watch": 1.8195}, {"t": 0.16, "watch": 1.8069}, {"t": 0.17, "watch": 1.7858}, {"t": 0.18, "watch": 1.7662}, {"t": 0.19, "watch": 1.7558}, {"t": 0.2, "watch": 1.73}, {"t": 0.21, "watch": 1.7207}, {"t": 0.22, "watch": 1.7104}, {"t": 0.23, "watch": 1.6912}, {"t": 0.24, "watch": 1.6846}, {"t": 0.25, "watch": 1.6672}, {"t": 0.26, "watch": 1.6457}, {"t": 0.27, "watch": 1.6404}, {"t": 0.28, "watch": 1.626}, {"t": 0.29, "watch": 1.6197}, {"t": 0.3, "watch": 1.6126}, {"t": 0.31, "watch": 1.6034}, {"t": 0.32, "watch": 1.6004}, {"t": 0.33, "watch": 1.5924}, {"t": 0.34, "watch": 1.5872}, {"t": 0.35, "watch": 1.583}, {"t": 0.36, "watch": 1.5753}, {"t": 0.37, "watch": 1.5729}, {"t": 0.38, "watch": 1.5671}, {"t": 0.39, "watch": 1.5566}, {"t": 0.4, "watch": 1.5525}, {"t": 0.41, "watch": 1.5488}, {"t": 0.42, "watch": 1.5448}, {"t": 0.43, "watch": 1.5427}, {"t": 0.44, "watch": 1.5376}, {"t": 0.45, "watch": 1.5341}, {"t": 0.46, "watch": 1.5319}, {"t": 0.47, "watch": 1.5282}, {"t": 0.48, "watch": 1.5262}, {"t": 0.49, "watch": 1.5225}, {"t": 0.5, "watch": 1.5198}, {"t": 0.51, "watch": 1.5163}, {"t": 0.52, "watch": 1.512}, {"t": 0.53, "watch": 1.5095}, {"t": 0.54, "watch": 1.506}, {"t": 0.55, "watch": 1.5041}, {"t": 0.56, "watch": 1.5025}, {"t": 0.57, "watch": 1.5013}, {"t": 0.58, "watch": 1.4993}, {"t": 0.59, "watch": 1.4987}, {"t": 0.6, "watch": 1.497}, {"t": 0.61, "watch": 1.4955}, {"t": 0.62, "watch": 1.4954}, {"t": 0.63, "watch": 1.4931}, {"t": 0.64, "watch": 1.4872}, {"t": 0.65, "watch": 1.4837}, {"t": 0.66, "watch": 1.4811}, {"t": 0.67, "watch": 1.4803}, {"t": 0.68, "watch": 1.478}, {"t": 0.69, "watch": 1.4759}, {"t": 0.7, "watch": 1.4714}, {"t": 0.71, "watch": 1.4638}, {"t": 0.72, "watch": 1.4601}, {"t": 0.73, "watch": 1.4519}, {"t": 0.74, "watch": 1.4441}, {"t": 0.75, "watch": 1.4321}, {"t": 0.76, "watch": 1.4136}, {"t": 0.77, "watch": 1.4055}, {"t": 0.78, "watch": 1.3926}, {"t": 0.79, "watch": 1.3818}, {"t": 0.8, "watch": 1.3725}, {"t": 0.81, "watch": 1.3619}, {"t": 0.82, "watch": 1.3567}, {"t": 0.83, "watch": 1.3451}, {"t": 0.84, "watch": 1.3335}, {"t": 0.85, "watch": 1.3235}, {"t": 0.86, "watch": 1.3132}, {"t": 0.87, "watch": 1.3042}, {"t": 0.88, "watch": 1.2905}, {"t": 0.89, "watch": 1.2813}, {"t": 0.9, "watch": 1.2759}, {"t": 0.91, "watch": 1.2724}, {"t": 0.92, "watch": 1.2703}, {"t": 0.93, "watch": 1.2671}, {"t": 0.94, "watch": 1.2635}, {"t": 0.95, "watch": 1.2605}, {"t": 0.96, "watch": 1.2578}, {"t": 0.97, "watch": 1.2556}, {"t": 0.98, "watch": 1.2525}, {"t": 0.99, "watch": 1.2489}, {"t": 1, "watch": 1.2428}], "hook": 2.065, "mid": 1.52, "end": 1.243, "relPerf": 0.903, "dropAt": 0.14, "dropAmt": 0.04, "id": "jyqvUuonp1w", "title": "【目の下たるみ】50代のクマ取り治療#クマ取り #ダウンタイム #shorts", "views": 23950, "published": "2024-05-12", "avgViewPct": 152.7}, {"curve": [{"t": 0.01, "watch": 1.5693}, {"t": 0.02, "watch": 1.531}, {"t": 0.03, "watch": 1.4863}, {"t": 0.04, "watch": 1.4339}, {"t": 0.05, "watch": 1.386}, {"t": 0.06, "watch": 1.3456}, {"t": 0.07, "watch": 1.3249}, {"t": 0.08, "watch": 1.2884}, {"t": 0.09, "watch": 1.2728}, {"t": 0.1, "watch": 1.2553}, {"t": 0.11, "watch": 1.2369}, {"t": 0.12, "watch": 1.2239}, {"t": 0.13, "watch": 1.2119}, {"t": 0.14, "watch": 1.1924}, {"t": 0.15, "watch": 1.1758}, {"t": 0.16, "watch": 1.1642}, {"t": 0.17, "watch": 1.1514}, {"t": 0.18, "watch": 1.1368}, {"t": 0.19, "watch": 1.1285}, {"t": 0.2, "watch": 1.1222}, {"t": 0.21, "watch": 1.1135}, {"t": 0.22, "watch": 1.1088}, {"t": 0.23, "watch": 1.1019}, {"t": 0.24, "watch": 1.0944}, {"t": 0.25, "watch": 1.0881}, {"t": 0.26, "watch": 1.084}, {"t": 0.27, "watch": 1.0765}, {"t": 0.28, "watch": 1.0702}, {"t": 0.29, "watch": 1.0656}, {"t": 0.3, "watch": 1.0603}, {"t": 0.31, "watch": 1.0532}, {"t": 0.32, "watch": 1.0489}, {"t": 0.33, "watch": 1.0438}, {"t": 0.34, "watch": 1.0384}, {"t": 0.35, "watch": 1.0347}, {"t": 0.36, "watch": 1.0276}, {"t": 0.37, "watch": 1.0201}, {"t": 0.38, "watch": 1.017}, {"t": 0.39, "watch": 1.0138}, {"t": 0.4, "watch": 1.0071}, {"t": 0.41, "watch": 1.0037}, {"t": 0.42, "watch": 1.0022}, {"t": 0.43, "watch": 0.9984}, {"t": 0.44, "watch": 0.9945}, {"t": 0.45, "watch": 0.9921}, {"t": 0.46, "watch": 0.9909}, {"t": 0.47, "watch": 0.9868}, {"t": 0.48, "watch": 0.9803}, {"t": 0.49, "watch": 0.972}, {"t": 0.5, "watch": 0.9612}, {"t": 0.51, "watch": 0.9543}, {"t": 0.52, "watch": 0.9482}, {"t": 0.53, "watch": 0.942}, {"t": 0.54, "watch": 0.9363}, {"t": 0.55, "watch": 0.9332}, {"t": 0.56, "watch": 0.9314}, {"t": 0.57, "watch": 0.9314}, {"t": 0.58, "watch": 0.9294}, {"t": 0.59, "watch": 0.9286}, {"t": 0.6, "watch": 0.9277}, {"t": 0.61, "watch": 0.9271}, {"t": 0.62, "watch": 0.9267}, {"t": 0.63, "watch": 0.9249}, {"t": 0.64, "watch": 0.9235}, {"t": 0.65, "watch": 0.9215}, {"t": 0.66, "watch": 0.9196}, {"t": 0.67, "watch": 0.9174}, {"t": 0.68, "watch": 0.916}, {"t": 0.69, "watch": 0.9152}, {"t": 0.7, "watch": 0.9158}, {"t": 0.71, "watch": 0.9141}, {"t": 0.72, "watch": 0.9135}, {"t": 0.73, "watch": 0.915}, {"t": 0.74, "watch": 0.9152}, {"t": 0.75, "watch": 0.9156}, {"t": 0.76, "watch": 0.9129}, {"t": 0.77, "watch": 0.9107}, {"t": 0.78, "watch": 0.9062}, {"t": 0.79, "watch": 0.9016}, {"t": 0.8, "watch": 0.9003}, {"t": 0.81, "watch": 0.8983}, {"t": 0.82, "watch": 0.8967}, {"t": 0.83, "watch": 0.8928}, {"t": 0.84, "watch": 0.8922}, {"t": 0.85, "watch": 0.8882}, {"t": 0.86, "watch": 0.8833}, {"t": 0.87, "watch": 0.8768}, {"t": 0.88, "watch": 0.8717}, {"t": 0.89, "watch": 0.8671}, {"t": 0.9, "watch": 0.8646}, {"t": 0.91, "watch": 0.8591}, {"t": 0.92, "watch": 0.8427}, {"t": 0.93, "watch": 0.8287}, {"t": 0.94, "watch": 0.8141}, {"t": 0.95, "watch": 0.8001}, {"t": 0.96, "watch": 0.7889}, {"t": 0.97, "watch": 0.7773}, {"t": 0.98, "watch": 0.7672}, {"t": 0.99, "watch": 0.7662}, {"t": 1, "watch": 0.764}], "hook": 1.386, "mid": 0.961, "end": 0.764, "relPerf": 0.794, "dropAt": 0.04, "dropAmt": 0.052, "id": "IS1vYtuuV5k", "title": "クマ取り失敗？地獄の日々...#クマ治療 #クマ取り #美容整形 #アンチエイジング #若返り", "views": 10228, "published": "2025-04-26", "avgViewPct": 99.1}], "analysis": {"shortBest": [{"id": "SXoB_vnU3iI", "views": 802351, "avgViewPct": 64.0, "avgSec": 56, "title": "汗疱（かんぽう）のコメント180件に、皮膚科専門医がガチ回答。ネットでよく見る情報の中には、別の病気（掌蹠膿疱症）の話が混ざっていたりと、誤解されやすいものも...", "published": "2026-10-11", "durSec": 89, "totalViews": 807673, "fmt": "short", "hook": 1.121, "end": 0.253, "relPerf": 0.613, "dropAt": 0.07}, {"id": "qYiKSLCnhKo", "views": 54579, "avgViewPct": 118.1, "avgSec": 36, "title": "クマ取り失敗。地獄の日々...あれから3ヶ月経ちました。 #クマ取り #若返り治療　#エイジングケア", "published": "2025-03-07", "durSec": 31, "totalViews": 313196, "fmt": "short", "hook": 1.626, "end": 0.718, "relPerf": 0.88, "dropAt": 0.98}, {"id": "5Y9Hf7NKe6M", "views": 45579, "avgViewPct": 109.0, "avgSec": 25, "title": "クマ取り失敗。地獄の日々...#クマ取りダウンタイム　#クマ取り #ダウンタイム", "published": "2025-03-30", "durSec": 23, "totalViews": 256163, "fmt": "short", "hook": 1.49, "end": 0.604, "relPerf": 0.805, "dropAt": 0.96}], "shortWorst": [{"id": "QgeuLAeo89U", "views": 246, "avgViewPct": 58.1, "avgSec": 19, "title": "皮膚の日焼けだけじゃなく、紫外線でこんなんになるなんて知らなかった😮#翼状片 #クマ取り #眼瞼下垂", "published": "2026-07-05", "durSec": 33, "totalViews": 496, "fmt": "short", "hook": 1.067, "end": 0.164, "relPerf": 0.24, "dropAt": 0.15}, {"id": "ksigTMOP09c", "views": 484, "avgViewPct": 86.4, "avgSec": 46, "title": "毛穴ニュルニュル押し出すのはNG⚠️あの白い正体は「角栓」。皮脂＋古い角質が詰まったもので、誰の毛穴にもあります。 #毛穴 #スキンケア #毛穴ケア", "published": "2026-07-25", "durSec": 54, "totalViews": 621, "fmt": "short", "hook": 1.204, "end": 0.476, "relPerf": 0.691, "dropAt": 0.03}, {"id": "JYjGxKnVMiY", "views": 948, "avgViewPct": 46.0, "avgSec": 45, "title": "タイトニングとリフトアップは違う！", "published": "2026-10-19", "durSec": 99, "totalViews": 966, "fmt": "short", "hook": 1.11, "end": 0.077, "relPerf": 0.579, "dropAt": 0.07}], "longBest": [{"id": "Ouj3i2tV8Qw", "views": 2362, "avgViewPct": 48.0, "avgSec": 164, "title": "クマ整形の術後ダウンタイム減らすにはどうすればよいか！？", "published": "2022-02-04", "durSec": 343, "totalViews": 93738, "fmt": "long", "hook": 0.659, "end": 0.157, "relPerf": 0.478, "dropAt": 0.02}, {"id": "gOx19RCAYTA", "views": 2888, "avgViewPct": 41.0, "avgSec": 190, "title": "【クマ治療を受けた方必見】クマ取りダウンタイム中の人は必ずこの動画を見てください！！クマ取りのダウンタイムってどれくらい？", "published": "2023-01-13", "durSec": 464, "totalViews": 91426, "fmt": "long", "hook": 0.619, "end": 0.153, "relPerf": 0.489, "dropAt": 0.02}, {"id": "z2oQajWlMYs", "views": 947, "avgViewPct": 37.7, "avgSec": 134, "title": "【大切なお願い】クマ取りを考えている方へ大切なお願いがあります。", "published": "2022-12-26", "durSec": 356, "totalViews": 48537, "fmt": "long", "hook": 0.74, "end": 0.131, "relPerf": 0.36, "dropAt": 0.02}], "longWorst": [{"id": "llfTmk4EDL4", "views": 430, "avgViewPct": 33.3, "avgSec": 203, "title": "【Netflixダウンタイム】がん経験者は美容整形できる？「実はある話」を現役美容外科医が逆張りで解説", "published": "2026-10-11", "durSec": 609, "totalViews": 431, "fmt": "long", "hook": 0.586, "end": 0.223, "relPerf": 0.418, "dropAt": 0.02}, {"id": "MkLkcY_Tnzg", "views": 456, "avgViewPct": 41.5, "avgSec": 133, "title": "【警告】大手が始めた\"ミニハムラ\"は偽ハムラです。クマ治療にミニもプチもない理由", "published": "2026-08-06", "durSec": 322, "totalViews": 456, "fmt": "long", "hook": 0.694, "end": 0.22, "relPerf": 0.472, "dropAt": 0.05}, {"id": "jfLYT_HNrag", "views": 458, "avgViewPct": 35.4, "avgSec": 219, "title": "【糸・ハイフで物足りない人へ】ミニ切開リフトとは？傷あと・ダウンタイム・フル切開との違いを形成外科専門医が解説", "published": "2026-10-16", "durSec": 621, "totalViews": 466, "fmt": "long", "hook": 0.628, "end": 0.261, "relPerf": 0.505, "dropAt": 0.02}]}, "dailyByFmt": [{"date": "2026-07-29", "short": 4143, "long": 447}, {"date": "2026-07-30", "short": 7610, "long": 694}, {"date": "2026-07-31", "short": 6228, "long": 492}, {"date": "2026-08-01", "short": 4072, "long": 460}, {"date": "2026-08-02", "short": 3787, "long": 425}, {"date": "2026-08-03", "short": 3158, "long": 421}, {"date": "2026-08-04", "short": 3059, "long": 357}, {"date": "2026-08-05", "short": 3003, "long": 358}, {"date": "2026-08-06", "short": 3798, "long": 544}, {"date": "2026-08-07", "short": 2634, "long": 414}, {"date": "2026-08-08", "short": 3996, "long": 408}, {"date": "2026-08-09", "short": 3506, "long": 406}, {"date": "2026-08-10", "short": 5417, "long": 549}, {"date": "2026-08-11", "short": 4684, "long": 594}, {"date": "2026-08-12", "short": 3082, "long": 484}, {"date": "2026-08-13", "short": 3597, "long": 515}, {"date": "2026-08-14", "short": 3102, "long": 494}, {"date": "2026-08-15", "short": 3761, "long": 479}, {"date": "2026-08-16", "short": 5766, "long": 480}, {"date": "2026-08-17", "short": 4271, "long": 426}, {"date": "2026-08-18", "short": 3432, "long": 445}, {"date": "2026-08-19", "short": 3755, "long": 414}, {"date": "2026-08-20", "short": 3907, "long": 392}, {"date": "2026-08-21", "short": 4948, "long": 384}, {"date": "2026-08-22", "short": 5160, "long": 425}, {"date": "2026-08-23", "short": 4188, "long": 365}, {"date": "2026-08-24", "short": 4286, "long": 391}, {"date": "2026-08-25", "short": 5419, "long": 414}, {"date": "2026-08-26", "short": 3630, "long": 429}, {"date": "2026-08-27", "short": 4762, "long": 749}, {"date": "2026-08-28", "short": 3947, "long": 759}, {"date": "2026-08-29", "short": 5423, "long": 840}, {"date": "2026-08-30", "short": 4189, "long": 916}, {"date": "2026-08-31", "short": 4052, "long": 1108}, {"date": "2026-09-01", "short": 4892, "long": 1381}, {"date": "2026-09-02", "short": 3188, "long": 1639}, {"date": "2026-09-03", "short": 3425, "long": 1526}, {"date": "2026-09-04", "short": 4387, "long": 1492}, {"date": "2026-09-05", "short": 3329, "long": 1328}, {"date": "2026-09-06", "short": 5139, "long": 1600}, {"date": "2026-09-07", "short": 3814, "long": 1771}, {"date": "2026-09-08", "short": 4143, "long": 1662}, {"date": "2026-09-09", "short": 3531, "long": 1238}, {"date": "2026-09-10", "short": 3130, "long": 1301}, {"date": "2026-09-11", "short": 3225, "long": 1883}, {"date": "2026-09-12", "short": 4912, "long": 2092}, {"date": "2026-09-13", "short": 4086, "long": 1531}, {"date": "2026-09-14", "short": 3846, "long": 1505}, {"date": "2026-09-15", "short": 3847, "long": 1847}, {"date": "2026-09-16", "short": 3425, "long": 1373}, {"date": "2026-09-17", "short": 3076, "long": 1248}, {"date": "2026-09-18", "short": 4744, "long": 1361}, {"date": "2026-09-19", "short": 4107, "long": 1535}, {"date": "2026-09-20", "short": 5110, "long": 1469}, {"date": "2026-09-21", "short": 9148, "long": 1462}, {"date": "2026-09-22", "short": 15611, "long": 2342}, {"date": "2026-09-23", "short": 8648, "long": 1560}, {"date": "2026-09-24", "short": 6214, "long": 1471}, {"date": "2026-09-25", "short": 6999, "long": 1455}, {"date": "2026-09-26", "short": 4260, "long": 1301}, {"date": "2026-09-27", "short": 4698, "long": 1254}, {"date": "2026-09-28", "short": 4366, "long": 1208}, {"date": "2026-09-29", "short": 4202, "long": 1196}, {"date": "2026-09-30", "short": 3262, "long": 1139}, {"date": "2026-10-01", "short": 3875, "long": 1453}, {"date": "2026-10-02", "short": 4414, "long": 1259}, {"date": "2026-10-03", "short": 4568, "long": 1060}, {"date": "2026-10-04", "short": 3231, "long": 1530}, {"date": "2026-10-05", "short": 2779, "long": 1051}, {"date": "2026-10-06", "short": 2685, "long": 1076}, {"date": "2026-10-07", "short": 2585, "long": 1001}, {"date": "2026-10-08", "short": 3335, "long": 1236}, {"date": "2026-10-09", "short": 2473, "long": 1055}, {"date": "2026-10-10", "short": 4321, "long": 915}, {"date": "2026-10-11", "short": 32555, "long": 1246}, {"date": "2026-10-12", "short": 85097, "long": 1008}, {"date": "2026-10-13", "short": 258199, "long": 1123}, {"date": "2026-10-14", "short": 174962, "long": 893}, {"date": "2026-10-15", "short": 113222, "long": 757}, {"date": "2026-10-16", "short": 88294, "long": 1031}, {"date": "2026-10-17", "short": 30436, "long": 986}, {"date": "2026-10-18", "short": 18107, "long": 816}, {"date": "2026-10-19", "short": 16994, "long": 840}, {"date": "2026-10-20", "short": 9997, "long": 801}, {"date": "2026-10-21", "short": 7975, "long": 846}, {"date": "2026-10-22", "short": 7101, "long": 912}, {"date": "2026-10-23", "short": 7549, "long": 888}, {"date": "2026-10-24", "short": 12877, "long": 1640}, {"date": "2026-10-25", "short": 41312, "long": 1120}, {"date": "2026-10-26", "short": 17864, "long": 816}, {"date": "2026-10-27", "short": 24104, "long": 840}], "fmtSummary": {"short": {"views": 1271447, "minutes": 456290, "subsGained": 313, "shares": 176, "avgViewPct": 68.3, "count": 121}, "long": {"views": 90847, "minutes": 183817, "subsGained": 143, "shares": 70, "avgViewPct": 36.4, "count": 79}}, "cadence": [{"week": "2026-07-27", "short": 3, "long": 0}, {"week": "2026-08-03", "short": 2, "long": 1}, {"week": "2026-08-10", "short": 5, "long": 0}, {"week": "2026-08-17", "short": 3, "long": 1}, {"week": "2026-08-24", "short": 4, "long": 0}, {"week": "2026-08-31", "short": 3, "long": 0}, {"week": "2026-09-07", "short": 3, "long": 1}, {"week": "2026-09-14", "short": 2, "long": 1}, {"week": "2026-09-21", "short": 6, "long": 2}, {"week": "2026-09-28", "short": 4, "long": 2}, {"week": "2026-10-05", "short": 2, "long": 1}, {"week": "2026-10-12", "short": 2, "long": 3}, {"week": "2026-10-19", "short": 7, "long": 1}, {"week": "2026-10-26", "short": 1, "long": 0}], "viewSource": {"total": 1019346, "fromNew": 892176, "fromTail": 127170, "windowDays": 28}, "viewSourceByFmt": {"short": {"total": 988567, "fromNew": 888994, "fromTail": 99573, "windowDays": 28}, "long": {"total": 30779, "fromNew": 3182, "fromTail": 27597, "windowDays": 28}}, "traffic": [{"source": "SUBSCRIBER", "views": 742543}, {"source": "SHORTS", "views": 380295}, {"source": "YT_SEARCH", "views": 192031}, {"source": "YT_CHANNEL", "views": 35869}, {"source": "RELATED_VIDEO", "views": 14884}, {"source": "YT_OTHER_PAGE", "views": 6962}, {"source": "EXT_URL", "views": 3746}, {"source": "NO_LINK_OTHER", "views": 2097}, {"source": "NOTIFICATION", "views": 1229}, {"source": "SOUND_PAGE", "views": 1220}, {"source": "HASHTAGS", "views": 905}, {"source": "PLAYLIST", "views": 470}, {"source": "IMMERSIVE_LIVE", "views": 404}, {"source": "END_SCREEN", "views": 336}, {"source": "SHORTS_CONTENT_LINKS", "views": 54}, {"source": "ANNOTATION", "views": 1}], "demographics": [{"age": "age45-54", "gender": "female", "pct": 19.4}, {"age": "age55-64", "gender": "female", "pct": 14.1}, {"age": "age35-44", "gender": "female", "pct": 12.9}, {"age": "age35-44", "gender": "male", "pct": 12.7}, {"age": "age45-54", "gender": "male", "pct": 11.1}, {"age": "age25-34", "gender": "male", "pct": 8.1}, {"age": "age25-34", "gender": "female", "pct": 7.4}, {"age": "age55-64", "gender": "male", "pct": 4.9}, {"age": "age65-", "gender": "female", "pct": 4.9}, {"age": "age18-24", "gender": "female", "pct": 1.4}, {"age": "age18-24", "gender": "male", "pct": 1.4}, {"age": "age65-", "gender": "male", "pct": 1.3}, {"age": "age13-17", "gender": "female", "pct": 0.2}, {"age": "age13-17", "gender": "male", "pct": 0.2}, {"age": "age25-34", "gender": "genderUserSpecified", "pct": 0.0}, {"age": "age35-44", "gender": "genderUserSpecified", "pct": 0.0}, {"age": "age45-54", "gender": "genderUserSpecified", "pct": 0.0}], "devices": [{"device": "MOBILE", "views": 1059536}, {"device": "DESKTOP", "views": 166744}, {"device": "TV", "views": 99594}, {"device": "TABLET", "views": 55831}], "countries": [{"country": "JP", "views": 1371359}, {"country": "US", "views": 4811}, {"country": "AU", "views": 721}, {"country": "CA", "views": 651}, {"country": "DE", "views": 359}, {"country": "KR", "views": 276}, {"country": "TW", "views": 275}, {"country": "TH", "views": 274}], "byFmt": {"short": {"summary": {"views": 1284644, "minutes": 460016, "subsGained": 321, "shares": 179, "likes": 3822, "comments": 386}, "traffic": [{"source": "SUBSCRIBER", "views": 701124}, {"source": "SHORTS", "views": 380026}, {"source": "YT_SEARCH", "views": 157277}, {"source": "YT_CHANNEL", "views": 30000}, {"source": "YT_OTHER_PAGE", "views": 6388}, {"source": "RELATED_VIDEO", "views": 5446}, {"source": "SOUND_PAGE", "views": 1220}, {"source": "NOTIFICATION", "views": 1087}, {"source": "HASHTAGS", "views": 890}, {"source": "EXT_URL", "views": 785}, {"source": "PLAYLIST", "views": 182}, {"source": "END_SCREEN", "views": 144}, {"source": "NO_LINK_OTHER", "views": 56}], "demographics": [{"age": "age45-54", "gender": "female", "pct": 19.0}, {"age": "age55-64", "gender": "female", "pct": 13.6}, {"age": "age35-44", "gender": "male", "pct": 13.1}, {"age": "age35-44", "gender": "female", "pct": 12.9}, {"age": "age45-54", "gender": "male", "pct": 11.2}, {"age": "age25-34", "gender": "male", "pct": 8.5}, {"age": "age25-34", "gender": "female", "pct": 7.4}, {"age": "age55-64", "gender": "male", "pct": 4.8}, {"age": "age65-", "gender": "female", "pct": 4.7}, {"age": "age18-24", "gender": "female", "pct": 1.5}, {"age": "age18-24", "gender": "male", "pct": 1.5}, {"age": "age65-", "gender": "male", "pct": 1.4}, {"age": "age13-17", "gender": "female", "pct": 0.2}, {"age": "age13-17", "gender": "male", "pct": 0.2}], "devices": [{"device": "MOBILE", "views": 997522}, {"device": "DESKTOP", "views": 156426}, {"device": "TV", "views": 77001}, {"device": "TABLET", "views": 52394}], "daily": [{"date": "2026-07-29", "views": 4326, "minutes": 1499}, {"date": "2026-07-30", "views": 7732, "minutes": 2110}, {"date": "2026-07-31", "views": 6496, "minutes": 2125}, {"date": "2026-08-01", "views": 4313, "minutes": 1496}, {"date": "2026-08-02", "views": 3947, "minutes": 1228}, {"date": "2026-08-03", "views": 3330, "minutes": 1109}, {"date": "2026-08-04", "views": 3280, "minutes": 925}, {"date": "2026-08-05", "views": 3146, "minutes": 927}, {"date": "2026-08-06", "views": 3944, "minutes": 971}, {"date": "2026-08-07", "views": 2737, "minutes": 831}, {"date": "2026-08-08", "views": 4083, "minutes": 1103}, {"date": "2026-08-09", "views": 3659, "minutes": 1129}, {"date": "2026-08-10", "views": 5516, "minutes": 1740}, {"date": "2026-08-11", "views": 4838, "minutes": 1436}, {"date": "2026-08-12", "views": 3171, "minutes": 978}, {"date": "2026-08-13", "views": 3679, "minutes": 916}, {"date": "2026-08-14", "views": 3352, "minutes": 910}, {"date": "2026-08-15", "views": 3869, "minutes": 1027}, {"date": "2026-08-16", "views": 6002, "minutes": 1633}, {"date": "2026-08-17", "views": 4357, "minutes": 1502}, {"date": "2026-08-18", "views": 3600, "minutes": 1251}, {"date": "2026-08-19", "views": 3881, "minutes": 1172}, {"date": "2026-08-20", "views": 4025, "minutes": 1464}, {"date": "2026-08-21", "views": 5274, "minutes": 1669}, {"date": "2026-08-22", "views": 5355, "minutes": 1693}, {"date": "2026-08-23", "views": 4349, "minutes": 1406}, {"date": "2026-08-24", "views": 4431, "minutes": 1447}, {"date": "2026-08-25", "views": 5553, "minutes": 1818}, {"date": "2026-08-26", "views": 3744, "minutes": 1023}, {"date": "2026-08-27", "views": 4929, "minutes": 1204}, {"date": "2026-08-28", "views": 4049, "minutes": 1015}, {"date": "2026-08-29", "views": 5588, "minutes": 1189}, {"date": "2026-08-30", "views": 4277, "minutes": 977}, {"date": "2026-08-31", "views": 4119, "minutes": 977}, {"date": "2026-09-01", "views": 5002, "minutes": 1324}, {"date": "2026-09-02", "views": 3362, "minutes": 839}, {"date": "2026-09-03", "views": 3684, "minutes": 883}, {"date": "2026-09-04", "views": 4507, "minutes": 983}, {"date": "2026-09-05", "views": 3439, "minutes": 745}, {"date": "2026-09-06", "views": 5370, "minutes": 1451}, {"date": "2026-09-07", "views": 3940, "minutes": 909}, {"date": "2026-09-08", "views": 4248, "minutes": 1318}, {"date": "2026-09-09", "views": 3592, "minutes": 884}, {"date": "2026-09-10", "views": 3418, "minutes": 735}, {"date": "2026-09-11", "views": 3746, "minutes": 857}, {"date": "2026-09-12", "views": 5401, "minutes": 1126}, {"date": "2026-09-13", "views": 4266, "minutes": 1065}, {"date": "2026-09-14", "views": 4014, "minutes": 1093}, {"date": "2026-09-15", "views": 3963, "minutes": 1342}, {"date": "2026-09-16", "views": 3577, "minutes": 985}, {"date": "2026-09-17", "views": 3162, "minutes": 731}, {"date": "2026-09-18", "views": 4814, "minutes": 1078}, {"date": "2026-09-19", "views": 4177, "minutes": 987}, {"date": "2026-09-20", "views": 5398, "minutes": 1188}, {"date": "2026-09-21", "views": 9288, "minutes": 2242}, {"date": "2026-09-22", "views": 15827, "minutes": 5014}, {"date": "2026-09-23", "views": 8742, "minutes": 2809}, {"date": "2026-09-24", "views": 6295, "minutes": 2045}, {"date": "2026-09-25", "views": 7088, "minutes": 1787}, {"date": "2026-09-26", "views": 4352, "minutes": 1111}, {"date": "2026-09-27", "views": 4817, "minutes": 1064}, {"date": "2026-09-28", "views": 4435, "minutes": 1060}, {"date": "2026-09-29", "views": 4279, "minutes": 1239}, {"date": "2026-09-30", "views": 3359, "minutes": 1029}, {"date": "2026-10-01", "views": 3961, "minutes": 1095}, {"date": "2026-10-02", "views": 4474, "minutes": 1037}, {"date": "2026-10-03", "views": 4698, "minutes": 1233}, {"date": "2026-10-04", "views": 3308, "minutes": 916}, {"date": "2026-10-05", "views": 2861, "minutes": 664}, {"date": "2026-10-06", "views": 2737, "minutes": 698}, {"date": "2026-10-07", "views": 2630, "minutes": 608}, {"date": "2026-10-08", "views": 3484, "minutes": 753}, {"date": "2026-10-09", "views": 2565, "minutes": 672}, {"date": "2026-10-10", "views": 4405, "minutes": 1075}, {"date": "2026-10-11", "views": 32668, "minutes": 10041}, {"date": "2026-10-12", "views": 85198, "minutes": 26605}, {"date": "2026-10-13", "views": 258488, "minutes": 108742}, {"date": "2026-10-14", "views": 175278, "minutes": 72562}, {"date": "2026-10-15", "views": 113357, "minutes": 45967}, {"date": "2026-10-16", "views": 88481, "minutes": 36514}, {"date": "2026-10-17", "views": 30563, "minutes": 13130}, {"date": "2026-10-18", "views": 18187, "minutes": 7578}, {"date": "2026-10-19", "views": 17105, "minutes": 6617}, {"date": "2026-10-20", "views": 10210, "minutes": 3665}, {"date": "2026-10-21", "views": 8024, "minutes": 2595}, {"date": "2026-10-22", "views": 7243, "minutes": 2219}, {"date": "2026-10-23", "views": 7610, "minutes": 2220}, {"date": "2026-10-24", "views": 13017, "minutes": 3978}, {"date": "2026-10-25", "views": 41434, "minutes": 12692}, {"date": "2026-10-26", "views": 17946, "minutes": 5378}, {"date": "2026-10-27", "views": 24199, "minutes": 6893}]}, "long": {"summary": {"views": 97655, "minutes": 200828, "subsGained": 152, "shares": 84, "likes": 321, "comments": 13}, "traffic": [{"source": "SUBSCRIBER", "views": 41367}, {"source": "YT_SEARCH", "views": 34745}, {"source": "RELATED_VIDEO", "views": 9435}, {"source": "YT_CHANNEL", "views": 5852}, {"source": "EXT_URL", "views": 2961}, {"source": "NO_LINK_OTHER", "views": 2033}, {"source": "YT_OTHER_PAGE", "views": 574}, {"source": "PLAYLIST", "views": 288}, {"source": "END_SCREEN", "views": 192}, {"source": "NOTIFICATION", "views": 138}, {"source": "SHORTS_CONTENT_LINKS", "views": 54}, {"source": "HASHTAGS", "views": 15}, {"source": "ANNOTATION", "views": 1}], "demographics": [{"age": "age45-54", "gender": "female", "pct": 26.2}, {"age": "age55-64", "gender": "female", "pct": 22.2}, {"age": "age35-44", "gender": "female", "pct": 13.0}, {"age": "age45-54", "gender": "male", "pct": 9.4}, {"age": "age35-44", "gender": "male", "pct": 7.2}, {"age": "age65-", "gender": "female", "pct": 6.6}, {"age": "age55-64", "gender": "male", "pct": 6.1}, {"age": "age25-34", "gender": "female", "pct": 6.0}, {"age": "age25-34", "gender": "male", "pct": 2.5}, {"age": "age65-", "gender": "male", "pct": 0.7}], "devices": [{"device": "MOBILE", "views": 61299}, {"device": "TV", "views": 22576}, {"device": "DESKTOP", "views": 10310}, {"device": "TABLET", "views": 3412}], "daily": [{"date": "2026-07-29", "views": 503, "minutes": 1847}, {"date": "2026-07-30", "views": 768, "minutes": 2588}, {"date": "2026-07-31", "views": 568, "minutes": 1850}, {"date": "2026-08-01", "views": 530, "minutes": 1790}, {"date": "2026-08-02", "views": 471, "minutes": 1423}, {"date": "2026-08-03", "views": 476, "minutes": 1775}, {"date": "2026-08-04", "views": 422, "minutes": 1398}, {"date": "2026-08-05", "views": 405, "minutes": 1460}, {"date": "2026-08-06", "views": 617, "minutes": 1966}, {"date": "2026-08-07", "views": 463, "minutes": 1547}, {"date": "2026-08-08", "views": 459, "minutes": 1429}, {"date": "2026-08-09", "views": 462, "minutes": 1552}, {"date": "2026-08-10", "views": 619, "minutes": 2297}, {"date": "2026-08-11", "views": 671, "minutes": 2279}, {"date": "2026-08-12", "views": 562, "minutes": 1923}, {"date": "2026-08-13", "views": 572, "minutes": 1841}, {"date": "2026-08-14", "views": 563, "minutes": 1833}, {"date": "2026-08-15", "views": 545, "minutes": 1597}, {"date": "2026-08-16", "views": 544, "minutes": 1777}, {"date": "2026-08-17", "views": 471, "minutes": 1714}, {"date": "2026-08-18", "views": 512, "minutes": 1668}, {"date": "2026-08-19", "views": 469, "minutes": 1774}, {"date": "2026-08-20", "views": 459, "minutes": 1522}, {"date": "2026-08-21", "views": 431, "minutes": 1477}, {"date": "2026-08-22", "views": 473, "minutes": 1517}, {"date": "2026-08-23", "views": 420, "minutes": 1385}, {"date": "2026-08-24", "views": 440, "minutes": 1581}, {"date": "2026-08-25", "views": 475, "minutes": 1616}, {"date": "2026-08-26", "views": 484, "minutes": 1430}, {"date": "2026-08-27", "views": 822, "minutes": 1535}, {"date": "2026-08-28", "views": 833, "minutes": 1476}, {"date": "2026-08-29", "views": 919, "minutes": 1911}, {"date": "2026-08-30", "views": 1028, "minutes": 1864}, {"date": "2026-08-31", "views": 1191, "minutes": 2576}, {"date": "2026-09-01", "views": 1462, "minutes": 3113}, {"date": "2026-09-02", "views": 1764, "minutes": 3670}, {"date": "2026-09-03", "views": 1588, "minutes": 3660}, {"date": "2026-09-04", "views": 1586, "minutes": 3407}, {"date": "2026-09-05", "views": 1418, "minutes": 2713}, {"date": "2026-09-06", "views": 1708, "minutes": 3463}, {"date": "2026-09-07", "views": 1869, "minutes": 4000}, {"date": "2026-09-08", "views": 1774, "minutes": 3428}, {"date": "2026-09-09", "views": 1344, "minutes": 2668}, {"date": "2026-09-10", "views": 1395, "minutes": 2768}, {"date": "2026-09-11", "views": 1982, "minutes": 3905}, {"date": "2026-09-12", "views": 2195, "minutes": 4475}, {"date": "2026-09-13", "views": 1608, "minutes": 3134}, {"date": "2026-09-14", "views": 1586, "minutes": 2863}, {"date": "2026-09-15", "views": 1987, "minutes": 3534}, {"date": "2026-09-16", "views": 1455, "minutes": 2979}, {"date": "2026-09-17", "views": 1310, "minutes": 2334}, {"date": "2026-09-18", "views": 1446, "minutes": 2342}, {"date": "2026-09-19", "views": 1643, "minutes": 2730}, {"date": "2026-09-20", "views": 1563, "minutes": 2894}, {"date": "2026-09-21", "views": 1553, "minutes": 2655}, {"date": "2026-09-22", "views": 1789, "minutes": 3310}, {"date": "2026-09-23", "views": 1685, "minutes": 2835}, {"date": "2026-09-24", "views": 1549, "minutes": 2481}, {"date": "2026-09-25", "views": 1555, "minutes": 2596}, {"date": "2026-09-26", "views": 1392, "minutes": 2388}, {"date": "2026-09-27", "views": 1345, "minutes": 2443}, {"date": "2026-09-28", "views": 1303, "minutes": 2238}, {"date": "2026-09-29", "views": 1283, "minutes": 2097}, {"date": "2026-09-30", "views": 1208, "minutes": 2176}, {"date": "2026-10-01", "views": 1508, "minutes": 2533}, {"date": "2026-10-02", "views": 1380, "minutes": 2176}, {"date": "2026-10-03", "views": 1181, "minutes": 2106}, {"date": "2026-10-04", "views": 1615, "minutes": 3140}, {"date": "2026-10-05", "views": 1141, "minutes": 2046}, {"date": "2026-10-06", "views": 1166, "minutes": 2001}, {"date": "2026-10-07", "views": 1065, "minutes": 2124}, {"date": "2026-10-08", "views": 1310, "minutes": 2129}, {"date": "2026-10-09", "views": 1131, "minutes": 1932}, {"date": "2026-10-10", "views": 985, "minutes": 1428}, {"date": "2026-10-11", "views": 1336, "minutes": 2100}, {"date": "2026-10-12", "views": 1118, "minutes": 1943}, {"date": "2026-10-13", "views": 1235, "minutes": 1794}, {"date": "2026-10-14", "views": 974, "minutes": 1498}, {"date": "2026-10-15", "views": 830, "minutes": 1583}, {"date": "2026-10-16", "views": 1118, "minutes": 1658}, {"date": "2026-10-17", "views": 1076, "minutes": 1767}, {"date": "2026-10-18", "views": 912, "minutes": 1620}, {"date": "2026-10-19", "views": 913, "minutes": 1694}, {"date": "2026-10-20", "views": 898, "minutes": 1528}, {"date": "2026-10-21", "views": 967, "minutes": 1762}, {"date": "2026-10-22", "views": 1048, "minutes": 1937}, {"date": "2026-10-23", "views": 961, "minutes": 1456}, {"date": "2026-10-24", "views": 1762, "minutes": 3096}, {"date": "2026-10-25", "views": 1214, "minutes": 2029}, {"date": "2026-10-26", "views": 907, "minutes": 1557}, {"date": "2026-10-27", "views": 912, "minutes": 1632}]}}, "trendsResearch": {"updated": "2026-10-30", "bullets": [{"t": "トラブル訴訟報道を受け、施術のデメリットやしこりリスクを医師が包み隠さず本音で語る動画が強い信頼と反応を集めています。", "src": "日本美容医療リスクマネジメント協会・2026/02/27"}, {"t": "医療広告ガイドラインの厳格化により、効果の誇張を避け、費用や副作用をつかみで明記する誠実な動画構成が必須になっています。", "src": "厚生労働省 医療広告ガイドライン（AI要約）"}, {"t": "クマ取りは脱脂単体より、太もも脂肪注入や裏ハムラ法との違いを1分で比較する解説が最後まで見られた割合を伸ばしています。", "src": "YouTubeショート・TikTok美容医療トレンド（AI要約）"}, {"t": "ほうれい線や輪郭のたるみに、切るリフトと最新引き締め機器の効果差を数字で実演する検証動画が大きな反響を呼んでいます。", "src": "Instagramリール美容トレンド（AI要約）"}, {"t": "「寝不足？」と言われる老け見え疲れ顔の原因を、目元の段差と肌のハリ不足に分けて対策を示す共感型の動画が保存数を伸ばしています。", "src": "TikTokクリエイターポータル・美容医療トレンド（AI要約）"}, {"t": "後遺症への警鐘が高まる中、韓国の肌育注射と日本のクマ治療を費用や経過日数で冷静に比べる解説が検索から多く見られています。", "src": "日本美容医療リスクマネジメント協会・2026/07/27"}]}, "hasWeeklyIdeas": true};
+// 数値が欠けていても NaN や TypeError で止まらないようにする（1か所落ちると以降が全部描画されない）
+const yen = n => (n==null||n===''||isNaN(n)) ? '—' : Number(n).toLocaleString('ja-JP');
+const jdate = s => s ? s.replace(/-/g,'/') : '';   // 2026-05-12 -> 2026/05/12
+const tip = document.getElementById('tip');
+function showTip(html,x,y){tip.innerHTML=html;tip.style.opacity=1;
+  let tx=x+14,ty=y+14; if(tx+tip.offsetWidth>innerWidth)tx=x-tip.offsetWidth-14;
+  tip.style.left=tx+'px';tip.style.top=ty+'px';}
+function hideTip(){tip.style.opacity=0;}
+
+// ---- 欠損しても落ちないように既定値を入れる ----
+// API が一部だけ失敗しても、そこから下のセクションが丸ごと描画されなくなるのを防ぐ。
+D.channel=D.channel||{}; D.summary=D.summary||{}; D.period=D.period||{};
+D.daily=D.daily||[]; D.traffic=D.traffic||[]; D.devices=D.devices||[];
+D.topVideos=D.topVideos||[]; D.topBySubs=D.topBySubs||[]; D.demographics=D.demographics||[];
+D.retention=D.retention||[]; D.countries=D.countries||[]; D.cadence=D.cadence||[];
+D.analysis=D.analysis||{};
+
+// ---- 取得できなかった項目（report_data.py の warnings / <key>_error）----
+// 「取れなかった」ことを読み手に見せるための土台。黙ってセクションが消えるのが一番まずい。
+const MISS_LABEL={
+  summary:'期間サマリー', lifetime:'累計視聴', daily:'日次トレンド',
+  topVideos:'TOP動画', topVideoConv:'動画別の登録者獲得・シェア',
+  avgpct:'動画ごとの、最後まで見られた割合',
+  retention:'最後まで見られた割合のグラフ', analysis:'再生数トップ／少ない動画の分析',
+  dailyByFmt:'縦（ショート）／横（長尺）別の内訳', cadence:'投稿ペース',
+  viewSource:'視聴の出どころ', traffic:'流入元', demographics:'視聴者層',
+  devices:'デバイス', countries:'国',
+  fmtTotals:'縦横別の合計', fmtTraffic:'縦横別の流入元', fmtDemo:'縦横別の視聴者層',
+  fmtDevices:'縦横別の端末', fmtDaily:'縦横別の日次推移', viewSourceByFmt:'縦横別の視聴の出どころ'};
+const MISS=(function(){
+  const m={};
+  // 新形式（warnings 配列）
+  (D.warnings||[]).forEach(w=>{ if(w&&w.key) m[w.key]=w.what||MISS_LABEL[w.key]||w.key; });
+  // 旧形式（<key>_error）。どちらか片方しか無い世代のJSONでも拾えるようにする
+  Object.keys(D).forEach(k=>{
+    if(k.length>6 && k.slice(-6)==='_error'){ const b=k.slice(0,-6); if(!m[b]) m[b]=MISS_LABEL[b]||b; }
+  });
+  return m;
+})();
+const missed=k=>Object.prototype.hasOwnProperty.call(MISS,k);
+// カード本文を「取れませんでした」に差し替えるための箱
+function missBox(k){
+  return '<div class="missbox"><b>この項目は今回取得できませんでした</b><br>'+
+    'YouTube側のエラーで「'+(MISS[k]||MISS_LABEL[k]||k)+'」を取れていません。'+
+    '<b>0本・0回という意味ではありません</b>。次回の自動更新（毎週月曜9時）で復旧します。</div>';
+}
+
+// ---- ページ全体で1つだけの「事実」----
+// 同じ数字を各セクションが別々に計算していたため、1画面の中で
+// 「横ばい／少し増加／13%増」が同時に出る、検索流入が 28% と 26% で食い違う、
+// 「45〜64歳女性」と「45〜54歳女性」が別々に出る、といった矛盾が起きていた。
+// 数字と、その数字の言い回しは、必ずここ1か所から配る。
+const M=(function(){
+  const dl=D.daily||[];
+  const sum=(a,k)=>a.reduce((x,v)=>x+(v[k]||0),0);
+
+  // --- 今の勢い ---
+  // 主判定は「直近28日 vs その前の28日」。7日ごとはブレが大きすぎて判断に使えない
+  // （同じ週で 7日=+13% / 28日=+3% になる）ので、判定には一切使わない。
+  const v28=sum(dl.slice(-28),'views'), vPrev28=sum(dl.slice(-56,-28),'views');
+  const m28=sum(dl.slice(-28),'minutes'), mPrev28=sum(dl.slice(-56,-28),'minutes');
+  const s28=sum(dl.slice(-28),'subsNet'), sPrev28=sum(dl.slice(-56,-28),'subsNet');
+  const hasTrend=dl.length>=56 && vPrev28>0;
+  const d28=hasTrend?(v28-vPrev28)/vPrev28*100:null;
+  const pct=(cur,prev)=>prev?((cur-prev)/prev*100):null;
+
+  // 勢いの呼び名は1つだけ。バッジ・本文・要点すべてこれを使う。
+  let momentum,momentumCls,momentumWord;
+  if(!hasTrend){ momentum='判定できません'; momentumCls='mid'; momentumWord='比べられるだけのデータがありません'; }
+  else if(d28>=10){ momentum='好調'; momentumCls='good'; momentumWord='はっきり増えています'; }
+  else if(d28>=5){ momentum='やや好調'; momentumCls='good'; momentumWord='少し増えています'; }
+  else if(d28>-5){ momentum='横ばい'; momentumCls='mid'; momentumWord='ほぼ横ばいです'; }
+  else if(d28>-10){ momentum='やや軟調'; momentumCls='warn'; momentumWord='じわじわ減っています'; }
+  else { momentum='要注意'; momentumCls='warn'; momentumWord='はっきり減っています'; }
+  const signed=v=>v==null?'—':((v>=0?'+':'−')+Math.abs(v).toFixed(0)+'%');
+  // 「直近1か月は、その前の1か月より +3%（ほぼ横ばい）」— この1文だけを使い回す
+  const momentumLine=hasTrend
+    ? '直近1か月は、その前の1か月より <b>'+signed(d28)+'</b>＝<b>'+momentumWord+'</b>'
+    : '<b>増減を出せるだけの日次データがありません</b>';
+
+  // --- どこから見に来たか ---
+  const trTot=(D.traffic||[]).reduce((a,t)=>a+t.views,0)||1;
+  const tr={}; (D.traffic||[]).forEach(t=>tr[t.source]=t.views);
+  const searchViews=tr.YT_SEARCH||0, subViews=tr.SUBSCRIBER||0;
+  const searchPct=Math.round(searchViews/trTot*100);
+  const subPct=Math.round(subViews/trTot*100);
+
+  // --- 視聴者層 ---
+  // 「一番多い層」と「まとめた層」は必ず同じ定義から出す。
+  // 以前は本文が「40〜60代」、計算は 35〜64歳、グラフは 45〜54歳 でバラバラだった。
+  const AGEJ={'age13-17':'13〜17歳','age18-24':'18〜24歳','age25-34':'25〜34歳','age35-44':'35〜44歳',
+    'age45-54':'45〜54歳','age55-64':'55〜64歳','age65-':'65歳以上'};
+  const GJ={female:'女性',male:'男性'};
+  const CORE=['age35-44','age45-54','age55-64'];
+  let coreFemale=0, topSeg=null;
+  (D.demographics||[]).forEach(r=>{
+    if(r.gender==='female'&&CORE.includes(r.age)) coreFemale+=r.pct;
+    if(GJ[r.gender] && (!topSeg||r.pct>topSeg.pct)) topSeg={pct:r.pct,label:(AGEJ[r.age]||r.age)+GJ[r.gender]};
+  });
+  const CORE_LABEL='35〜64歳女性';   // 言い回しもここで固定する
+
+  // --- 最後まで見られた割合（似た動画との比較）---
+  const R=(D.retention||[]).filter(r=>r.curve&&r.curve.length);
+  const avgRel=R.length?R.reduce((a,r)=>a+(r.relPerf||0),0)/R.length:null;
+  const relTop=avgRel!=null?Math.max(1,100-Math.round(avgRel*100)):null;  // 「上位nn%」
+
+  // --- スマホ率 ---
+  const devTot=(D.devices||[]).reduce((a,d)=>a+d.views,0)||1;
+  const mob=(D.devices||[]).find(d=>d.device==='MOBILE');
+  const mobilePct=(D.devices||[]).length?Math.round((mob?mob.views:0)/devTot*100):null;
+
+  return {v28:v28,vPrev28:vPrev28,m28:m28,s28:s28,hasTrend:hasTrend,d28:d28,
+    d28m:pct(m28,mPrev28),d28s:pct(s28,sPrev28),signed:signed,
+    momentum:momentum,momentumCls:momentumCls,momentumWord:momentumWord,momentumLine:momentumLine,
+    trTot:trTot,tr:tr,searchViews:searchViews,searchPct:searchPct,subViews:subViews,subPct:subPct,
+    AGEJ:AGEJ,GJ:GJ,coreFemale:coreFemale,coreLabel:CORE_LABEL,topSeg:topSeg,
+    retention:R,avgRel:avgRel,relTop:relTop,mobilePct:mobilePct};
+})();
+
+// 割合の表示は「100%を超えない」を全ページで守る。
+// YouTube のショートはくり返し再生されるため、素の値は 164% / 135% / 123.9% のように
+// 100 を超える。注記1行では「最後まで見た割合が135%」は腑に落ちないので、
+// 表示は 100% で止め、超えていた場合だけ「くり返し再生ぶんを除く」と添える。
+const LOOP_NOTE='くり返し再生ぶんを除く';
+function clipPct(ratio){            // 0〜1（以上）の比 → {txt, over}
+  if(ratio==null||isNaN(ratio)) return {txt:'—',over:false};
+  const v=ratio*100;
+  return {txt:Math.min(100,Math.round(v))+'%',over:v>100.5};
+}
+function clipPctNum(v){             // すでに % の値（48.6 / 119.4）
+  if(v==null||isNaN(v)) return {txt:'—',over:false};
+  return {txt:Math.min(100,Math.round(v*10)/10)+'%',over:v>100.5};
+}
+// 似た動画との比較は「0.891」でも「46」でもなく「上位11%」と書く
+function relRankTxt(x){ return x==null?'—':('上位'+Math.max(1,100-Math.round(x*100))+'%'); }
+
+// グラフの目盛りを、暗算できる数（1/2/2.5/5 ×10のn乗）に丸める。
+function niceStep(raw){
+  if(!(raw>0)) return 1;
+  const mag=Math.pow(10,Math.floor(Math.log10(raw)));
+  const n=raw/mag;
+  return (n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*mag;
+}
+
+// ---- header ----
+document.getElementById('chTitle').textContent = D.channel.title||'YouTubeレポート';
+document.getElementById('subPill').textContent = D.channel.subscribers!=null?'登録者 '+yen(D.channel.subscribers)+'人':'登録者 —';
+document.getElementById('period').textContent = '対象期間: '+(D.period.start||'—')+' 〜 '+(D.period.end||'—')+'（過去90日）';
+document.getElementById('foot').textContent = '生成日: '+(D.generated||'—')+' ／ データ: YouTube Analytics API・Data API v3 ／ チャンネルID '+(D.channel.id||'—');
+
+// ---- データの鮮度＋取得できなかった項目のお知らせ ----
+(function(){
+  const el=document.getElementById('dataWarn'); if(!el) return;
+  const parts=[];
+  // 鮮度：週次更新なので8日以上開いていたら更新が止まっている可能性
+  if(D.generated && /^\d{4}-\d{2}-\d{2}$/.test(D.generated)){
+    const g=D.generated.split('-').map(Number);
+    const gen=Date.UTC(g[0],g[1]-1,g[2]);
+    const n=new Date();
+    const now=Date.UTC(n.getFullYear(),n.getMonth(),n.getDate());
+    const days=Math.round((now-gen)/86400000);
+    if(days>=8) parts.push('<span class="mh">このレポートは '+days+'日前（'+D.generated+'）のデータです</span>'+
+      '毎週月曜9時に自動更新される想定です。日付が古いままなら<b>自動更新が止まっています</b>。');
+  }
+  const keys=Object.keys(MISS);
+  if(keys.length){
+    parts.push('<span class="mh">今回取得できなかった項目が '+keys.length+'件あります</span>'+
+      'YouTube側のエラーで下の項目が取れていません。<b>その数字がこのレポートに出ていないだけで、0という意味ではありません</b>。'+
+      '<ul>'+keys.map(k=>'<li>'+(MISS[k]||k)+'</li>').join('')+'</ul>');
+  }
+  if(!parts.length) return;
+  el.style.display='';
+  el.innerHTML=parts.join('<div style="height:10px"></div>');
+})();
+
+// ---- 描画が途中で落ちたときに、読み手に分かるようにする ----
+// このレポートは1つの script で全セクションを描くので、1か所の例外で以降が真っ白になる。
+// 何も出ていないのに「問題なし」に見えるのが一番まずいので、必ず告知する。
+window.addEventListener('error',function(){
+  const el=document.getElementById('dataWarn'); if(!el) return;
+  if(el.dataset.crash) return; el.dataset.crash='1';
+  el.style.display='';
+  el.innerHTML='<span class="mh">このレポートは一部を表示できませんでした</span>'+
+    '途中でエラーが起きたため、ここから下の内容が欠けている可能性があります。'+
+    '見えている数字は正しいものですが、<b>足りないセクションがある前提で読んでください</b>。'
+    +'<div style="height:10px"></div>'+el.innerHTML;
+});
+
+// ---- 縦横（横動画／ショート）別の事実。概要の2つの箱と、各セクションの切替はここから配る ----
+// 「全体の数字」は M。ここは形式ごとに同じ定義で出す（勢い＝28日比、客層＝35〜64歳女性、など M と同じ物差し）。
+const FMT_LABEL={long:'横動画（長尺）',short:'ショート'};
+const F=(function(){
+  const B=D.byFmt||{};
+  const sumK=(a,k)=>a.reduce((x,v)=>x+(v[k]||0),0);
+  const mk=key=>{
+    const b=B[key]||{};
+    // 日次：YouTubeの形式分類（creatorContentType）由来。無ければ従来の尺による振り分け（dailyByFmt）
+    let daily=b.daily||null;
+    if(!daily && (D.dailyByFmt||[]).length) daily=D.dailyByFmt.map(v=>({date:v.date,views:v[key]||0}));
+    daily=daily||[];
+    const v28=sumK(daily.slice(-28),'views'), vPrev28=sumK(daily.slice(-56,-28),'views');
+    const hasTrend=daily.length>=56&&vPrev28>0;
+    const d28=hasTrend?(v28-vPrev28)/vPrev28*100:null;
+    let word='判定できません',cls='mid';
+    if(hasTrend){
+      if(d28>=10){word='はっきり増えています';cls='good';}
+      else if(d28>=5){word='少し増えています';cls='good';}
+      else if(d28>-5){word='ほぼ横ばいです';cls='mid';}
+      else if(d28>-10){word='じわじわ減っています';cls='warn';}
+      else{word='はっきり減っています';cls='warn';}
+    }
+    const fs=(D.fmtSummary||{})[key]||{};
+    const tot=b.summary||{};
+    // 「出した本数」は投稿ペース（cadence）の合計＝この90日に公開した本数。
+    // fmtSummary.count は「再生のあった本数」なので別物。混ぜない。
+    const posted=(D.cadence||[]).length?(D.cadence||[]).reduce((a,w)=>a+(w[key]||0),0):null;
+    const views90=tot.views!=null?tot.views:(fs.views!=null?fs.views:null);
+    const subs90=tot.subsGained!=null?tot.subsGained:(fs.subsGained!=null?fs.subsGained:null);
+    const traffic=b.traffic||null;
+    const trTot=traffic?(traffic.reduce((a,t)=>a+t.views,0)||1):0;
+    const tr={}; (traffic||[]).forEach(t=>tr[t.source]=t.views);
+    const pctOf=k=>traffic?Math.round((tr[k]||0)/trTot*100):null;
+    const demo=b.demographics||null;
+    let coreFemale=0, topSeg=null;
+    (demo||[]).forEach(r=>{
+      if(r.gender==='female'&&['age35-44','age45-54','age55-64'].includes(r.age)) coreFemale+=r.pct;
+      if(M.GJ[r.gender]&&(!topSeg||r.pct>topSeg.pct)) topSeg={pct:r.pct,label:(M.AGEJ[r.age]||r.age)+M.GJ[r.gender]};
+    });
+    const dev=b.devices||null;
+    const devTot=dev?(dev.reduce((a,d)=>a+d.views,0)||1):0;
+    const mob=(dev||[]).find(d=>d.device==='MOBILE');
+    const vs=(D.viewSourceByFmt||{})[key]||null;
+    // 中身の強さ：「似た動画と比べて上位n%」をその形式の動画だけで出す。
+    // 全体の数字（M.relTop）は「よく見られた上位6本」の平均で、上位6本はほぼショート。
+    // 横動画にそのまま当てはめると実態より強く見えるので、形式ごとに別々に出す。
+    const fmtOf={}; (D.topVideosAll||[]).forEach(v=>{ if(v.fmt) fmtOf[v.id]=v.fmt; });
+    const A=D.analysis||{};
+    const pool={};
+    (D.retention||[]).forEach(r=>{ if(r.id&&fmtOf[r.id]===key&&r.relPerf!=null) pool[r.id]=r.relPerf; });
+    [...(A[key+'Best']||[]),...(A[key+'Worst']||[])].forEach(v=>{ if(v.id&&v.relPerf!=null&&!(v.id in pool)) pool[v.id]=v.relPerf; });
+    const rels=Object.values(pool);
+    const avgRel=rels.length?rels.reduce((a,x)=>a+x,0)/rels.length:null;
+    const relTop=avgRel!=null?Math.max(1,100-Math.round(avgRel*100)):null;
+    const bestTitle=((A[key+'Best']||[])[0]||{}).title||null;
+    return {key:key,label:FMT_LABEL[key],has:!!(daily.length||views90!=null),
+      relTop:relTop,relN:rels.length,bestTitle:bestTitle,
+      v28:v28,vPrev28:vPrev28,hasTrend:hasTrend,d28:d28,word:word,cls:cls,
+      views90:views90,subs90:subs90,posted:posted,avgViewPct:fs.avgViewPct!=null?fs.avgViewPct:null,
+      traffic:traffic,searchPct:pctOf('YT_SEARCH'),subPct:pctOf('SUBSCRIBER'),feedPct:pctOf('SHORTS'),
+      demo:demo,coreFemale:demo?coreFemale:null,topSeg:topSeg,
+      devices:dev,mobilePct:dev?Math.round((mob?mob.views:0)/devTot*100):null,
+      tailPct:(vs&&vs.total)?Math.round(vs.fromTail/vs.total*100):null};
+  };
+  const r={long:mk('long'),short:mk('short')};
+  const both=(r.long.views90||0)+(r.short.views90||0);
+  r.shortShare=both?Math.round((r.short.views90||0)/both*100):null;   // 全体の再生のうちショートの割合
+  return r;
+})();
+// ページ全体で1つの「全体／横動画／ショート」切替。各セクションは render(key) を登録し、
+// 上部のバー1つでまとめて切り替える（key＝all / long / short）。
+const FMT_REG=[]; let FMT_KEY='all';
+function fmtSwitch(beforeEl, render){ FMT_REG.push(render); try{render(FMT_KEY);}catch(e){} }
+function fmtApply(k){ FMT_KEY=k; FMT_REG.forEach(function(r){try{r(k);}catch(e){}}); }
+(function(){
+  const host=document.getElementById('fmtbar'); if(!host) return;
+  host.innerHTML='<div class="fmtseg big">'+[['all','全体'],['long','横動画'],['short','ショート']]
+      .map(function(k){return '<button type="button" data-k="'+k[0]+'"'+(k[0]==='all'?' class="on"':'')+'>'+k[1]+'</button>';}).join('')+'</div>'+
+    '<span class="fmtbar-note">このボタンで、下の各セクションがまとめて「全体／横動画／ショート」に切り替わります</span>';
+  host.addEventListener('click',function(e){
+    const b=e.target.closest('button'); if(!b) return;
+    host.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);});
+    fmtApply(b.dataset.k);
+  });
+})();
+const FMT_MISS='<p class="csub">この形式だけの内訳は今回取得できませんでした（「全体」には数字があります）</p>';
+
+// ---- 概要・総評（この分析で何が言えるか）----
+// 数字と言い回しは M（ページで1つだけの事実）から取る。ここで独自に計算しない。
+(function(){
+  const el=document.getElementById('overview'); if(!el) return;
+  const A=D.analysis||{};
+  const worstAll=[...(A.shortWorst||[]),...(A.longWorst||[])];
+  const thumb=worstAll.filter(v=>{const isS=v.durSec&&v.durSec<=180;return v.avgViewPct!=null&&v.avgViewPct>=(isS?55:38);}).length;
+  const declining = M.hasTrend && M.d28<=-5;
+  // 縦/横 別の内訳（あれば）
+  const fb=D.dailyByFmt||[]; let fmtNote='';
+  if(missed('dailyByFmt')) fmtNote='（<b>縦＝ショート／横＝長尺の内訳は今回取得できませんでした</b>）';
+  else if(fb.length>=56){
+    const sF=(k,a,b)=>fb.slice(a,b).reduce((x,v)=>x+(v[k]||0),0);
+    const dL=sF('long',-56,-28)?(sF('long',-28,undefined)-sF('long',-56,-28))/sF('long',-56,-28)*100:null;
+    const dS=sF('short',-56,-28)?(sF('short',-28,undefined)-sF('short',-56,-28))/sF('short',-56,-28)*100:null;
+    fmtNote='（内訳：<b>横＝長尺 '+M.signed(dL)+'</b>／縦＝ショート '+M.signed(dS)+'）';
+  }
+  const baseTone = M.relTop==null ? '<b>最後まで見られた割合（似た動画との比較）は今回取れていません。</b>'
+                 : M.relTop<=25 ? '<b>動画の中身は強い。</b>似た動画と比べて<b>上位'+M.relTop+'%</b>'
+                 : M.relTop<=50 ? '<b>中身は標準以上。</b>似た動画の平均より上（上位'+M.relTop+'%）'
+                 : '<b>最後まで見られた割合に改善の余地。</b>似た動画と比べて平均より下（上位'+M.relTop+'%）';
+  const issues=[];
+  if(declining) issues.push('<b>再生の落ち込みを止める</b>（投稿本数を保つ＋新しい動画の出だしを強くする）');
+  if(thumb>0) issues.push('<b>サムネ画像の改善</b>（中身はよく見られているのに再生が伸びない"もったいない"動画が'+thumb+'本）');
+  // 動画ごとの計測用LINEリンクは2026年2月から発行済み（概要欄に設置）。無い物を作る提案にしない。
+  issues.push('<b>LINE登録の入口を太くする</b>（ショートは概要欄のリンクが押せない仕様のため、YouTube経由の登録はほぼチャンネルのプロフィールリンクから。横動画は計測リンクを概要欄の1行目と固定コメントに置く）');
+
+  // 「チャンネル全体」「横動画」「ショート」の3つの箱に分ける。どの文もどれかの箱に必ず入れる
+  // （以前は全体の文と、ほぼショートだけの文が混ざっていて、どちらの話か分からなかった）。
+  const yen0=v=>yen(v||0);
+  const relWord=t=>t==null?null:(t<=25?'<b>強い</b>（似た動画と比べて上位'+t+'%）':t<=50?'<b>標準以上</b>（似た動画の平均より上・上位'+t+'%）':'<b>平均並み。改善の余地あり</b>（似た動画と比べて上位'+t+'%）');
+  const liRow=rows=>'<ul class="ovlist">'+rows.map(r=>'<li><span class="ic">▸</span>'+r+'</li>').join('')+'</ul>';
+  const cut=t=>t?(t.length>28?t.slice(0,28)+'…':t):'';
+  // --- 全体 ---
+  const allRows=[];
+  allRows.push('<b>今の勢い：</b>'+M.momentumLine+'。'+(M.hasTrend?'バッジ「'+M.momentum+'」はこの数字です（1週間ごとの数字は上下が激しいため、勢いは1か月の増減だけで見ます）':''));
+  if(F.shortShare!=null) allRows.push('<b>内訳：</b>直近90日の再生回数の<b>'+F.shortShare+'%はショート</b>、'+(100-F.shortShare)+'%が横動画。再生の量はショート、1本あたりの深さは横動画が担っています');
+  const vs=D.viewSource;
+  if(vs&&vs.total){ const tailPct=Math.round(vs.fromTail/vs.total*100);
+    allRows.push('<b>再生の'+tailPct+'%は前から出している動画によるもの</b>（新しい動画からは'+(100-tailPct)+'%）＝<b>過去のヒット頼み</b>。新しい当たりが出ないと再生は自然に減ります'); }
+  if(M.relTop!=null){
+    const nS=(M.retention||[]).filter(r=>(D.topVideosAll||[]).some(v=>v.id===r.id&&v.fmt==='short')).length;
+    allRows.push('<b>中身：</b>よく見られた上位'+M.retention.length+'本は、似た動画と比べて<b>上位'+M.relTop+'%</b>'+(nS?'（ただし'+M.retention.length+'本のうち'+nS+'本がショート＝ほぼショートの成績。横動画は下の箱の数字で見てください）':''));
+  }
+  allRows.push('<b>今の伸びしろ：</b>'+issues.join(' ／ '));
+  const allBox='<div class="fmtbox wide"><h3>チャンネル全体 <span class="ovbadge '+M.momentumCls+'">'+M.momentum+'</span></h3>'+liRow(allRows)+'</div>';
+  // --- 形式別 ---
+  const fmtBox=f=>{
+    if(!f.has) return '<div class="fmtbox"><h3>'+f.label+'</h3><p class="csub">この形式の内訳は今回取得できませんでした</p></div>';
+    const rows=[];
+    rows.push('<b>今の勢い：</b>'+(f.hasTrend
+      ?'直近1か月は、その前の1か月より <b>'+M.signed(f.d28)+'</b>＝<b>'+f.word+'</b>'
+      :'増減を出せるだけの日次データがありません'));
+    rows.push('<b>直近90日：</b>再生 <b>'+yen0(f.views90)+'回</b>'
+      +(f.posted!=null?'／この90日に出した本数 '+yen(f.posted)+'本':'')
+      +(f.avgViewPct!=null?'／最後まで見られた割合 '+clipPctNum(f.avgViewPct).txt:'')
+      +(f.subs90!=null?'／登録 +'+yen(f.subs90)+'人':''));
+    const rw=relWord(f.relTop);
+    if(rw) rows.push('<b>中身：</b>'+rw+'。'+(f.key==='short'
+      ?'勝ちパターン＝「失敗→回復」「注意喚起」「セルフ診断」が定着。作れば当たる型があります'
+      :(f.bestTitle?'よく見られたのは「'+cut(f.bestTitle)+'」。実用の解説（ダウンタイム中・手術の選び方）が伸びます':'')));
+    if(f.traffic) rows.push('<b>入口：</b>検索 '+f.searchPct+'%／登録者フィード '+f.subPct+'%'
+      +(f.key==='short'&&f.feedPct!=null?'／ショートフィード '+f.feedPct+'%':'')
+      +(f.searchPct>=30?'＝<b>「クマ取り」で調べている検討中の人</b>が来ています':''));
+    if(f.demo) rows.push('<b>見ている人：</b>'+(f.topSeg?'最多は'+f.topSeg.label+'（'+f.topSeg.pct.toFixed(1)+'%）、':'')
+      +M.coreLabel+'が'+f.coreFemale.toFixed(0)+'%');
+    if(f.tailPct!=null) rows.push('<b>出どころ：</b>直近28日の再生の'+f.tailPct+'%は前から出している動画（新しい動画からは'+(100-f.tailPct)+'%）');
+    return '<div class="fmtbox"><h3>'+f.label+' <span class="ovbadge '+f.cls+'">'+(f.hasTrend?M.signed(f.d28):'—')+'</span></h3>'+liRow(rows)+'</div>';
+  };
+  const leadHead = declining
+    ? 'このチャンネルは<b>「専門性×正直さ」という実力は健在</b>ですが、'+M.momentumLine+'。'
+    : 'このチャンネルは<b>「専門性×正直さ」で明確な強み</b>を持っています。';
+  const firstAction = declining
+    ? '<b>落ち込みを止める：当たる型（失敗→回復・注意喚起・セルフ診断）を、投稿本数を減らさず数多く出して、出だしの伸びを取り戻す</b>'
+    : (thumb>0 ? '<b>サムネ画像を直して、埋もれた良い動画を掘り起こす</b>（すぐ効く・最優先）'
+               : '<b>当たる型（失敗→回復・注意喚起・セルフ診断）を、教育2：認知1の割合で数多く出す</b>');
+  el.innerHTML=
+    '<h2>概要・総評 <span class="ovbadge '+M.momentumCls+'">'+M.momentum+'</span></h2>'+
+    '<p class="ovlead">'+leadHead+'下の3つの箱は<b>「チャンネル全体」「横動画」「ショート」</b>で分けています。伸び悩みの主な原因は中身ではなく、<b>①見つけてもらえていない（サムネ画像・表示のされ方）②成果を数えられていない（来院につながったかの計測）</b>の2つです。</p>'+
+    allBox+'<div class="fmtgrid">'+fmtBox(F.long)+fmtBox(F.short)+'</div>'+
+    '<div class="ovconcl"><b>結論（全体）：</b>目的は再生回数ではなく<b>来院・ご成約</b>。今週の最優先は '+firstAction+'。あわせて「<b>当たる型を数多く出す</b>」「<b>横動画のLINEリンクを概要欄の1行目と固定コメントに置き、最近の動画もLINE側で集計できるようにする</b>（どの動画が来院を生んだかを数字にする）」を続けます。これを積み重ねれば、実力が売上に変わります。</div>';
+})();
+
+// ---- KPI ----
+(function(){
+  const s = D.summary;
+  const L = D.lifetime||{};
+  const hours = Math.round(s.minutesWatched/60);
+  const netSign = s.subsNet>=0?'+':'';
+  const lifeHours = L.minutes!=null ? yen(Math.round(L.minutes/60))+'時間' : '—';
+  const el=document.getElementById('kpis');
+  const FS=D.fmtSummary||{};
+  const postedOf=k=>(D.cadence||[]).reduce(function(a,w){return a+(w[k]||0);},0);
+  const cards=list=>el.innerHTML=list.map(function(k){
+    return '<div class="kpi"><div class="label">'+k.label+' <span style="font-size:10px;color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:1px 5px;vertical-align:middle">'+k.tag+'</span></div><div class="val">'+k.val+'</div><div class="note">'+k.note+'</div></div>';
+  }).join('');
+  // 各KPIは「累計/現在（大きい数字）」＋「直近90日（下の注記）」の両方を表示
+  const allKpis = [
+    {label:'視聴回数', tag:'累計', val:yen(D.channel.totalViews),
+     note:'<b>90日：'+yen(s.views)+'回</b>（1日 約'+yen(Math.round(s.views/90))+'）'},
+    {label:'総視聴時間', tag:'累計', val:lifeHours,
+     note:'<b>90日：'+yen(hours)+'時間</b>'},
+    {label:'登録者', tag:'現在', val:yen(D.channel.subscribers)+'人',
+     note:'<b>90日 純増：'+netSign+yen(s.subsNet)+'</b>（獲得'+yen(s.subsGained)+'／解除'+yen(s.subsLost)+'）'},
+    {label:'動画本数', tag:'累計', val:yen(D.channel.videoCount)+'本',
+     note:'これまでに公開した本数'},
+    {label:'最後まで見られた割合', tag:'90日平均',
+     val:clipPctNum(s.avgViewPct).txt.replace('%','<span style="font-size:15px;font-weight:600">%</span>'),
+     note:'1回あたり平均 '+(s.avgViewDurationSec!=null?s.avgViewDurationSec+'秒':'—')+'見られています'+
+          (M.relTop!=null?'<br>似た動画と比べると<b>'+relRankTxt(M.avgRel)+'</b>＝'+(M.relTop<=25?'良いほう':(M.relTop<=50?'平均より上':'平均より下'))
+                         :'')+
+          (clipPctNum(s.avgViewPct).over?'<br>※'+LOOP_NOTE:'')},
+  ];
+  // 形式別は「累計」を出せないので直近90日だけ。
+  const fmtKpis=k=>{
+    const f=FS[k]; if(!f) return null;
+    const pc=clipPctNum(f.avgViewPct);
+    return [
+      {label:'視聴回数', tag:'90日', val:yen(f.views||0)+'回', note:'1日あたり 約'+yen(Math.round((f.views||0)/90))+'回'},
+      {label:'総視聴時間', tag:'90日', val:(f.minutes!=null?yen(Math.round(f.minutes/60))+'時間':'—'), note:'この形式ぶんの合計'},
+      {label:'登録者 純増', tag:'90日', val:'+'+yen(f.subsGained||0)+'人', note:'この形式の動画で増えた分'},
+      {label:'投稿本数', tag:'約90日', val:yen(postedOf(k))+'本', note:'この形式で公開した本数'},
+      {label:'最後まで見られた割合', tag:'90日平均',
+       val:pc.txt.replace('%','<span style="font-size:15px;font-weight:600">%</span>'),
+       note:'この形式の平均'+(pc.over?'<br>※'+LOOP_NOTE:'')},
+    ];
+  };
+  fmtSwitch(el, function(k){
+    if(k==='all'){ cards(allKpis); return; }
+    const kk=fmtKpis(k); if(!kk){ el.innerHTML=FMT_MISS; return; } cards(kk);
+  });
+})();
+
+// ---- trend area chart ----
+(function(){
+  const svg=document.getElementById('trend');
+  const dbf=D.dailyByFmt||[];
+  const hasAll=D.daily&&D.daily.length;
+  if(!hasAll && !dbf.length){
+    // グラフが空のまま出ると「再生ゼロ」に見えるので、取れなかったことを書く
+    svg.closest('.svgwrap').outerHTML =
+      missed('daily')?missBox('daily'):'<div class="missbox">日次データがありません。</div>';
+    return;
+  }
+  const W=920,H=260,pad={l:62,r:14,t:22,b:26};
+  const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+  function draw(rows, full){
+    if(!rows||!rows.length){ svg.innerHTML='<text x="20" y="34" fill="var(--muted)" font-size="13">この形式の日次データがありません</text>'; return; }
+    // 目盛りは半端な数にしない（1・2・2.5・5 の刻みに丸める）
+    const step=niceStep(Math.max(...rows.map(r=>r.views))*1.08/4)||1;
+    const max=step*4||1;
+    const x=i=>pad.l+ (rows.length<2?iw/2: i/(rows.length-1)*iw);
+    const y=v=>pad.t+ih - v/max*ih;
+    let g='';
+    for(let t=0;t<=4;t++){const v=step*t; const yy=y(v);
+      g+='<line x1="'+pad.l+'" x2="'+(W-pad.r)+'" y1="'+yy+'" y2="'+yy+'" stroke="var(--grid)" stroke-width="1"/>';
+      g+='<text x="'+(pad.l-8)+'" y="'+(yy+4)+'" text-anchor="end" font-size="12" fill="var(--muted)" style="font-variant-numeric:tabular-nums">'+yen(v)+'</text>';
+    }
+    g+='<text x="'+pad.l+'" y="12" font-size="12" fill="var(--muted)">単位：回（1日あたりの再生回数）</text>';
+    [0,Math.floor(rows.length/2),rows.length-1].forEach(i=>{
+      g+='<text x="'+x(i)+'" y="'+(H-8)+'" text-anchor="middle" font-size="12" fill="var(--muted)">'+rows[i].date.slice(5).replace('-','/')+'</text>';
+    });
+    let line='M'+x(0)+' '+y(rows[0].views);
+    rows.forEach((r,i)=>{ if(i) line+=' L'+x(i)+' '+y(r.views); });
+    const area=line+' L'+x(rows.length-1)+' '+(pad.t+ih)+' L'+x(0)+' '+(pad.t+ih)+' Z';
+    g+='<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1">'+
+       '<stop offset="0" stop-color="var(--s1)" stop-opacity="0.28"/>'+
+       '<stop offset="1" stop-color="var(--s1)" stop-opacity="0.02"/></linearGradient></defs>';
+    g+='<path d="'+area+'" fill="url(#ag)"/>';
+    g+='<path d="'+line+'" fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round"/>';
+    g+='<line x1="'+pad.l+'" x2="'+(W-pad.r)+'" y1="'+(pad.t+ih)+'" y2="'+(pad.t+ih)+'" stroke="var(--axis)" stroke-width="1"/>';
+    g+='<line id="cross" x1="0" x2="0" y1="'+pad.t+'" y2="'+(pad.t+ih)+'" stroke="var(--axis)" stroke-width="1" opacity="0"/>';
+    g+='<circle id="cdot" r="4.5" fill="var(--s1)" stroke="var(--surface)" stroke-width="2" opacity="0"/>';
+    g+='<rect x="'+pad.l+'" y="'+pad.t+'" width="'+iw+'" height="'+ih+'" fill="transparent" id="hit"/>';
+    svg.innerHTML=g;
+    const cross=svg.querySelector('#cross'),cdot=svg.querySelector('#cdot');
+    svg.querySelector('#hit').addEventListener('mousemove',function(ev){
+      const rect=svg.getBoundingClientRect(); const sx=(ev.clientX-rect.left)/rect.width*W;
+      let i=Math.round((sx-pad.l)/iw*(rows.length-1)); i=Math.max(0,Math.min(rows.length-1,i));
+      const r=rows[i]; cross.setAttribute('x1',x(i));cross.setAttribute('x2',x(i));cross.setAttribute('opacity',1);
+      cdot.setAttribute('cx',x(i));cdot.setAttribute('cy',y(r.views));cdot.setAttribute('opacity',1);
+      showTip('<b>'+r.date+'</b><br>視聴 '+yen(r.views)+'回'+(full?'<br>視聴時間 '+yen(r.minutes)+'分<br>登録 '+(r.subsNet>=0?'+':'')+r.subsNet:''), ev.clientX, ev.clientY);
+    });
+    svg.querySelector('#hit').addEventListener('mouseleave',function(){cross.setAttribute('opacity',0);cdot.setAttribute('opacity',0);hideTip();});
+  }
+  fmtSwitch(svg, function(k){
+    if(k==='all'){ draw(D.daily||[], true); return; }
+    draw(dbf.map(function(r){return {date:r.date, views:r[k]||0};}), false);
+  });
+})();
+
+// ---- 投稿ペース（週ごとの本数・積み上げ棒）----
+(function(){
+  const cd=D.cadence;
+  const card=document.getElementById('sec-cadence');
+  if(!cd||cd.length<3){
+    if(!missed('cadence')) return;
+    card.style.display='';
+    document.getElementById('cadChart').closest('.svgwrap').style.display='none';
+    document.getElementById('cadLegend').style.display='none';
+    document.getElementById('cadHint').outerHTML=missBox('cadence');
+    return;
+  }
+  const rows=cd.slice(-13);
+  // いちばん右の棒が「今週（まだ途中）」なら目印を付け、平均の計算からは除く。
+  // 途中の週を混ぜると「本数が減った」ように見えてしまう（2026-10-09 指摘）。
+  const gen=(D.generated||'').slice(0,10);
+  rows.forEach(r=>{ r.partial = !!gen && r.week<=gen && gen < (function(){const d=new Date(r.week+'T00:00:00Z'); d.setUTCDate(d.getUTCDate()+7); return d.toISOString().slice(0,10);})(); });
+  card.style.display='';
+  const hasPartial=rows.some(r=>r.partial);
+  const full=rows.filter(r=>!r.partial);   // 今週（途中）は除く
+  const W=460,H=240,pad={l:34,r:10,t:22,b:44};
+  const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+  const bw=iw/rows.length*0.62, gap=iw/rows.length;
+  function draw(key){
+    const isAll=key==='all';
+    const val=r=> isAll ? (r.short+r.long) : (r[key]||0);
+    const col=key==='short'?'var(--s2,#e0a030)':'var(--s1)';
+    document.getElementById('cadLegend').innerHTML= isAll
+      ? '<span><i style="background:var(--s2,#e0a030)"></i>ショート（短い縦動画）</span><span><i style="background:var(--s1)"></i>長尺（横動画）</span>'
+      : '<span><i style="background:'+col+'"></i>'+(key==='short'?'ショート（短い縦動画）':'長尺（横動画）')+'だけの本数</span>';
+    const max=Math.max(3,...rows.map(val));
+    const y=v=>pad.t+ih-v/max*ih;
+    let g='<text x="0" y="12" font-size="12" fill="var(--muted)">単位：本（その週に公開した本数）</text>';
+    for(let t=0;t<=max;t+= (max>6?2:1)){const yy=y(t);
+      g+='<line x1="'+pad.l+'" x2="'+(W-pad.r)+'" y1="'+yy+'" y2="'+yy+'" stroke="var(--grid)" stroke-width="1"/>';
+      g+='<text x="'+(pad.l-6)+'" y="'+(yy+4)+'" text-anchor="end" font-size="12" fill="var(--muted)">'+t+'</text>';
+    }
+    rows.forEach(function(r,i){
+      const cx=pad.l+gap*i+gap/2, x0=cx-bw/2;
+      const op=r.partial?' opacity="0.45"':'';
+      if(isAll){
+        const hS=r.short/max*ih, hL=r.long/max*ih;
+        g+='<rect x="'+x0+'" y="'+y(r.short)+'" width="'+bw+'" height="'+hS+'" fill="var(--s2,#e0a030)"'+op+'/>';
+        g+='<rect x="'+x0+'" y="'+(y(r.short)-hL)+'" width="'+bw+'" height="'+hL+'" fill="var(--s1)"'+op+'/>';
+      } else {
+        const h=val(r)/max*ih;
+        g+='<rect x="'+x0+'" y="'+y(val(r))+'" width="'+bw+'" height="'+h+'" fill="'+col+'"'+op+'/>';
+      }
+      const tv=val(r);
+      if(tv>0) g+='<text x="'+cx+'" y="'+(y(tv)-4)+'" text-anchor="middle" font-size="11" font-weight="600" fill="var(--ink)">'+tv+'</text>';
+      g+='<text x="'+cx+'" y="'+(H-26)+'" text-anchor="middle" font-size="11" fill="var(--muted)" transform="rotate(-42 '+cx+' '+(H-26)+')">'+r.week.slice(5).replace('-','/')+(r.partial?'※':'')+'</text>';
+    });
+    g+='<text x="'+(W/2)+'" y="'+(H-3)+'" text-anchor="middle" font-size="11" fill="var(--muted)">週のはじまりの日（月/日）</text>';
+    document.getElementById('cadChart').innerHTML=g;
+    const avg=(a,b)=>{const s=full.slice(a,b);return s.length?s.reduce(function(x,r){return x+val(r);},0)/s.length:0;};
+    const rec=avg(-4,undefined), prev=avg(-8,-4);
+    const sRec=(full.slice(-4).reduce(function(x,r){return x+r.short;},0)/Math.max(1,full.slice(-4).length));
+    document.getElementById('cadHint').innerHTML=
+      '<span class="h">📖 見方</span>棒1本が1週間で、'+(isAll?'ショートと長尺を積み上げた合計本数':(key==='short'?'ショート':'長尺')+'だけの本数')+'です。'+
+      (hasPartial?'いちばん右の「※」は<b>今週（まだ途中）</b>で、本数が少なく見えますが減ったわけではありません。平均には入れていません。':'')+
+      '<b>直近4週の平均 '+rec.toFixed(1)+'本/週'+(isAll?'（うちショート '+sRec.toFixed(1)+'本）':'')+'／その前の4週は '+prev.toFixed(1)+'本/週。</b>'+
+      (rec<prev-0.5?'<b style="color:var(--bad)"> 投稿本数が減っています＝当たりが出る回数も減ります。</b>':'')+
+      '<br><span class="h">📊 数字の出どころ</span>YouTube公式データ（投稿した日を週ごとに集計。長さ180秒以下をショートとして数えています）';
+  }
+  fmtSwitch(document.getElementById('cadChart'), draw);
+})();
+
+// ---- 視聴の出どころ（新しい動画 vs 前からの動画）----
+(function(){
+  const vs=D.viewSource;
+  if(!vs||!vs.total){
+    if(!missed('viewSource')) return;
+    document.getElementById('sec-source').style.display='';
+    document.getElementById('srcHint').outerHTML=missBox('viewSource');
+    return;
+  }
+  document.getElementById('sec-source').style.display='';
+  const el=document.getElementById('srcViz'), hint=document.getElementById('srcHint');
+  const byF=D.viewSourceByFmt||{};
+  function draw(vs){
+    if(!vs||!vs.total){ el.innerHTML=FMT_MISS; hint.innerHTML=''; return; }
+    const newP=Math.round(vs.fromNew/vs.total*100), tailP=100-newP;
+    el.innerHTML=
+      '<div style="display:flex;height:34px;border-radius:8px;overflow:hidden;font-size:12px;font-weight:700;color:#fff">'+
+        '<div style="width:'+newP+'%;background:var(--s1);display:flex;align-items:center;justify-content:center;min-width:44px">新作 '+newP+'%</div>'+
+        '<div style="width:'+tailP+'%;background:var(--s2,#e0a030);display:flex;align-items:center;justify-content:center">前からの動画 '+tailP+'%</div>'+
+      '</div>'+
+      '<div style="display:flex;justify-content:space-between;margin-top:8px;font-size:13px">'+
+        '<div><b style="font-size:20px">'+yen(vs.fromNew)+'</b><br><span style="color:var(--muted)">新作（直近'+vs.windowDays+'日公開）</span></div>'+
+        '<div style="text-align:right"><b style="font-size:20px">'+yen(vs.fromTail)+'</b><br><span style="color:var(--muted)">前から出している動画</span></div>'+
+      '</div>';
+    hint.innerHTML=
+      '<span class="h">📖 見方</span>直近28日の再生の内訳。<b>前から出している動画が'+tailP+'%</b>＝過去のヒット頼み。'+
+      (tailP>=70?'新しい当たりが出ないと再生は自然に減ります。だから<b>本数を減らさず、当たる型を出し続ける</b>ことが一番大事。':'新しい動画が全体を支えられている良い状態です。')+
+      '<br><span class="h">📊 数字の出どころ</span>YouTube公式データ（直近28日の再生を、公開日で新しい／前からに分けて集計）';
+  }
+  fmtSwitch(el, function(k){ draw(k==='all'?vs:byF[k]); });
+})();
+
+// ---- horizontal bars helper ----
+// バーは「一番多い項目に対する比」なので、小さい項目は1〜2pxになって見えなくなる
+// （外部サイト 4,502 が 2px、その他YouTube 2,117 が 1px で消えていた）。
+// 最低幅を確保したうえで、数字側に「全体の何%か」も必ず出す。
+function bars(el, items, labelKey, valKey, color){
+  if(!items||!items.length){ el.innerHTML='<p class="csub">データがありません</p>'; return; }
+  const max=Math.max(...items.map(i=>i[valKey]))||1;
+  const tot=items.reduce((a,i)=>a+i[valKey],0)||1;
+  el.innerHTML=items.map(it=>{
+    const w=(it[valKey]/max*100).toFixed(1);
+    const share=(it[valKey]/tot*100);
+    return '<div class="bar-row"><div class="name" title="'+it[labelKey]+'">'+it[labelKey]+'</div>'+
+      '<div class="bar-track"><div class="bar-fill" style="width:'+w+'%;min-width:3px;background:'+color+'"></div></div>'+
+      '<div class="bar-val">'+yen(it[valKey])+'<span style="color:var(--muted)">（'+
+        (share>=1?share.toFixed(0):share.toFixed(1))+'%）</span></div></div>';
+  }).join('');
+}
+
+// traffic
+const TR={SUBSCRIBER:'登録者フィード',YT_SEARCH:'YouTube検索',SHORTS:'ショートフィード',YT_CHANNEL:'チャンネルページ',
+RELATED_VIDEO:'関連動画',EXT_URL:'外部サイト',YT_OTHER_PAGE:'その他YouTube',NO_LINK_OTHER:'直接/不明',
+NOTIFICATION:'通知',HASHTAGS:'ハッシュタグ',SOUND_PAGE:'サウンドページ',END_SCREEN:'終了画面',
+PLAYLIST:'再生リスト',SHORTS_CONTENT_LINKS:'ショート内リンク',ANNOTATION:'アノテーション'};
+(function(){
+  const el=document.getElementById('traffic');
+  fmtSwitch(el, k=>{
+    if(k==='all'){
+      if(missed('traffic')&&!D.traffic.length){ el.innerHTML=missBox('traffic'); return; }
+      bars(el, D.traffic.slice(0,7).map(t=>({name:TR[t.source]||t.source,views:t.views})),'name','views','var(--s1)');
+      return;
+    }
+    const src=F[k].traffic;
+    if(!src){ el.innerHTML=FMT_MISS; return; }
+    bars(el, src.slice(0,7).map(t=>({name:TR[t.source]||t.source,views:t.views})),'name','views',k==='short'?'var(--kuma)':'var(--s1)');
+  });
+})();
+
+// devices
+const DV={MOBILE:'スマホ',TV:'テレビ',DESKTOP:'PC',TABLET:'タブレット'};
+(function(){
+  const el=document.getElementById('devices');
+  const draw=list=>{
+    const tot=list.reduce((a,d)=>a+d.views,0)||1;
+    el.innerHTML=list.map(d=>{
+      const pct=(d.views/tot*100);
+      return '<div class="bar-row"><div class="name">'+(DV[d.device]||d.device)+'</div>'+
+        '<div class="bar-track"><div class="bar-fill" style="width:'+pct.toFixed(1)+'%"></div></div>'+
+        '<div class="bar-val">'+pct.toFixed(1)+'%</div></div>';
+    }).join('');
+  };
+  fmtSwitch(el, k=>{
+    if(k==='all'){
+      if(!D.devices.length){ el.innerHTML=missed('devices')?missBox('devices'):'<p class="csub">データがありません</p>'; return; }
+      draw(D.devices); return;
+    }
+    if(!F[k].devices){ el.innerHTML=FMT_MISS; return; }
+    draw(F[k].devices);
+  });
+})();
+
+// top videos
+(function(){
+  const el=document.getElementById('topvids');
+  const draw=list=>{
+    const max=Math.max(...list.map(v=>v.totalViews||v.views))||1;
+    el.innerHTML=list.map((v,i)=>{
+      const tot=v.totalViews||v.views;
+      const w=(tot/max*100).toFixed(1);
+      const url='https://youtu.be/'+v.id;
+      const tag=v.fmt?'<span class="tag '+(v.fmt==='short'?'s':'l')+'">'+(v.fmt==='short'?'ショート':'横動画')+'</span> ':'';
+      return '<div class="vid-row"><div class="vid-rank">'+(i+1)+'</div>'+
+        '<div class="vid-body"><div class="vt">'+tag+'<a href="'+url+'" target="_blank" rel="noopener" title="'+v.title.replace(/"/g,'&quot;')+'">'+v.title+'</a><a class="watch" href="'+url+'" target="_blank" rel="noopener">見る →</a></div>'+
+        '<div class="vid-meta"><div class="bar-track"><div class="bar-fill" style="width:'+w+'%"></div></div>'+
+        '<div class="bar-val">'+yen(tot)+'回(累計) ・ 90日'+yen(v.views)+(v.published?' ・ '+jdate(v.published)+'公開':'')+'</div></div></div></div>';
+    }).join('');
+  };
+  fmtSwitch(el, k=>{
+    if(k==='all'){
+      if(!D.topVideos.length){ el.innerHTML=missed('topVideos')?missBox('topVideos'):'<p class="csub">データがありません</p>'; return; }
+      draw(D.topVideos); return;
+    }
+    const all=D.topVideosAll||[];
+    if(!all.length||all[0].fmt==null){ el.innerHTML=FMT_MISS; return; }
+    const list=all.filter(v=>v.fmt===k).slice(0,10);
+    if(!list.length){ el.innerHTML='<p class="csub">直近90日によく見られた30本の中に、この形式の動画がありません</p>'; return; }
+    draw(list);
+  });
+})();
+
+// demographics grouped by age
+(function(){
+  const AG={'age13-17':'13〜17歳','age18-24':'18〜24歳','age25-34':'25〜34歳','age35-44':'35〜44歳',
+    'age45-54':'45〜54歳','age55-64':'55〜64歳','age65-':'65歳〜'};
+  const order=['age13-17','age18-24','age25-34','age35-44','age45-54','age55-64','age65-'];
+  const el=document.getElementById('demo');
+  const hint=document.getElementById('demoHint');
+  const SRC='<br><span class="h">📊 数字の出どころ</span>YouTube公式データ（年齢×性別の割合。年齢や性別を登録していない人は含まれないため、合計は100%になりません）';
+  const draw=(rows, facts, label)=>{
+    const map={};
+    rows.forEach(r=>{map[r.age]=map[r.age]||{f:0,m:0}; if(r.gender==='female')map[r.age].f=r.pct; else if(r.gender==='male')map[r.age].m=r.pct;});
+    const used=order.filter(a=>map[a]);
+    if(!used.length){ el.innerHTML='<p class="csub">データがありません</p>'; hint.innerHTML=''; return; }
+    // 目盛りは暗算できる数に丸める。軸が無いと「どこまでが多いのか」が読めない。
+    const rawMax=Math.max(...used.map(a=>Math.max(map[a].f,map[a].m)),1);
+    const axisMax=Math.max(5,Math.ceil(rawMax/5)*5);   // 5%刻みで、いちばん長い棒のすぐ上まで
+    const sc=v=>(v/axisMax*100).toFixed(1);
+    const scale='<div class="demo-row" style="grid-template-columns:1fr 56px 1fr;color:var(--muted);font-size:11.5px;margin-bottom:2px">'+
+      '<div style="text-align:left">'+axisMax+'%</div><div style="text-align:center">0%</div>'+
+      '<div style="text-align:right">'+axisMax+'%</div></div>';
+    el.innerHTML=scale+used.map(a=>{
+      const o=map[a];
+      return '<div class="demo-row" style="grid-template-columns:1fr 56px 1fr;border-left:0">'+
+        '<div class="demo-half l"><div class="demo-num">'+o.f.toFixed(1)+'%</div><div class="demo-bar" style="width:'+sc(o.f)+'%;min-width:2px;background:var(--mag)"></div></div>'+
+        '<div class="demo-lab" style="text-align:center;border-left:1px solid var(--axis);border-right:1px solid var(--axis)">'+AG[a]+'</div>'+
+        '<div class="demo-half"><div class="demo-bar" style="width:'+sc(o.m)+'%;min-width:2px;background:var(--s1)"></div><div class="demo-num">'+o.m.toFixed(1)+'%</div></div>'+
+        '</div>';
+    }).join('');
+    const seg=facts.topSeg?'いちばん多いのは<b>'+facts.topSeg.label+'（'+facts.topSeg.pct.toFixed(1)+'%）</b>。':'';
+    const core=facts.coreFemale!=null?'まとめると<b>'+facts.coreFemale.toFixed(0)+'%が'+M.coreLabel+'</b>':'';
+    hint.innerHTML='<span class="h">📖 見方</span>'+(label?'<b>'+label+'だけ</b>を見た人。':'誰が見ているか。')+
+      '真ん中の縦線が0%で、<b>左へ伸びるほど女性が多く、右へ伸びるほど男性が多い</b>。左右の端が'+axisMax+'%です。'+
+      seg+core+(label?'。':'で、<b>実際の患者さんと合っています</b>。ズレていればサムネ画像や伝え方を調整します。')+SRC;
+  };
+  fmtSwitch(el, k=>{
+    if(k==='all'){
+      if(!D.demographics.length){ el.innerHTML=missed('demographics')?missBox('demographics'):'<p class="csub">データがありません</p>'; hint.innerHTML=''; return; }
+      draw(D.demographics, M, ''); return;
+    }
+    if(!F[k].demo){ el.innerHTML=FMT_MISS; hint.innerHTML=''; return; }
+    draw(F[k].demo, F[k], FMT_LABEL[k]);
+  });
+})();
+
+// ---- retention small multiples ----
+(function(){
+  const R=M.retention;
+  const el=document.getElementById('retention');
+  const sub=document.getElementById('retSub');
+  if(!R.length){
+    el.innerHTML=missed('retention')?missBox('retention'):'<p class="csub">この動画は視聴数が少ないため表示していません</p>';
+    sub.textContent='';
+    return;
+  }
+  const fmtMap={}; (D.topVideosAll||[]).forEach(function(v){ if(v.fmt) fmtMap[v.id]=v.fmt; });
+  const W=270,H=124,pad={l:34,r:8,t:10,b:20};
+  const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+  function cardHTML(r){
+    const cur=r.curve;
+    const maxY=Math.max(1.05,...cur.map(p=>p.watch));
+    const x=t=>pad.l+t*iw;
+    const y=v=>pad.t+ih-(v/maxY)*ih;
+    let path='M'+x(cur[0].t)+' '+y(cur[0].watch);
+    cur.forEach((p,i)=>{if(i)path+=' L'+x(p.t)+' '+y(p.watch);});
+    // 縦軸（0% / 50% / 100%）。以前は軸も%も無く、点線が何の線かも書いていなかった。
+    let axis='';
+    [0,0.5,1].forEach(v=>{
+      const yy=y(v);
+      axis+='<line x1="'+pad.l+'" x2="'+(W-pad.r)+'" y1="'+yy+'" y2="'+yy+'" stroke="var(--grid)" stroke-width="1"'+(v===1?' stroke-dasharray="3 3"':'')+'/>';
+      axis+='<text x="'+(pad.l-5)+'" y="'+(yy+4)+'" text-anchor="end" font-size="10" fill="var(--muted)">'+(v*100)+'%</text>';
+    });
+    let mark='';
+    if(r.dropAt!=null){const dp=cur.reduce((a,b)=>Math.abs(b.t-r.dropAt)<Math.abs(a.t-r.dropAt)?b:a);
+      mark='<text x="'+x(dp.t)+'" y="'+(y(dp.watch)-4)+'" text-anchor="middle" font-size="11" fill="var(--bad)">▼</text>';}
+    const relCls=r.relPerf>=0.75?'good':(r.relPerf>=0.5?'mut':'warn');
+    const hookCls=r.hook>=1?'good':(r.hook>=0.7?'mut':'warn');
+    const hookC=clipPct(r.hook), endC=clipPct(r.end);
+    // 一言診断（この動画をどう読むか）
+    let vcls='mid', vtxt='真ん中あたりから少しずつ離れていく';
+    if(r.dropAt!=null && r.dropAt<=0.1){ vcls='warn'; vtxt='最初で離れている → 出だし2秒（つかみ）を直すと伸びる'; }
+    else if(r.end>=0.9){ vcls='good'; vtxt='最後までしっかり見られている'; }
+    else if(r.relPerf>=0.75){ vcls='good'; vtxt='似た動画よりよく見られている（良い作り）'; }
+    return '<div class="ret-card">'+
+      '<div class="ret-title">'+r.title+'</div>'+
+      '<div class="ret-badges">'+
+        '<span class="badge '+relCls+'">似た動画と比べて '+relRankTxt(r.relPerf)+'</span>'+
+        '<span class="badge '+hookCls+'">出だし '+hookC.txt+'</span>'+
+        '<span class="badge mut">最後まで '+endC.txt+'</span>'+
+      '</div>'+
+      ((hookC.over||endC.over)?'<div style="font-size:11.5px;color:var(--muted);margin:-2px 0 6px">※'+LOOP_NOTE+'（くり返し再生ぶんを足すと100%を超えるため、100%で止めています）</div>':'')+
+      '<svg viewBox="0 0 '+W+' '+H+'">'+
+        axis+
+        '<path d="'+path+'" fill="none" stroke="var(--s1)" stroke-width="2"/>'+
+        mark+
+        '<text x="'+pad.l+'" y="'+(H-4)+'" font-size="10" fill="var(--muted)">開始</text>'+
+        '<text x="'+(W-pad.r)+'" y="'+(H-4)+'" text-anchor="end" font-size="10" fill="var(--muted)">最後</text>'+
+      '</svg>'+
+      '<div class="verdict '+vcls+'">'+vtxt+'</div></div>';
+  }
+  function draw(list,label){
+    if(!list.length){ el.innerHTML=FMT_MISS; sub.textContent=''; return; }
+    const avg=list.reduce(function(a,r){return a+(r.relPerf||0);},0)/list.length;
+    sub.innerHTML=label+'TOP'+list.length+'動画。<b>最後まで見られた割合</b>は、似た動画と比べて平均で<b>'+relRankTxt(avg)+'</b>です（「上位10%」なら似た動画100本のうち10位くらい＝良い）';
+    el.innerHTML=list.map(cardHTML).join('');
+  }
+  fmtSwitch(el, function(k){
+    if(k==='all'){ draw(R,'よく見られた'); }
+    else { draw(R.filter(function(r){return fmtMap[r.id]===k;}), k==='short'?'ショートの':'横動画の'); }
+  });
+})();
+
+// ---- 再生数トップ／少ない動画（縦・横に分けて同一項目で並べる）----
+(function(){
+  // タイトルから「参考にできる型」を選んでテンプレを返す。
+  // ここが返すのは【一般的なテンプレート】であって、その動画の書き起こしではない。
+  // 以前は「クマ整形の術後ダウンタイム減らすには」に
+  // 「クマ取り失敗。地獄の日々…」というセリフ例が付き、分析していないように見えていた。
+  // 判定の順番も、強い手がかり（失敗・診断・比較）を先に見るように並べ替えてある。
+  function kataOf(t){
+    t=String(t||'');
+    if(/失敗|地獄|後悔|やらかし/.test(t)) return {
+      name:'失敗→回復ドキュメント型',
+      flow:'<b>はじめの2秒</b> 衝撃の結論（失敗を先出し）→ <b>序盤</b> 一番ひどい経過を先に見せる → <b>中盤</b> 日ごとの回復を時系列で → <b>終盤</b> 結論＋「どんな人向けか」 → <b>もう一度はじめに戻る作り</b>',
+      serifu:'「クマ取り失敗。地獄の日々…」→（内出血のピーク映像）「1日目、ここまで腫れます」→「3日目…」→「3ヶ月後、こうなりました」',
+      reason:'はじめに"失敗"という<b>悪い結論を先出し</b>するので、<b>続きが気になる仕掛け</b>になる。さらに「自分もこうなる？」という<b>不安が自分ごとになる</b>ため、最後まで見ずにいられない。'};
+    if(/診断|セルフ|どのタイプ|向き\?|向き？|見分け/.test(t)) return {
+      name:'セルフ診断・参加型',
+      flow:'<b>はじめの2秒</b> 「あなたは？」と問いかけ → <b>序盤</b> チェック方法を実演 → <b>中盤</b> はい／いいえで分岐 → <b>終盤</b> タイプ別の答え → <b>「保存してね」</b>',
+      serifu:'「あなたのクマ、どのタイプ？」→「目の下を軽く引いて…」→「影が消えた人は"影クマ"です」→「覚えられない人は保存」',
+      reason:'見ている人が<b>自分ごととして参加する</b>（鏡の前で実際にやる）ので、最後まで見られた割合が跳ね上がる。答えを知りたくて最後まで見るうえ、「保存」も意図して取れる。'};
+    if(/ビフォーアフター|劇的|before|after/i.test(t)) return {
+      name:'施術前後の比較型',
+      flow:'<b>はじめの2秒</b> 施術後の姿を一瞬チラ見せ → <b>序盤</b> 施術前の悩みを提示 → <b>中盤</b> 施術のポイントを1つ → <b>終盤</b> 同じ照明で前後を並べる → <b>もう一度はじめに戻る作り</b>',
+      serifu:'「40代、これが3ヶ月後です」→（施術前）「元はこの状態」→「変わったのはココ」→（施術後を並べて）「加工なしです」',
+      reason:'人は<b>変化（差）</b>に最も反応する。はじめに施術後を匂わせ、施術前との<b>落差</b>を最後の比較で回収するので、"結末を見たい"心理で最後まで見られる。'};
+    if(/脱脂|比較|どっち|違い|新常識|ゾンビ|偽|警告|9割|知らない/.test(t)) return {
+      name:'対比・注意喚起型',
+      flow:'<b>はじめの2秒</b> 言い切る（「9割が知らない」等）→ <b>序盤</b> ダメな例 → <b>中盤</b> 正しい例と並べて対比 → <b>終盤</b> 見分け方・相談のしかた → <b>もう一度はじめに戻る作り</b>',
+      serifu:'「そのクマ取り、5年後に凹みます」→「素人はコレを選ぶ」→「プロはこう考える」→「見分け方は…」',
+      reason:'はじめの<b>言い切り＋損の予告</b>で「え、自分大丈夫？」と引き込み、<b>並べて見せる作り</b>で"正解"を知りたくさせる。専門家としての立ち位置も同時に立つ。'};
+    if(/ダウンタイム|経過|日目|腫れ|内出血|術後|ケア|治し|早く/.test(t)) return {
+      name:'術後ケア・ハウツー型',
+      flow:'<b>はじめの2秒</b> 「これをやると早く治ります」と結論 → <b>序盤</b> なぜ腫れるのかを一言で → <b>中盤</b> やること／やってはいけないことを具体的に → <b>終盤</b> いつ相談すべきかの目安 → <b>まとめ</b>',
+      serifu:'「腫れを最短で引かせる方法、3つあります」→「腫れるのは、体が治そうとしているサイン」→「1つめ、最初の48時間は冷やす」→「逆に、これはNG」',
+      reason:'すでに手術を受けた人・これから受ける人が<b>いま困っていること</b>に直接答えるので、検索から長く見られ続ける。手順が具体的なほど保存されやすい。'};
+    if(/びっくり|衝撃|閲覧注意|リアクション|見たこと|他院|ドッキリ|レビュー|反応/.test(t)) return {
+      name:'リアクション解説型（衝撃映像×専門医）',
+      flow:'<b>はじめの2秒</b> 衝撃映像のピークを即出し（スクロールを止める）→ <b>2〜8秒</b> 医師の"え、これは…"というリアクション → <b>中盤</b> 専門医が"実は"を解説（正しい治療へ）→ <b>終盤</b> 相談への案内 → <b>もう一度はじめに戻る作り</b>',
+      serifu:'（衝撃映像）「見たこと無い治療を解説してる時の医者の頭の中」→「え、これは…」→「実は、脂肪を取りすぎているんです」→「正しくは、必要な分だけ残します」',
+      reason:'衝撃映像が最強の"スクロールを止めるつかみ"になる。専門医のリアクションで<b>信頼とエンタメ</b>を両立できる。※他人の映像は権利の処理が必要、自院の症例は広告ルールの4項目（治療名・費用・リスクと副作用・術後のケア）を必ず併記。'};
+    return {
+      name:'教育・解説型',
+      flow:'<b>はじめの2秒</b> 結論の字幕 → <b>序盤</b> なぜ？を1文で → <b>中盤</b> 図で具体的に → <b>終盤</b> まとめ＋次への案内 → <b>もう一度はじめに戻る作り</b>',
+      serifu:'「結論、クマは"影"と"ふくらみ"で治し方が違います」→「理由はコレ」→（図解）→「つまり…」→「保存してね」',
+      reason:'はじめに<b>結論を先に出す</b>ことで"答え合わせ"の心理を作り、図で理解が進むので途中で離れにくい。'};
+  }
+
+  // 共通の指標行（トップ／少ない で完全に同じ項目）
+  function metricRow(v){
+    const avg=clipPctNum(v.avgViewPct), hook=clipPct(v.hook), end=clipPct(v.end);
+    const cells=[
+      ['再生回数', yen(v.totalViews||v.views), '累計（直近90日は '+yen(v.views)+'）'],
+      ['最後まで見られた割合', avg.txt, '平均でどこまで見られたか'],
+      ['出だし', hook.txt, '最初の2秒で残っている割合'],
+      ['最後まで', end.txt, '最後まで見た割合'],
+      ['似た動画と比べて', relRankTxt(v.relPerf), '同じくらいの動画の中での順位'],
+    ];
+    const over=avg.over||hook.over||end.over;
+    return '<div class="varow">'+cells.map(c=>'<div class="vm"><div class="vml">'+c[0]+'</div><div class="vmv">'+c[1]+'</div>'+(c[2]?'<div class="vsub">'+c[2]+'</div>':'')+'</div>').join('')+'</div>'+
+      (over?'<div style="font-size:12px;color:var(--muted);margin:-4px 0 8px">※'+LOOP_NOTE+'：ショートはくり返し再生されるため素の値は100%を超えます。ここでは100%で止めて表示しています。</div>':'');
+  }
+
+  function render(v,i,mode){
+    const k=kataOf(v.title);
+    const url='https://youtu.be/'+v.id;
+    const noMetrics=(v.hook==null&&v.end==null&&v.relPerf==null&&v.avgViewPct==null);
+    let diagHtml, ptLabel, ptHtml;
+    if(mode==='win'){
+      const w=[];
+      if(v.hook>=1) w.push('出だしで離れる人がほとんどいない');
+      else if(v.hook>=0.85) w.push('出だしはよく残っている（'+clipPct(v.hook).txt+'）');
+      if(v.end>=0.9) w.push('最後まで見られている（'+clipPct(v.end).txt+'）');
+      else if(v.end>=0.7) w.push('終盤まで見られている（'+clipPct(v.end).txt+'）');
+      if(v.relPerf>=0.8) w.push('似た動画と比べて '+relRankTxt(v.relPerf));
+      // 「よく見られている勝ち動画」と書くと、中身の指標が低い動画にも付いてしまう。
+      // この並びは再生数順なので、良い点が見つからなければ正直にそう書く。
+      const fallback=noMetrics
+        ? 'この動画は、最後まで見られた割合のデータ（出だし・最後まで・似た動画との比較）が今回取得できませんでした。順位は<b>再生回数</b>だけで決まっています。'
+        : 'この期間の<b>再生回数が多かった</b>動画です。ただし最後まで見られた割合や、似た動画との比較は、目立って良いわけではありません。';
+      diagHtml='<div class="diagline"><span class="tag '+(w.length?'gd':'rc')+'">'+(w.length?'良い点':'再生数トップ')+'</span>'+(w.join(' ／ ')||fallback)+'</div>';
+      ptLabel='この型が効く理由'; ptHtml='<div class="reason">'+k.reason+'</div>';
+    } else {
+      let tag,tcls,fix;
+      const isShort=(v.durSec!=null && v.durSec>0 && v.durSec<=180);
+      const goodRet=isShort?55:38;
+      if(noMetrics){ tcls='rc'; tag='判定できません';
+        fix='最後まで見られた割合のデータ（出だし・最後まで・似た動画との比較）が今回取得できなかったため、<b>原因を切り分けられていません</b>。次回の自動更新で判定できるようになります。'; }
+      else if(v.avgViewPct!=null && v.avgViewPct>=goodRet){ tcls='th'; tag='サムネ画像／タイトルが弱い';
+        fix='中身はよく見られている（<b>最後まで見られた割合 '+clipPctNum(v.avgViewPct).txt+'</b>）のに再生が少ない＝<b>クリックされていない</b>。サムネ画像・タイトルの差し替えが最優先。'; }
+      else if((v.hook!=null && v.hook<0.85) || (v.hook==null && v.dropAt!=null && v.dropAt<=0.1)){ tcls='cn'; tag='出だしで離れている';
+        fix='<b>最初の2秒</b>を、結論を先に言う＋動く映像に差し替え。'+ (v.hook!=null? '（出だしで残っているのは '+clipPct(v.hook).txt+'）':''); }
+      else if(v.end!=null && v.end<0.5){ tcls='cn'; tag='組み立てで離れている';
+        fix='後半で離れています（最後まで見た人は '+clipPct(v.end).txt+'）。<b>テンポを上げ、中だるみを削り</b>、結論を早めに。'; }
+      else { tcls='rc'; tag='露出不足';
+        fix='大きな欠点は無いのに再生が伸びていない。<b>投稿する時間帯・タイトルの言葉</b>を見直し、当たる型で作り直す。'; }
+      diagHtml='<div class="diagline"><span class="tag '+tcls+'">'+tag+'</span></div>';
+      ptLabel='改善アクション'; ptHtml='<div class="reason">'+fix+'<br><span style="color:var(--muted)">※実際のクリック率（表示された中で押された割合）は、YouTube Studio →各動画→「インプレッションのクリック率」で確認できます</span></div>';
+    }
+    return '<div class="win'+(mode==='worst'?' bad':'')+'">'+
+      '<div class="wt">'+(i+1)+'. <a href="'+url+'" target="_blank" rel="noopener" style="color:var(--ink)">'+v.title+'</a>'+
+        (v.published?' <span style="color:var(--muted);font-size:11px;font-weight:400">'+v.published.replace(/-/g,'/')+' 公開</span>':'')+'</div>'+
+      metricRow(v)+
+      diagHtml+
+      '<span class="kata">'+(mode==='win'?'参考にできる型：':'目標にしたい型：')+k.name+'</span>'+
+      '<div class="wrow"><div class="wlab">流れ</div><div class="flow">'+k.flow+'</div></div>'+
+      '<div class="wrow"><div class="wlab">セリフ例</div><div class="serifu">'+k.serifu+
+        '<div style="color:var(--muted);font-size:11.5px;margin-top:4px">※この型の書き方の見本です。この動画で実際に話された言葉ではありません。</div></div></div>'+
+      '<div class="wrow"><div class="wlab">'+ptLabel+'</div>'+ptHtml+'</div>'+
+      '</div>';
+  }
+
+  const A=D.analysis||{};
+  const fill=(id,list,mode)=>{
+    const el=document.getElementById(id); if(!el) return;
+    el.innerHTML=(list&&list.length)? list.map((v,i)=>render(v,i,mode)).join('')
+      : (missed('analysis')?missBox('analysis'):'<p class="csub">この形式の対象データがありません</p>');
+  };
+  fill('winShort', A.shortBest, 'win');
+  fill('winLong',  A.longBest,  'win');
+  fill('worstShort', A.shortWorst, 'worst');
+  fill('worstLong',  A.longWorst,  'worst');
+  const note=document.getElementById('worstNote');
+  if(note) note.innerHTML='※「最後まで見られた割合・出だし・最後まで・似た動画と比べて」は、上の再生数トップの動画とまったく同じ実データの項目です。診断は自動で判定しています（サムネの問題＝中身はよく見られているのに再生が少ない／出だし・組み立ての問題＝見られても途中で離れる）。「目標にしたい型」で作り直すと直しやすいです。';
+})();
+
+// ---- action plan (data-driven) ----
+(function(){
+  // 数字はすべて M（ページで1つだけの事実）から取る。ここで計算し直さない。
+  const s=D.summary;
+  const searchPct=M.searchPct, subPct=M.subPct, mobPct=M.mobilePct;
+  const relTop=M.relTop;
+  const earlyDrop=M.retention.filter(r=>r.dropAt!=null&&r.dropAt<=0.1);
+  // 「失敗→回復」系がTOPで何本を占めるか（固定文にせず毎回数える）
+  const FAIL_RE=/失敗|地獄|ダウンタイム|経過|日目/;
+  const plain=t=>String(t||'').split('#')[0];   // ハッシュタグは本題ではないので判定から外す
+  const shortTitle=t=>{t=plain(t).trim(); return t.length>22?t.slice(0,22)+'…':t;};
+  const topN=D.topVideos.slice(0,6);
+  const failN=topN.filter(v=>FAIL_RE.test(plain(v.title))).length;
+  const top1=topN[0]||null;
+  const top1Fail=top1?FAIL_RE.test(plain(top1.title)):false;
+  // 投稿ペース（直近4週／その前4週の平均本数）
+  const cadAvg=(a,b)=>{const t=D.cadence.slice(a,b); return t.length?t.reduce((x,r)=>x+(r.short||0)+(r.long||0),0)/t.length:null;};
+  const cadRec=D.cadence.length>=4?cadAvg(-4,undefined):null;
+  const cadPrev=D.cadence.length>=8?cadAvg(-8,-4):null;
+  // 長尺の代表例（実データから。長さは durSec を秒→分秒に直して出す）
+  const mmss=sec=>{sec=Number(sec)||0; return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');};
+  const longRef=(D.analysis.longBest||[]).find(v=>v.durSec>0)||null;
+
+  const acts=[
+    {p:'hi',h:(failN>=2?'「失敗→回復」ストーリーのショートを主軸に増産'
+                      :'よく伸びた動画の型をそのまま増産'),
+     body:!top1 ? 'TOP動画のデータが取れていないため、今回は本数を数えられていません。'
+       : 'TOP動画は「'+shortTitle(top1.title)+'」が'+yen(top1.views)+'回（90日）で1位。'+
+         '上位'+topN.length+'本のうち「失敗・経過」系は'+failN+'本'+
+         (failN>=2?'＝この型が主力です。':'。今期は'+(top1Fail?'1位はこの型ですが':'この型が上位に少なく')+'、型が入れ替わっている可能性があります。'),
+     why:'<b>理由:</b> '+(relTop!=null?'よく伸びた動画の最後まで見られた割合は、似た動画と比べて平均で上位'+relTop+'%です。':'')+'すでに"勝ちパターン"ができています。症例や経過日数を変えて、<b>同じ作り方で本数を増やす</b>のが、いちばん効率的です。'},
+    {p:'hi',h:'ショートの出だし2秒（つかみ）をしっかり作る',
+     body:earlyDrop.length? '一部の動画（'+earlyDrop.length+'本）で、再生を始めて '+Math.round(earlyDrop[0].dropAt*100)+'% あたりに、いちばん多くの人が離れています。はじめに結論・施術前の状態を先に見せる。'
+        :'出だしで見られるかどうかが、最終的な再生回数を左右します。結論や施術前の状態を、最初の1カットで見せます。',
+     why:'<b>理由:</b> '+(mobPct!=null?'スマホで見る人が'+mobPct+'%。':'')+'縦向きで、ひと目で分かる出だしの字幕が効きます。出だしがよく見られる動画ほど、最後まで見られ再生回数も伸びます。'},
+    {p:'md',h:'検索で見つかりやすいタイトル・説明にする',
+     body:'「クマ取り」「目の下のクマ」「ダウンタイム（腫れが引くまでの期間）」を軸に、症例の条件（年代・手術の種類）をタイトルの前半へ。',
+     why:'<b>理由:</b> 見に来た人の'+searchPct+'%がYouTube検索から（'+yen(M.searchViews)+'回）。検索で来る人は来院意欲が高い層です。タイトル前半の言葉づかいで、クリックされやすさが変わります。'},
+    {p:'md',h:M.coreLabel+'に響く見せ方に寄せる',
+     body:'サムネの文言・症例モデル・悩みの取り上げ方を「'+M.coreLabel+'」目線に統一。',
+     why:'<b>理由:</b> 見ている人の'+M.coreFemale.toFixed(0)+'%が'+M.coreLabel+'。'+
+       (M.topSeg?'いちばん多いのは'+M.topSeg.label+'（'+M.topSeg.pct.toFixed(1)+'%）。':'')+
+       'この層の言葉に合わせると、クリック率（表示された中で押された割合）も、最後まで見られた割合も伸びます。'},
+    {p:'md',h:'投稿ペースを保って、登録者に届く回数を増やす',
+     body:(cadRec!=null
+       ? '直近4週の平均は<b>週'+cadRec.toFixed(1)+'本</b>'+
+         (cadPrev!=null?'（その前の4週は週'+cadPrev.toFixed(1)+'本）':'')+
+         '。'+(cadPrev!=null&&cadRec<cadPrev-0.5?'ペースが落ちているので、まず本数を戻す。':'このペースを落とさない。')
+       : '投稿ペースのデータが取れていないため、本数は今回出せていません。')+
+       '公開時間を、よく見られている時間帯に寄せて、通知が届くようにする。',
+     why:'<b>理由:</b> いちばん多い入口は登録者への表示'+subPct+'%（'+yen(M.subViews)+'回）。投稿が途切れると届く回数が落ちます。90日で登録が'+(s.subsNet>=0?'+':'')+yen(s.subsNet)+'人。'},
+    {p:'lo',h:'長めの解説動画で"比較・検討中"の人を取り込む',
+     body:'ショートで知ってもらい →「手術の種類の違い」「クリニックの選び方」などの長め動画で、比較・検討中の人を受け止める。',
+     why:'<b>理由:</b> '+(longRef
+        ? '長尺の「'+shortTitle(longRef.title)+'」（'+mmss(longRef.durSec)+'）が累計'+yen(longRef.totalViews||longRef.views)+'回。'
+        : '')+
+       '1回あたりの平均視聴時間'+(s.avgViewDurationSec!=null?s.avgViewDurationSec+'秒':'—')+'はショート中心のため短めです。長め動画は、<b>院名や先生の名前で直接検索してもらうこと</b>（指名検索）につながり、来院に結びつきやすい。'},
+    {p:'lo',h:'収益データの可視化（要・追加設定）',
+     body:'売上・単価をこのレポートに追加するには、追加の許可設定（再ログイン）が必要です。',
+     why:'<b>理由:</b> いまの設定では売上データを取っていません。追加すれば、単価の高いテーマが分かり、力の入れどころを最適化できます。'},
+  ];
+  document.getElementById('actions').innerHTML=acts.map(a=>
+    '<div class="act"><h3><span class="prio '+a.p+'">'+({hi:'優先度 高',md:'優先度 中',lo:'優先度 低'}[a.p])+'</span>'+a.h+'</h3>'+
+    '<p>'+a.body+'</p><p class="why">'+a.why+'</p></div>').join('');
+})();
+
+// ---- 今週の要点 ----
+// 以前はここだけ「直近7日 vs 前7日」で、上のバッジ（28日判定）と食い違っていた。
+// 最初の1画面に「横ばい」「少し増加」「▲13% 前週比・前の週より増加」が同時に出て、
+// しかも ▲ は日本語では下落の記号なので、増えているのか減っているのか読めなかった。
+// 勢いの判定は M（28日）だけを使い、7日の数字は「参考」として増減なしで出す。
+(function(){
+  const dl=D.daily||[];
+  const sum=(a,k)=>a.reduce((x,v)=>x+(v[k]||0),0);
+  const last28=dl.slice(-28);
+  const v7=sum(dl.slice(-7),'views');
+  const dhtml=(d)=>{ if(d===null||d===undefined||isNaN(d)) return '<span style="color:var(--muted)">前の28日と比べられません</span>';
+    const cls=d>=0?'up':'down'; const w=d>=0?'増':'減';
+    return '<span class="'+cls+'">'+M.signed(d)+' '+w+'<span style="color:var(--muted);font-weight:400"> 前の28日と比べて</span></span>';};
+  document.getElementById('execSub').innerHTML=
+    '直近28日間（'+(last28[0]?jdate(last28[0].date):'')+' 〜 '+(last28.length?jdate(last28[last28.length-1].date):'')+'）の実績と、その前の28日間との比較です。'+
+    '<b>1週間ごとの数字は上下が激しく、勢いの判断には使えない</b>ため、このレポートでは1か月（28日）でそろえています。';
+  const chips=[
+    {l:'視聴回数（28日）',v:yen(M.v28)+'回',d:M.d28},
+    {l:'視聴時間（28日）',v:yen(Math.round(M.m28/60))+'時間',d:M.d28m},
+    {l:'登録者 純増（28日）',v:(M.s28>=0?'+':'')+yen(M.s28)+'人',d:M.d28s},
+  ];
+  document.getElementById('execChips').innerHTML=chips.map(c=>
+    '<div class="chip"><div class="cl">'+c.l+'</div><div class="cv">'+c.v+'</div><div class="cd">'+dhtml(c.d)+'</div></div>').join('');
+  // 自動ハイライト
+  const TRJ={SUBSCRIBER:'登録者フィード',YT_SEARCH:'YouTube検索',SHORTS:'ショートフィード',YT_CHANNEL:'チャンネルページ',RELATED_VIDEO:'関連動画'};
+  const trTop=D.traffic&&D.traffic[0]?(TRJ[D.traffic[0].source]||D.traffic[0].source):'—';
+  const topV=D.topVideos&&D.topVideos[0]?D.topVideos[0]:null;
+  const weak=M.retention.filter(r=>r.dropAt!=null&&r.dropAt<=0.1);
+  const FAIL_RE=/失敗|地獄|ダウンタイム|経過|日目/;
+  const plain=t=>String(t||'').split('#')[0];   // ハッシュタグは本題ではないので判定から外す
+  const pts=[];
+  pts.push({t:'<b>今の勢い：</b>'+M.momentumLine+'。バッジの「'+M.momentum+'」はこの数字です。（参考：直近7日だけを見ると '+yen(v7)+'回ですが、週ごとの数字はブレるので判断には使いません）主な入口は<b>'+trTop+'</b>。'});
+  if(topV) pts.push({t:'今期の最人気は「'+topV.title.slice(0,26)+'…」（'+yen(topV.views)+'回）。'+
+    (FAIL_RE.test(plain(topV.title))?'<b>失敗→回復ストーリーを、同じ作り方で本数を増やす</b>のが最優先。':'<b>この型を、同じ作り方で本数を増やす</b>のが最優先。')});
+  if(M.relTop!=null) pts.push({t:'<b>最後まで見られた割合</b>は、似た動画と比べて<b>'+relRankTxt(M.avgRel)+'</b>＝このチャンネルの強み。本数を落とさず数多く出しましょう。'});
+  if(weak.length) pts.push({t:'出だしで早く離れられる動画が <b>'+weak.length+'本</b>。<b>最初の2秒</b>を、結論の字幕＋動く症例映像に直しましょう。'});
+  if(M.topSeg) pts.push({t:'いちばん多いのは<b>'+M.topSeg.label+'</b>（'+M.topSeg.pct.toFixed(1)+'%）。サムネの文言・症例モデルをこの層に合わせると、クリックされやすくなります。'});
+  document.getElementById('execPts').innerHTML=pts.map(p=>'<li><span class="ic">▸</span>'+p.t+'</li>').join('');
+})();
+
+// ---- engagement tiles ----
+// 以前は「シェア 174」のように数字だけで、期間も良し悪しも書いていなかった。
+// 48.6% が「半分も見てもらえた」のか「半分で逃げられた」のか読めないので、
+// 期間・1,000回再生あたり・比べる相手（似た動画）まで必ず添える。
+(function(){
+  const s=D.summary; if(!s) return;
+  const el=document.getElementById('engage');
+  const render=items=>el.innerHTML=items.map(function(i){
+    return '<div class="e"><div class="el">'+i.l+'</div><div class="ev">'+i.v+'</div>'+
+      '<div class="en">'+i.n+'</div><div class="ej">'+i.j+'</div></div>';
+  }).join('');
+  const views=s.views||0;
+  const per1k=v=>views? (Math.round(v/views*1000*10)/10)+'件' : '—';
+  const avg=clipPctNum(s.avgViewPct);
+  const allItems=[
+    {l:'最後まで見られた割合',v:avg.txt,
+     n:'直近90日の平均'+(avg.over?'／※'+LOOP_NOTE:''),
+     j:M.relTop!=null
+        ? '似た動画と比べると<b>'+relRankTxt(M.avgRel)+'</b>。'+(M.relTop<=25?'よく見られているほうです。':(M.relTop<=50?'平均より上です。':'平均より下で、伸びしろがあります。'))
+        : '比べる相手（似た動画）のデータが今回取れていません。'},
+    {l:'シェア',v:yen(s.shares||0)+'件',n:'直近90日の合計／1,000回再生あたり '+per1k(s.shares||0),
+     j:'人に見せたくなったかの合図。<b>おすすめに乗るのに効く3つ</b>のひとつです。'},
+    {l:'いいね',v:yen(s.likes||0)+'件',n:'直近90日の合計／1,000回再生あたり '+per1k(s.likes||0),
+     j:'参考の数字。おすすめへの影響は、シェア・コメントより小さいとされています。'},
+    {l:'コメント',v:yen(s.comments||0)+'件',n:'直近90日の合計／1,000回再生あたり '+per1k(s.comments||0),
+     j:'書き込みは手間がかかるぶん、反応としては重いもの。<b>おすすめに乗るのに効く3つ</b>のひとつです。'},
+  ];
+  const fmtItems=k=>{
+    const f=(D.fmtSummary||{})[k]; if(!f) return null;
+    const v=f.views||0; const per=x=>v?(Math.round((x||0)/v*1000*10)/10)+'件':'—';
+    const pc=clipPctNum(f.avgViewPct);
+    return [
+      {l:'最後まで見られた割合',v:pc.txt,n:'この形式の平均'+(pc.over?'／※'+LOOP_NOTE:''),
+       j:'<b>おすすめに乗るのに効く3つ</b>のひとつです。'},
+      {l:'シェア',v:yen(f.shares||0)+'件',n:'この形式の合計／1,000回再生あたり '+per(f.shares),
+       j:'人に見せたくなったかの合図。'},
+      {l:'いいね・コメント',v:'—',n:'形式別は取れません',
+       j:'いいね・コメントは<b>「全体」タブ</b>で見てください（YouTubeの数字が形式別に分かれないため）。'},
+    ];
+  };
+  fmtSwitch(el, function(k){
+    if(k==='all'){ render(allItems); return; }
+    const it=fmtItems(k); if(!it){ el.innerHTML=FMT_MISS; return; } render(it);
+  });
+})();
+
+// ---- business funnel ----
+// ※ このページは公開URLに置かれるため、社内KPIの実数と社内資料のURLは載せていない。
+// バーは必ず「灰色の枠（=100%）の中の塗り」として描く。
+// 以前は .fbar そのものに width:% と min-width:60px を指定していたため、
+// 375px幅では 100% と 12.8% のバーが同じ長さになり、「減っていく」という
+// この図の唯一の主張がスマホで消えていた。
+(function(){
+  const LINE2CLOSE = 0.129;   // 入口→ご成約の通過率（計算済みの合成値）
+  const per100 = 100*LINE2CLOSE;
+  const step=(label,val,pctOfTop,note,ghost)=>
+    '<div class="fstep">'+
+      '<div class="fhead"><span class="fl">'+label+'</span>'+
+        (val?'<span class="fv">'+val+'</span>':'')+
+        (pctOfTop!=null?'<span class="fp">入口の '+pctOfTop+'%</span>':'')+'</div>'+
+      '<div class="ftrack"><div class="fbar'+(ghost?' ghost':'')+'" style="width:'+(ghost?100:pctOfTop)+'%"></div></div>'+
+      '<div class="fr">'+note+'</div>'+
+    '</div>';
+  let html='<div class="hint"><span class="h">📖 見方</span>YouTube経由で<b>LINE登録が100人</b>いたとしても、そのあと<b>予約 → 来院 → ご成約</b>と進むたびに人数は減ります。最後まで残るのは<b>ひと握り</b>です。灰色の枠が「入口の100人」、青い塗りが「そこまで残った人数」を表しています。</div>';
+  html+='<div class="funnel">'+
+    step('① LINE登録','100人',100,'YouTube経由の入口（100人と仮定した場合）',false)+
+    step('② 予約 → 来院','',null,'この2段階で人数が減ります。各段階の通過率は社内KPI（目標として追いかける数字）なので、社外からも見えるこのページには載せていません',true)+
+    step('③ ご成約','約'+per100.toFixed(0)+'人',Number(per100.toFixed(1)),'入口100人のうち、ご成約まで進むのはこのくらい',false)+
+    '</div>';
+  html+='<div class="ovconcl" style="margin-top:2px"><b>まとめ：</b>LINE登録 <b>100人</b> → ご成約 <b>約'+per100.toFixed(0)+'人</b>。ご成約1件の大きさは、100万再生の広告収入（数千〜数万円）とは<b>桁が違います</b>。だから"再生数"より、この<b>100人（LINE登録）を作る動画と、次の行動への案内</b>が大事。</div>';
+  // 参考試算（件数まで。金額換算は社内のKPIシート側で行う）
+  html+='<div class="tblwrap"><table class="calc"><thead><tr><th>YouTube経由 LINE登録/月</th><th>→ ご成約(見込)</th></tr></thead><tbody>'+
+    [20,50,100].map(n=>'<tr><td>'+n+'件</td><td>約'+(n*LINE2CLOSE).toFixed(1)+'件</td></tr>').join('')+
+    '</tbody></table></div>';
+  html+='<div class="note" style="font-size:12px;color:var(--muted)">※ この表は<b>件数まで</b>です。金額への換算は<b>社内のKPI資料側</b>で行ってください（このページは社外からも見えるため、金額と各段階の率は載せていません）。上の通過率も計画の前提から置いた目安で、月ごとの実績は上下します。</div>';
+  html+='<details class="fold"><summary>この数字を"実際の数字"にするための改善提案を見る</summary><div class="fbody">'+
+    '<div class="note" style="margin-top:0"><b>今の分析の改善点：</b>YouTubeの成果は最終的に<b>LINE登録→来院→ご成約</b>で測るべきで、その仕組みはあります。<b>概要欄のLINEリンクは2026年2月から動画ごとに計測用を発行</b>しており、LINE運用ダッシュボードで「どのリンクから登録したか→予約→来院→ご成約」まで追えます。'+
+    '今の課題は3つ。<b>①ショートは概要欄のリンクが押せない</b>（YouTubeの仕様）。再生の大半を占めるショートから来た人の入口は、チャンネルのプロフィールリンク1本だけ'+
+    '<b>②横動画の計測リンクは、1本あたりの再生が少ないうえ、最近は概要欄の下のほうにある</b>（スマホでは「もっと見る」を開いてスクロールしないと見えない。1行目に置き、固定コメントにも置く）'+
+    '<b>③最近の動画はLINE側で動画ごとの集計ができていない</b>（集計の列が途中の月で止まっている。運用側に追加を依頼し、この週次レポートにも取り込む）。'+
+    '<br><b>LINEの実績からの裏付け：</b>YouTube経由のLINE登録は毎月コンスタントにあり、来院・ご成約までつながっています。ただし動画ごとには割れていないため、<b>「どの動画が効いたか」はまだ言えません</b>。</div></div></details>';
+  document.getElementById('funnel').innerHTML=html;
+})();
+
+// ---- subscriber drivers ----
+(function(){
+  const base=(D.topBySubs||[]).filter(v=>v.subsGained>0);
+  const el=document.getElementById('subsdrivers');
+  if(!base.length){el.innerHTML='<p class="csub">データがありません</p>';return;}
+  function draw(list){
+    if(!list.length){ el.innerHTML=FMT_MISS; return; }
+    const max=Math.max(...list.map(v=>v.subsGained));
+    el.innerHTML=list.map(function(v,i){
+      const w=(v.subsGained/max*100).toFixed(1);
+      const url='https://youtu.be/'+v.id;
+      const tag=v.fmt?'<span class="tag '+(v.fmt==='short'?'s':'l')+'">'+(v.fmt==='short'?'ショート':'横動画')+'</span> ':'';
+      return '<div class="vid-row"><div class="vid-rank">'+(i+1)+'</div>'+
+        '<div class="vid-body"><div class="vt">'+tag+'<a href="'+url+'" target="_blank" rel="noopener">'+v.title+'</a></div>'+
+        '<div class="vid-meta"><div class="bar-track"><div class="bar-fill" style="width:'+w+'%;background:var(--aqua)"></div></div>'+
+        '<div class="bar-val">+'+yen(v.subsGained)+'人 ・ '+yen(v.totalViews||v.views)+'回(累計)'+(v.published?' ・ '+jdate(v.published)+'公開':'')+'</div></div></div></div>';
+    }).join('');
+  }
+  fmtSwitch(el, function(k){ draw(k==='all'?base:base.filter(function(v){return v.fmt===k;})); });
+})();
+
+// ---- strategy static content ----
+// 専門用語をそのまま出さない。上半分で「CTR→クリック率」と噛み砕いておきながら、
+// 下半分で「4要件」「機序」「DT逆算」「BA比較」「横展開」「尺配分」「コンプラ」などが
+// 説明なしに出ていたため、素人はここで読めなくなっていた。
+(function(){
+  // 地の文に埋める数字は M（ページで1つだけの事実）から取る。
+  const relTxt=M.relTop!=null?'上位'+M.relTop+'%':'上位（データなし）';
+  const searchPct=M.searchPct;
+  // 医療広告ガイドラインの「4項目」。ページのどこにも中身が書かれていないのに
+  // 「4要件」「4点」と3〜4回出てきていたので、ここで一度だけ定義して以降は同じ言い方にする。
+  const FOUR='<b>広告ルールの4項目</b>（治療名・費用・リスクと副作用・術後のケア）';
+  const trend=[
+    '<b>YouTubeに好かれる3つの数字＝流行りの音・最後まで見られた割合・保存された割合</b>（爾今SNS調査）。毎回この3つを意識して作る。',
+    '<b>最初の2秒で結論を先に言う＋2カット以上の動き</b>で、序盤に離れるのを防ぐ（多いと半分近くが離れます）。つかめないとすぐ飛ばされる。',
+    '<b>流行りの音を使うと、最初の広がりが1.5〜3倍</b>。ただし流行は約2週間で古くなるので、旬を逃さない。',
+    '<b>日本語＋英語の字幕で保存が+12%</b>。字幕は必ず入れる。',
+    '<b>コメントを誘う</b>：結論を一部伏せて「残りはコメント欄」、「AとBどっち？」と問いかけて、コメントを増やす。',
+    '美容は<b>ショートが主戦場</b>。医師の人柄が来院に直結。検索対策は<b>AIの検索（ChatGPTなど）への対策</b>へ移り変わりつつある。',
+    '<b>医療広告ガイドライン（医療の広告で守るルール）</b>：体験談は原則NG、施術前後の写真を出すときは'+FOUR+'を必ず併記。<b>医師による教育・解説</b>として作る。',
+  ];
+  const edit=[
+    '<b>「覚えられない人は保存してね」と言って</b>、保存（YouTubeに好かれる数字の1つ）を意図的に増やす。',
+    '<b>字幕は1フレーズ1行・大きめ・目立つ色</b>。スマホで見やすく。日本語＋英語の字幕で保存+12%。',
+    '<b>2カット以上の動き＋3秒に1カット</b>のテンポで切りかえる（間を詰めて話がすぐ進む編集）。間は0.1秒単位で削り、止まっている画は0.4〜0.6秒まで。',
+    '<b>0秒から結論の字幕</b>を入れる（例：「クマ取り、9割が知らない落とし穴」）。',
+    '<b>くり返し再生の工夫</b>：最後のカットが最初に自然につながる終わり方にして、くり返し見てもらい、最後まで見られた割合を稼ぐ。',
+    '<b>黒背景・無音スタートは避ける</b>（施術前後の写真は同じ照明で見せる／美容医療の口コミアプリ「トリビュー」でよくある見せ方に合わせる）。',
+  ];
+  const diff=[
+    '<b>日本初のクマ取り"専門"＋クマ治療執刀数7000件＋院長本人出演</b> → その他大勢の美容外科と違い「専門性・権威」で勝てる。',
+    '<b>"失敗・地獄の日々"を正直に見せる稀有なスタンス</b> → 業界は成功例しか出さない中「正直＝信頼」で差別化（よく見られている＝'+relTxt+'の理由）。',
+    '<b>「専門医が失敗を解剖する」立ち位置</b>を確立。体験談ではなく<b>医学的な教育動画</b>として作る＝ルールにも合い、独自性も出る。',
+    '<b>ルールを守ること自体を差別化に</b>：'+FOUR+'をきちんと出す誠実さで信頼を作る。体験談風の組み立て（はじめに成功談→最後に来院の案内）は避け、削除・炎上のリスクも回避。',
+    '<b>勝ちパターンが3つの経路で一致</b>：「失敗→回復・注意喚起・セルフ診断」系は、YouTubeでよく見られている（'+relTxt+'）だけでなく<b>LINE配信でも高反応</b>・爾今のSNS分析でも本丸。別々の3つのデータが同じ結論＝この路線は"間違いない"。',
+  ];
+  // 秒数はあくまで目安。読み手が時計を見ながら作るものではないので「流れ」として書く。
+  const struct=
+    '<div class="tmpl"><div class="step"><b>ショート（60〜90秒）</b></div>'+
+    '<div class="step"><b>はじめの2秒 つかみ</b>：衝撃の結論、または問いかけ（0秒から字幕を出す）</div>'+
+    '<div class="step"><b>そのあと 何の話か</b>：何の話か／なぜ起きるかを、専門医の目線で</div>'+
+    '<div class="step"><b>中盤 本題</b>：なぜそうなるかの仕組み＋対比やセルフ診断（保存してもらう山場。'+FOUR+'は画面に出し続ける）</div>'+
+    '<div class="step"><b>終盤 深掘り・避け方</b>：不安の先回り解説／相談で聞くべき点</div>'+
+    '<div class="step"><b>最後 まとめ</b>：保存を促し、はじめに自然に戻す（くり返し再生されるように）</div></div>'+
+    '<div class="tmpl"><div class="step"><b>長尺（10〜20分）</b></div>'+
+    '<div class="step"><b>はじめ</b>：いちばん強いつかみ（結論を先出し・'+FOUR+'を明記）</div>'+
+    '<div class="step"><b>序盤</b>：「今日わかること」を箇条書きで提示（途中で離れるのを防ぐ）</div>'+
+    '<div class="step"><b>中盤</b>：症例の解説＋失敗のパターン＋避け方（チャプター＝章分けは必須）</div>'+
+    '<div class="step"><b>終盤</b>：質問に答え、次の動画へ案内（院名・先生の名前での検索、そして来院へ）</div></div>';
+  // なぜ 教育2：認知1 なのか（このチャンネルの根拠・説得用）
+  (function(){
+    const topV=D.topVideos&&D.topVideos[0]?D.topVideos[0]:null;
+    const topPub=topV&&topV.published?topV.published.replace(/-/g,'/'):'';
+    const roles=[
+      {t:'認知（新しく知ってもらう）',d:'はじめての人に見つけてもらう入口。流行ネタで広がるが、来院意欲は低く、約2週間で古くなる'},
+      {t:'教育（疑問を解決する）',d:'検索で見つかり、悩みを解決。来院意欲の高い人を集め、ずっと効き続ける“貯金”になる'},
+      {t:'ファン化（関係を深める）',d:'今の視聴者との関係づくり。登録者への表示を増やし、来院につなげる土台に'},
+    ];
+    const reasons=[
+      '<b>目的は再生回数ではなく来院・ご成約。</b>ご成約1件がクリニックにもたらすものは、100万再生の広告収入（数千〜数万円）とは<b>桁が違います</b>。だから「何回見られたか」より「<b>誰が見たか</b>」が全て。',
+      '<b>検索から来た人が'+M.searchPct+'%（'+yen(M.searchViews)+'回／90日）。</b>「クマ取り」等で検索する人は“今まさに悩んで調べている＝来院意欲が高い人”。これを生むのは拡散ネタではなく<b>教育動画</b>。',
+      '<b>教育は“長く見られ続ける”。</b>最も見られている動画は'+(topPub?'<b>'+topPub+'公開</b>なのに今も1位':'1年以上前でも上位')+'＝作り続けなくても集客し続ける。逆に拡散ネタ（流行便乗）は約2週間で消える。',
+      '<b>見ている人の'+M.coreFemale.toFixed(0)+'%が'+M.coreLabel+'＝クリニックの実際の患者さん。</b>拡散狙いに偏ると“見て終わり”の対象外の人が増え、数字は伸びても来院は増えない。',
+      '<b>順番が大事。</b>認知（1本）で新しい人に見つけてもらい→教育（2本）で信頼と来院意欲を育てる。この「入口1：本命2」の割合が、限られた撮影本数で来院を最大化する。',
+    ];
+    document.getElementById('whyRatio').innerHTML=
+      '<h4>なぜ「教育2：認知1」なのか — このチャンネルの根拠</h4>'+
+      '<p class="lead">“とにかく再生数”では売上は増えません。<b>再生回数は手段、目的は来院・ご成約</b>。だから割合には明確な理由があります。</p>'+
+      '<div class="roles">'+roles.map(r=>'<div class="role"><div class="rt">'+r.t+'</div>'+r.d+'</div>').join('')+'</div>'+
+      '<ul class="reasons">'+reasons.map((r,i)=>'<li><span class="rn">'+(i+1)+'</span>'+r+'</li>').join('')+'</ul>'+
+      '<div class="concl"><b>結論：</b>再生数だけを追うのは“認知しか見ていない”発想。売上を最大化するなら、検索に強く長く見られ続ける<b>教育を主役（2）</b>に、拡散の<b>認知を入口（1）</b>に置くのが、このチャンネルの目的（来院・ご成約）に最も合う。</div>';
+  })();
+
+  const li=a=>a.map(x=>'<li>'+x+'</li>').join('');
+  // 自動リサーチのトレンド（各項目に出典つき）があれば優先、無ければ固定値
+  const R=D.trendsResearch;
+  if(R&&Array.isArray(R.bullets)&&R.bullets.length){
+    document.getElementById('secTrend').innerHTML=R.bullets.map(b=>{
+      const t=(typeof b==='string')?b:(b.t||'');
+      const s=(b&&b.src)?b.src:'';
+      return '<li>'+t+(s?' <span class="tsrc">出典: '+s+'</span>':'')+'</li>';
+    }).join('');
+  } else {
+    document.getElementById('secTrend').innerHTML=li(trend);
+  }
+  if(R&&R.updated){document.getElementById('trendUpdated').innerHTML='自動リサーチ更新: <b>'+R.updated+'</b>（毎週月曜、X・TikTok・リール・YouTubeショート・美容メディア等をWeb横断調査。各項目に出典つき）';}
+  else{document.getElementById('trendUpdated').textContent='';}
+  document.getElementById('secEdit').innerHTML=li(edit);
+  document.getElementById('secDiff').innerHTML=li(diff);
+  document.getElementById('secStruct').innerHTML=struct;
+
+  // 企画: [区分 gen=原案そのまま/adp=参考, 種別 awr=認知/edu=教育/fan=ファン化, テーマ, 狙い・ターゲット, 時期, YouTube参考ID(原案のみ)]
+  const shorts=[
+    ['gen','edu','そのクマ、脱脂したら5年後に凹みます','素人とプロの考え方を体の作りから対比／カウンセリングを何院か回っている人','通年','cvRLXLcMKjU'],
+    ['gen','awr','クマ取りでゾンビ顔になる人が増えています','過剰脱脂の告発型・拡散狙い／失敗を恐れる慎重層','通年','rW6HitvJspU'],
+    ['gen','awr','Netflix『ダウンタイム』を美容外科医がガチ解説','9/17配信便乗で非フォロワー最大リーチ／新規','9/17前後','4Mopkx0DAZg'],
+    ['gen','awr','痩せたのに老けた…痩せる薬で顔がこけると、目の下がくぼむ','痩せる薬（GLP-1／マンジャロ）で顔がこける件の注意喚起／ダイエット×美容に関心のある人','8月','TW9q7ZK7894'],
+    ['gen','edu','その目、クマ？それとも眼瞼下垂？【セルフ診断】','若年検索急増ワード・保存の鉄板／眠そうな目に悩む層','通年','znopvru2aCY'],
+    ['gen','edu','あなたのクマ、脱脂向き？裏ハムラ向き？セルフ診断','最後まで見られた割合と保存を、意図して上げる作り／自分のタイプを知りたい人','通年','HYPA_JhIo4w'],
+    ['gen','edu','血色パンダチーク、クマがある人は逆に老け見えする理由','@cosme下半期トレンド筆頭に便乗／トレンド関心層','2026下期','-RFp0YuEWqI'],
+    ['gen','awr','お盆に仕込むクマ取りカレンダー【最大9連休】','ダウンタイム（腫れが引くまでの期間）から逆算して予約を促す／連休に手術したい会社員','7月中〜8月上','gOx19RCAYTA'],
+    ['adp','edu','はじめの2秒を作り直す：人気動画の"失敗→回復"を60〜90秒に再編集','出だしで離れられている2本を、最後まで見られた割合のデータをもとに改善／いま見てくれている人','即','' ],
+    ['adp','fan','登録をいちばん増やした動画の続編（同じ作り方で本数を増やす）','登録が増えた理由の再現／登録者・見込み客','通年','' ],
+    ['ext','edu','ハイフで頬は締まる。でも目の下の膨らみは消えません','たるみ機器（Xで当たりが大きい話題）の役割と限界から、脂肪の位置を整える治療へ／機器に通っている40〜50代','通年',''],
+    ['ext','awr','“年齢不詳”と言われる人の目元、3つの共通点','年齢不詳の有名人の話題を一般論で受け、目元に着地／若く見られたい40〜50代','通年',''],
+    ['ext','edu','寝ても消えないクマは“寝不足”じゃありません','疲れ顔（Xで表示回数の中央値がいちばん高い話題）から、血流と構造の見分け方へ／疲れてる？と言われる人','通年',''],
+    ['ext','awr','年末の集合写真で“老けた？”と思った人へ','季節の出来事から、照明で出る目の下の影の話へ／年末の写真で老け見えに気づいた人','11月下旬〜12月',''],
+    ['ext','edu','“今日決めたら半額”と言われたら、一度帰ってください','公的な数字で即決させる勧誘の仕組みを話し、良いカウンセリングの見分け方へ／検討中の人','通年',''],
+    ['ext','edu','バッカルファットを取ったら老けた？目の下の影との関係','隣接施術の話題から、頬と目の下の影の関係へ／小顔の施術を考えている人','通年',''],
+  ];
+  const longs=[
+    ['gen','edu','症例7000件でわかった「失敗する人」共通点3つ','症例数No.1を「失敗しにくい」という利点に変換／医師を指名して選ぶ人','通年','JmasA0PQm0c'],
+    ['adp','edu','【保存版】クマ取りの手術、ぜんぶ解説（脱脂／裏ハムラ／表ハムラ／注入）','広告ルールの4項目（治療名・費用・リスクと副作用・術後のケア）をそろえて検討中の人を取り込む／本格的に検討している人','通年','' ],
+    ['adp','edu','クマ取り"失敗"の医学的な原因と避け方','独自性を最大化・教育型／一度失敗した人・怖いと感じている人','通年','' ],
+    ['gen','awr','整形をやりすぎると10年後こうなる【芸能人の例で解説】','芸能×失敗で検索から入ってもらう／幅広く美容に関心のある人','通年','DHobQBus7cU'],
+    ['adp','fan','院長の1日／7000件の裏側（院内ツアー）','人柄・専門性を見せて来院の動機に／クリニックを選んでいる人','通年','' ],
+    ['gen','edu','男のクマ取りが当たり前になる日【市場1.8倍】','銀座×男性は競合が少なく狙い目／30〜60代の男性','通年','ONCj1SDONhI'],
+    ['adp','fan','質問50連発に専門医が回答（体験談の転載はしない）','いちばん多い入口である登録者への表示を最大化／いま見てくれているファン','通年','' ],
+    ['gen','edu','肌育注射5種を忖度なしで比較・目元に打っていい／ダメ','流行を一望しつつ専門家として仕分け／肌の流行に関心のある人','2026下期','kfTLnMyUscY'],
+    ['adp','edu','「切らないクマ取り」リジュラン／PDRN／ベビーコラーゲン徹底比較','爾今の成分ネタをまとめて対比／注入を検討している人','2026下期','' ],
+    ['gen','awr','渡韓美容もう損？免税終了で韓国と日本どっちが安いか本気で計算','時事から銀座という立地の強みへ案内／韓国での施術を検討している人','通年','sO8wrqT0WbM'],
+    ['ext','edu','ほうれい線は“線”じゃない。ヒアルロン酸・糸・ハイフ・ミッドフェイスリフトを本気で比較','原因と治療の役割分担を整理し、頬と目の下を一緒に考える話へ／ほうれい線・頬のたるみに悩む人','通年',''],
+    ['ext','edu','40代から“老けない人”と“急に老ける人”。差は目の下にあります','老け見えが出る順番から、早めに手を打つ場所＝目の下へ／急に老けたと感じ始めた人','通年',''],
+    ['ext','edu','症例写真の“盛り方”を医師がぜんぶ話します（照明・角度・メイク・加工）','ガイドラインと当院の撮り方で写真の見方を教え、信頼につなげる／症例写真で院を選ぶ人','通年',''],
+    ['ext','edu','韓国の“目の下脂肪再配置”は裏ハムラと同じ？渡韓前に聞くべき5つの質問','名前が同じでも中身が違うことを手順で説明（渡韓の費用の回の続き）／渡韓を考えている人','通年',''],
+  ];
+  const tp={gen:'原案',adp:'参考',ext:'拡張'}, tk={awr:'認知',edu:'教育',fan:'ファン化'};
+  const researchRef={
+    s09:'https://liartpromotion.co.jp/column/short-video-hook-examples/',
+    s10:'https://www.youtube.com/@kumatorinavi_sbc',
+    l02:'https://www.youtube.com/watch?v=dF01rczdqbU',
+    l03:'https://www.youtube.com/watch?v=B_KZykUhV8o',
+    l05:'https://www.youtube.com/watch?v=c_DmVjrwfzM',
+    l07:'https://www.youtube.com/channel/UCo3qCN17xUuS-bTHxFhiEuA',
+    l09:'https://www.youtube.com/watch?v=9FrS8gXguXI'};
+  const refLink=(ytid,did)=>{
+    if(ytid) return ' <a href="https://youtu.be/'+ytid+'" target="_blank" rel="noopener" style="color:var(--muted);font-size:12px;white-space:nowrap">参考動画</a>';
+    if(researchRef[did]) return ' <a href="'+researchRef[did]+'" target="_blank" rel="noopener" style="color:var(--muted);font-size:12px;white-space:nowrap">参考(調査)</a>';
+    return '';};
+  const renderIdeas=(rows,sel,prefix)=>{document.querySelector(sel+' tbody').innerHTML=rows.map((r,i)=>{
+    const did=prefix+String(i+1).padStart(2,'0');
+    return '<tr><td><span class="tag '+r[0]+'">'+tp[r[0]]+'</span></td>'+
+    '<td><span class="tag '+r[1]+'">'+tk[r[1]]+'</span></td>'+
+    '<td class="k"><a href="https://kumacli00.github.io/kuma-report/daihon/'+did+'.html" style="color:var(--ink)">'+r[2]+'</a> <a href="https://kumacli00.github.io/kuma-report/daihon/'+did+'.html" style="color:var(--s1);font-size:12px;white-space:nowrap">台本</a>'+refLink(r[5],did)+'</td><td>'+r[3]+'</td><td class="k">'+r[4]+'</td></tr>';}).join('');};
+  renderIdeas(shorts,'#ideaShort','s'); renderIdeas(longs,'#ideaLong','l');
+
+  // 今週の旬企画：中身は公開しない。「社内にある」という案内だけ出す。
+  (function(){
+    if(D.hasWeeklyIdeas) document.getElementById('weeklyIdeasWrap').style.display='';
+  })();
+  const all=[...shorts,...longs], cnt=k=>all.filter(r=>r[1]===k).length;
+  const nGen=all.filter(r=>r[0]==='gen').length;
+  const cntEl=document.getElementById('ideaCnt'); if(cntEl) cntEl.textContent='ショート'+shorts.length+'本・長尺'+longs.length+'本';
+  document.getElementById('ideaIntro').innerHTML='計'+all.length+'本（ショート'+shorts.length+'・長尺'+longs.length+'）。配分は<b>認知'+cnt('awr')+'：教育'+cnt('edu')+'：ファン化'+cnt('fan')+'</b>。Googleが示している動画の3本柱の考え方（新しく知ってもらう／疑問に答える／関係を深める）でも<b>「疑問に答える＝教育」を多めにするのが定石</b>とされており、このチャンネルの<b>検索から来た人'+M.searchPct+'%</b>がそれを裏付けます。20本中<b>'+nGen+'本が爾今の原案そのまま</b>（「参考」リンク付き）、残りが当分析での設計です。';
+  document.getElementById('secNote').innerHTML='<b>出典：</b><span class="tag gen">原案</span>＝爾今のSNS投稿提案（5つの経路・2,062投稿の勝ちパターン×2026トレンド調査、参考URL付き）。<span class="tag adp">参考</span>＝それを土台に、当分析の「最後まで見られた割合」のデータで設計。長尺は爾今の提案が短い動画中心のため、参考が多めです。<b>広告ルールの肝：</b>「医師が、仕組み・リスク・避け方を教える教育動画」に寄せ、体験談や、施術前後の写真を使った広告と見なされない作りにします。';
+
+})();
+
+// ---- 「目次へ戻る」ボタン（35画面ぶんのページに戻り道が無かった）----
+(function(){
+  const btn=document.getElementById('toTop'); if(!btn) return;
+  const sync=()=>btn.classList.toggle('is-on', window.scrollY>700);
+  sync(); window.addEventListener('scroll', sync, {passive:true});
+})();
+
+// ---- 表と横長グラフを「スクロールできると分かる」形に包む（5媒体で共通）----
+// sns/report_mobile.js の中身をそのまま埋め込んでいる（自己完結HTMLのため）。
+/* 表と横長グラフを、描画後に「スクロールできると分かる」形へ包み直す。
+   report_mobile.css と対で使う。各媒体の gen_report.py がインライン展開する。
+
+   各ページの表を生成しているコードは5媒体でバラバラなので、
+   生成側を触らずに済むよう、出来上がった DOM に対して後から適用する。 */
+(function () {
+  "use strict";
+
+  function wrap(el, cls) {
+    var p = el.parentNode;
+    if (p && p.classList && p.classList.contains(cls)) return p;  // 二重に包まない
+    var box = document.createElement("div");
+    box.className = cls;
+    p.insertBefore(box, el);
+    box.appendChild(el);
+    return box;
+  }
+
+  function hintFor(box) {
+    var h = box.nextElementSibling;
+    if (h && h.classList && h.classList.contains("tbl-hint")) return h;
+    h = document.createElement("p");
+    h.className = "tbl-hint";
+    h.textContent = "横にスクロールすると続きが見られます";
+    box.parentNode.insertBefore(h, box.nextSibling);
+    return h;
+  }
+
+  function sync(box, hint) {
+    // はみ出しているか。端数の丸めで1〜2pxずれることがあるので少し余裕を見る
+    // （余裕が無いと、実際には収まっている表にも案内が出てしまう）
+    var over = box.scrollWidth - box.clientWidth > 4;
+    box.classList.toggle("is-scrollable", over);
+    if (hint) hint.classList.toggle("is-on", over);
+    // 右端まで送ったらフェードを消す
+    var end = box.scrollLeft + box.clientWidth >= box.scrollWidth - 1;
+    box.classList.toggle("is-end", end);
+  }
+
+  function setup() {
+    var targets = [];
+
+    Array.prototype.forEach.call(document.querySelectorAll("table"), function (t) {
+      // すでに独自のスクロール枠を持っているものはクラスだけ足す（tiktok の .scroll）
+      var box = wrap(t, "tbl-scroll");
+      targets.push([box, hintFor(box)]);
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll("svg"), function (s) {
+      var w = parseFloat(s.getAttribute("width") || "0");
+      var vb = (s.getAttribute("viewBox") || "").split(/[\s,]+/);
+      var vw = vb.length === 4 ? parseFloat(vb[2]) : 0;
+      // 横長で、縮めると軸ラベルが潰れるものだけ対象にする
+      if (Math.max(w, vw) < 480) return;
+      var box = wrap(s, "svg-scroll");
+      targets.push([box, hintFor(box)]);
+    });
+
+    targets.forEach(function (pair) {
+      var box = pair[0], hint = pair[1];
+      sync(box, hint);
+      box.addEventListener("scroll", function () { sync(box, hint); }, { passive: true });
+    });
+
+    function resyncAll() {
+      targets.forEach(function (p) { sync(p[0], p[1]); });
+    }
+
+    var t = null;
+    window.addEventListener("resize", function () {
+      clearTimeout(t);
+      t = setTimeout(resyncAll, 120);
+    });
+
+    // DOMContentLoaded の時点ではWebフォントがまだ届いておらず、
+    // あとからフォントが差し替わると表の幅が変わる。測り直さないと
+    // 「はみ出しているのに案内が出ない」状態のままになる。
+    window.addEventListener("load", resyncAll);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(resyncAll).catch(function () {});
+    }
+    setTimeout(resyncAll, 800);   // 上記が発火しない環境への保険
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setup);
+  } else {
+    setup();
+  }
+})();
+
+</script>
+</body>
+</html>
